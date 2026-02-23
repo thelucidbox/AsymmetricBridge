@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { S, STATUS_CFG, Badge } from "../styles";
+import { DOMINOS } from "../data/dominos";
 import { SOURCES } from "../data/sources";
 import { COMPARISON } from "../data/comparison";
 
@@ -48,6 +49,46 @@ const POSITIONING = [
       "Bloch's rebuttal: displaced workers + cheap AI = business formation explosion. Your consulting practice is this thesis in action.",
   },
 ];
+
+const SIGNAL_CONNECTIONS = [
+  {
+    dominoId: 1,
+    signal: "SaaS NRR < 110%",
+    action: "Confirms short SaaS leg",
+  },
+  {
+    dominoId: 2,
+    signal: "JOLTS < 1.5M professional openings",
+    action: "Increase hard asset / vol hedge",
+  },
+  {
+    dominoId: 3,
+    signal: "Stablecoin vol > $2T/month",
+    action: "Friction collapse accelerating — watch V/MA",
+  },
+  {
+    dominoId: 4,
+    signal: "M2 velocity < 1.0",
+    action: "Ghost GDP confirmed — defensive positioning",
+  },
+  {
+    dominoId: 5,
+    signal: "BX/APO/KKR > 25% drawdown",
+    action: "Contagion priced in — evaluate PE shorts",
+  },
+  {
+    dominoId: 6,
+    signal: "Fed says 'structural displacement'",
+    action: "Paradigm shift — full defensive posture",
+  },
+].map((item) => {
+  const domino = DOMINOS.find((entry) => entry.id === item.dominoId);
+  return {
+    ...item,
+    domino: `D${item.dominoId}`,
+    color: domino?.color || "#E8E4DF",
+  };
+});
 
 export default function ThesisPortfolio() {
   const [expandedSource, setExpandedSource] = useState(-1);
@@ -163,44 +204,7 @@ export default function ThesisPortfolio() {
         Signal → Position Connection
       </div>
       <div style={S.card("rgba(255,255,255,0.06)")}>
-        {[
-          {
-            signal: "SaaS NRR < 110%",
-            action: "Confirms short SaaS leg",
-            domino: "D1",
-            color: "#E63946",
-          },
-          {
-            signal: "JOLTS < 1.5M professional openings",
-            action: "Increase hard asset / vol hedge",
-            domino: "D2",
-            color: "#F4A261",
-          },
-          {
-            signal: "Stablecoin vol > $2T/month",
-            action: "Friction collapse accelerating — watch V/MA",
-            domino: "D3",
-            color: "#2A9D8F",
-          },
-          {
-            signal: "M2 velocity < 1.0",
-            action: "Ghost GDP confirmed — defensive positioning",
-            domino: "D4",
-            color: "#264653",
-          },
-          {
-            signal: "BX/APO/KKR > 25% drawdown",
-            action: "Contagion priced in — evaluate PE shorts",
-            domino: "D5",
-            color: "#9B2226",
-          },
-          {
-            signal: "Fed says 'structural displacement'",
-            action: "Paradigm shift — full defensive posture",
-            domino: "D6",
-            color: "#6D6875",
-          },
-        ].map((row, i) => (
+        {SIGNAL_CONNECTIONS.map((row, i) => (
           <div
             key={i}
             style={{
