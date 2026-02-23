@@ -1,6 +1,9 @@
+import { withRetry } from "./retry.js";
+
 const FRED_BASE = "https://api.stlouisfed.org/fred/series/observations";
 
 export const FRED_API_KEY = import.meta.env.VITE_FRED_API_KEY;
+const FRED_SOURCE = "fred";
 
 // FRED series -> signal mapping
 export const FRED_SIGNALS = {
@@ -29,9 +32,66 @@ export const FRED_SIGNALS = {
   },
 };
 
-export async function fetchFredSeries(seriesId) {
+function createAdapterError(code, message, retryable) {
+  return {
+    code,
+    message,
+    retryable,
+    source: FRED_SOURCE,
+  };
+}
+
+function normalizeAdapterError(error) {
+  if (
+    error &&
+    typeof error === "object" &&
+    "code" in error &&
+    "message" in error
+  ) {
+    return {
+      code: error.code || "NETWORK_ERROR",
+      message: error.message || "Unknown FRED error",
+      retryable: Boolean(error.retryable),
+      source: error.source || FRED_SOURCE,
+    };
+  }
+
+  if (error instanceof TypeError) {
+    return createAdapterError(
+      "NETWORK_ERROR",
+      "FRED request failed due to a network error",
+      true,
+    );
+  }
+
+  if (error instanceof Error) {
+    return createAdapterError("NETWORK_ERROR", error.message, true);
+  }
+
+  return createAdapterError("NETWORK_ERROR", "Unknown FRED error", true);
+}
+
+function toErrorResult(error, attempts) {
+  return {
+    data: null,
+    error: normalizeAdapterError(error),
+    attempts,
+  };
+}
+
+function isErrorResult(value) {
+  return (
+    Boolean(value) &&
+    typeof value === "object" &&
+    "data" in value &&
+    "error" in value &&
+    "attempts" in value
+  );
+}
+
+async function requestFredSeries(seriesId) {
   if (!FRED_API_KEY) {
-    throw new Error("Missing VITE_FRED_API_KEY");
+    throw createAdapterError("AUTH_ERROR", "Missing VITE_FRED_API_KEY", false);
   }
 
   const params = new URLSearchParams({
@@ -43,40 +103,107 @@ export async function fetchFredSeries(seriesId) {
   });
 
   const response = await fetch(`${FRED_BASE}?${params.toString()}`);
-  if (!response.ok) {
-    throw new Error(`FRED API error: ${response.status}`);
+
+  if (response.status === 429) {
+    throw createAdapterError(
+      "RATE_LIMITED",
+      "FRED rate limit reached (120 requests/minute)",
+      true,
+    );
   }
 
-  const json = await response.json();
-  return json.observations ?? [];
+  if (response.status === 401 || response.status === 403) {
+    throw createAdapterError(
+      "AUTH_ERROR",
+      `FRED authentication failed (HTTP ${response.status})`,
+      false,
+    );
+  }
+
+  if (!response.ok) {
+    throw createAdapterError(
+      "NETWORK_ERROR",
+      `FRED API error: ${response.status}`,
+      response.status >= 500 || response.status === 408,
+    );
+  }
+
+  let json;
+  try {
+    json = await response.json();
+  } catch {
+    throw createAdapterError(
+      "INVALID_RESPONSE",
+      "FRED returned invalid JSON",
+      false,
+    );
+  }
+
+  if (!Array.isArray(json?.observations)) {
+    throw createAdapterError(
+      "INVALID_RESPONSE",
+      "FRED response missing observations array",
+      false,
+    );
+  }
+
+  return json.observations;
+}
+
+export async function fetchFredSeries(seriesId) {
+  const result = await withRetry(() => requestFredSeries(seriesId), {
+    maxRetries: 3,
+    baseDelay: 1000,
+    maxDelay: 10000,
+    onRetry: ({ attempts, delay, error }) => {
+      const normalized = normalizeAdapterError(error);
+      console.warn(
+        `[fred] retry ${attempts} in ${delay}ms: ${normalized.message}`,
+      );
+    },
+  });
+
+  if (result.error) {
+    return toErrorResult(result.error, result.attempts);
+  }
+
+  return result.data;
 }
 
 export async function fetchAllFredData() {
+  if (!FRED_API_KEY) {
+    return toErrorResult(
+      createAdapterError("AUTH_ERROR", "Missing VITE_FRED_API_KEY", false),
+      0,
+    );
+  }
+
   const seriesIds = Object.keys(FRED_SIGNALS);
-  const results = await Promise.all(
-    seriesIds.map(async (seriesId) => {
-      try {
-        const observations = await fetchFredSeries(seriesId);
-        return [
-          seriesId,
-          {
-            observations,
-            signal: FRED_SIGNALS[seriesId],
-            fetchedAt: new Date().toISOString(),
-          },
-        ];
-      } catch (error) {
-        console.error(`FRED fetch failed for ${seriesId}:`, error);
-        return [
-          seriesId,
-          {
-            error: error instanceof Error ? error.message : "Unknown FRED error",
-            signal: FRED_SIGNALS[seriesId],
-          },
-        ];
-      }
-    }),
-  );
+  const results = await Promise.all(seriesIds.map(async (seriesId) => {
+    const observations = await fetchFredSeries(seriesId);
+
+    if (isErrorResult(observations)) {
+      console.error(`FRED fetch failed for ${seriesId}:`, observations.error);
+      return [
+        seriesId,
+        {
+          data: null,
+          error: observations.error,
+          attempts: observations.attempts,
+          signal: FRED_SIGNALS[seriesId],
+        },
+      ];
+    }
+
+    return [
+      seriesId,
+      {
+        observations,
+        signal: FRED_SIGNALS[seriesId],
+        fetchedAt: new Date().toISOString(),
+      },
+    ];
+  }));
 
   return Object.fromEntries(results);
 }
