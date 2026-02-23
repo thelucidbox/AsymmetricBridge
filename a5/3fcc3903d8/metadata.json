@@ -6,17 +6,31 @@
   "checkpoints_count": 1,
   "files_touched": [
     ".env.example",
+    "ARCHITECTURE.md",
+    "CLAUDE.md",
     "CONTRIBUTING.md",
+    "DECOMPOSITION.md",
+    "DESIGN-BRIEF.md",
     "LICENSE",
     "README.md",
+    "SPEC.md",
     "index.html",
+    "productivity/TODO.md",
     "src/components/GlossaryTooltip.jsx",
     "src/components/conviction/ConvictionScorecard.jsx",
     "src/components/performance-lab/PerformanceView.jsx",
     "src/design-tokens/observatory.js",
     "src/design-tokens/terminal.js",
     "src/index.css",
-    "src/lib/export-utils.js"
+    "src/lib/export-utils.js",
+    "src/main.jsx",
+    "test-screenshots/03b_guided_tour_step1.png",
+    "test-screenshots/03b_guided_tour_step2.png",
+    "test-screenshots/03b_guided_tour_step3.png",
+    "test-screenshots/03b_guided_tour_step4.png",
+    "test-screenshots/ERROR_state.png",
+    "test-screenshots/console_log.txt",
+    "test-screenshots/test_report.json"
   ],
   "sessions": [
     {
@@ -28,10 +42,10 @@
     }
   ],
   "token_usage": {
-    "input_tokens": 89,
-    "cache_creation_tokens": 127539,
-    "cache_read_tokens": 8436184,
-    "output_tokens": 9366,
-    "api_call_count": 71
+    "input_tokens": 68,
+    "cache_creation_tokens": 134862,
+    "cache_read_tokens": 5080972,
+    "output_tokens": 7645,
+    "api_call_count": 38
   }
 }

@@ -1960,3 +1960,1008 @@ Precision = better results. AI doesn't guess what "better" means.
 
 
 ARGUMENTS: AsymmetricBridge at /Users/fabianaguilar/Projects/AsymmetricBridge/ — Full v2 codebase review. Key screens: CommandCenter (dashboard), ConvictionScorecard, PerformanceView, DigestView, OnboardingWizard, Navigation. Two theme variants: Terminal (IBM Plex, dark) and Observatory (Inter, glass-morphism). Design tokens in src/design-tokens/. Inline styles via S.card(), S.label(), S.tab() in src/styles.js.
+
+---
+
+OK, but like didn't we make Variance or we just completely updated it to one design.
+
+---
+
+All right, let's push it and open it. I wanna go ahead and take a look at this website.
+
+---
+
+Oh, this is amazing and I do want to test this out. But I'd love to work on the supreme version for myself. The version that doesn't require me to enter in anything cause you have all the information for me and that we would update via Claude code as well. You recall that one one that doesn't require the API I meant for testing out the version that we have today can you just give me some generic text to type in like are you know someone who might be looking at this tool?
+
+---
+
+OK, but can you give me like a fake résumé for this person?
+
+---
+
+can you give me the keys for both FRED and Twelve data. Also, I really thought version two was going to add more things that we could automate like getting stock prices and things like that. It's like a Yahoo API we need to add down the list for V3 which we're gonna do immediately after this cause I'm already not happy with the weight. It's turning out so far, but I am not giving what's can we complete the on boarding? I have not completed everything yet, but I already have tons of notes for you. But give me the keys for these now so we can complete the on boarding.
+
+---
+
+Here is more feedback:Need:
+Aligning page that describes what this is and then that will allow people to kick off into the process. Some descriptions are just there's no description..
+
+Additionally for example, take a look at this: This wizard creates your local thesis config and saves it via `useThesis().updateThesis()` when complete.
+
+RESUME INGESTION (REGEX HEURISTICS)
+
+Some of these terms don't necessarily need to be explained here, but could maybe be explained to the documentation
+
+
+
+
+In part three of the on boarding workflow in the thesis set up it should be clear that. Hey these are the big assumptions from these key texts or from this from this article right from and it should be clear and be like if you want to create your own here they are right or adjust them. I think that should be real clear. It's not very clear to the person right now.
+
+Also, I think it would be good to let the person know why they need the keys what the keys are gonna do like none of that information is there. I think this on boarding needs to assume that people aren't technical, but it doesn't assume assumes that people are very technical we need to we need to fix this..
+
+I love the tool tips and the movement to each section. It's really nice and clean. The guided tour is great..
+
+And the digest is of underwhelming I think it would be cool if someone could bring their own key and we would create personalized analysis based on their particular the data that we have from them. And honestly, the difference differences between the terminal of an observatory or so minimal that's very disappointing disappoint…
+
+Overall, it just feels a little bit jolting to jump in here and very confusing. I think what we need to do is really have a page that's like you know it just helps people understand what this bridge is what it was created. It's based off these documents to read and
+
+I think I wanna impress into the user. This is an experiment this takes these assumptions from these very popular articles and helps you understand how maybe you may fit and how to track if these assumptions actually play out I would love just something more informative. It just feels again a little overwhelming. I like the all the information it has but it just takes too long to get your bearings. We need to really understand how we can get people to understand kind of everything maybe like a high level Overview not just a guided walk. Also, I completed it with all the fake information and as soon as I get in there and it took me to my ultimate supreme dashboard and so I was never able to see it as a use it as a like a user like who's on boarding right even though I love seeing mine don't get me wrong, but I went through that process to not even see what it would look like for that person
+
+---
+
+I believe there's a lot Vercel Skills that we can use to test out the website can you research them? I believe I gave you a whole bunch at some point so I don't know if we have them already in our skill section, but there may be some already but if not, maybe we can test out this site a little bit more.
+
+---
+
+yes run all three
+
+---
+
+Are they working right now because I'm done testing out myself
+
+---
+
+This session is being continued from a previous conversation that ran out of context. The summary below covers the earlier portion of the conversation.
+
+Analysis:
+Let me chronologically analyze the conversation from the continuation point:
+
+1. **Session Start**: This is a continuation from a previous conversation. The previous session covered the full v2 implementation of AsymmetricBridge across Groups A, B, and C using Codex for parallel implementation.
+
+2. **Group C Commit**: The first task was to commit Group C (Conviction Ledger + Signal Digest Engine) which was completed by Codex but not committed. I checked git status, found we were on `v2/digest-engine` branch with 11 files (3 modified + 8 new), verified build passed, committed, merged to main via fast-forward, and pushed.
+
+3. **Group D + Quality Pipeline**: User said "let's do Group D and then the quality pipeline". I checked existing files - README.md was Vite boilerplate, LICENSE and CONTRIBUTING.md didn't exist, .env.example needed updates. I read key components to understand export capabilities.
+
+4. **Group D Implementation**: Created 5 deliverables:
+   - `LICENSE` (MIT)
+   - `CONTRIBUTING.md` (getting started, development guide)
+   - `README.md` (full rewrite with quickstart, features, stack)
+   - `.env.example` (expanded with setup instructions)
+   - `src/lib/export-utils.js` (shared export utility with `copyToClipboard`, `downloadFile`, `predictionsToMarkdown`, `performanceToMarkdown`)
+   - Added export buttons to ConvictionScorecard and PerformanceView
+
+5. **Quality Pipeline**: Ran design-review (Zoom-In Method), baseline-ui, fixing-accessibility, fixing-metadata as one consolidated pass. Key fixes:
+   - Terminal textMuted contrast: 0.35 → 0.48 (WCAG compliance)
+   - Added lineHeight tokens to both theme variants
+   - Added body line-height: 1.5 globally
+   - Added :focus-visible outline styles
+   - Fixed GlossaryTooltip outline:none removal
+   - Fixed index.html metadata (title, description, OG tags, theme-color)
+
+6. **User asked about variants**: "didn't we make Variants or we just completely updated it to one design" - I clarified both Terminal and Observatory variants are live and switchable via ThemeToggle in nav.
+
+7. **Deployment**: User said "let's push it and open it. I wanna go ahead and take a look at this website." Deployed to Vercel production at https://asymmetric-bridge.vercel.app
+
+8. **User testing feedback**: Extensive feedback about the onboarding experience being confusing, jargon-heavy, missing landing page, API keys lacking context, digest underwhelming, theme variants too similar, etc.
+
+9. **Fake resume request**: User wanted a fake persona to test onboarding - I provided "Sarah Chen" with full resume and career profile data.
+
+10. **API keys request**: User asked for their actual FRED and Twelve Data API keys - I read .env and provided them.
+
+11. **v3 feedback captured**: User provided extensive notes about what needs improvement.
+
+12. **Vercel skills research**: User asked about testing skills. I launched an Explore agent that found webapp-testing, web-design-guidelines, onboarding-cro, screen-inventory, react-best-practices, seo-strategist.
+
+13. **Three parallel agents launched**: User said "yes run all three" for webapp-testing (Playwright), web-design-guidelines, and onboarding-cro. All three were launched in background.
+
+14. **Current state**: All three agents are still running. The Playwright agent completed onboarding testing but hit a timeout on Dashboard navigation click (a div intercepting pointer events). It found 72 console errors (all FRED CORS failures) and captured screenshots. The web-design-guidelines agent is doing grep-based audits. The onboarding-cro agent is reading through all onboarding files.
+
+15. **User's last message before summary request**: "Are they working right now because I'm done testing out myself" - I checked status of all three agents, they were still running.
+
+Summary:
+1. Primary Request and Intent:
+   The user (Fabian) is executing the AsymmetricBridge v2 overhaul — a macro thesis tracking dashboard built with Vite + React + Supabase. This session focused on:
+   - Committing and merging Group C (Conviction Ledger + Signal Digest Engine) from Codex output
+   - Implementing Group D (OSS Packaging: LICENSE, CONTRIBUTING.md, README rewrite, .env.example expansion, export utilities)
+   - Running the full quality pipeline: /design-review → /baseline-ui → /fixing-accessibility → /fixing-metadata
+   - Deploying to Vercel production at https://asymmetric-bridge.vercel.app
+   - Testing the live site and capturing extensive UX feedback for v3
+   - Running three parallel audit agents: Playwright testing, Vercel Web Design Guidelines, and Onboarding CRO
+
+2. Key Technical Concepts:
+   - **Design Token System**: Two theme variants — Terminal (IBM Plex, #0D0D0F, flat) and Observatory (Inter, #0F1117, glass-morphism). ThemeProvider + ThemeToggle with localStorage persistence on `ab-theme-variant`.
+   - **Export Utilities**: Shared `src/lib/export-utils.js` with `copyToClipboard()`, `downloadFile()`, `predictionsToMarkdown()`, `performanceToMarkdown()` — all three data views (Digests, Conviction, Performance) now have markdown export.
+   - **WCAG Contrast**: Terminal textMuted was at rgba(255,255,255,0.35) giving ~2.5:1 contrast ratio. Fixed to 0.48 for WCAG compliance.
+   - **Focus Styles**: Added `:focus-visible` outlines globally in index.css. Removed `outline: "none"` from GlossaryTooltip anchor.
+   - **CORS Issue**: FRED API calls fail with CORS errors from Vercel deployment (works locally). All 8 FRED series endpoints blocked. Retry logic fires 3 times then fails gracefully.
+   - **Playwright Testing**: webapp-testing skill uses Python + Playwright for browser automation, screenshots, console log capture.
+   - **Onboarding Flow**: 5-step wizard (Welcome → Career Profile → Thesis Setup → API Keys → Complete). Redirects to /onboarding if no `ab-thesis-config` in localStorage.
+
+3. Files and Code Sections:
+
+   - **`/Users/fabianaguilar/Projects/AsymmetricBridge/src/lib/export-utils.js`** (CREATED)
+     - Shared export utility for all three data views
+     - Contains `copyToClipboard(text)`, `downloadFile(content, filename, mime)`, `predictionsToMarkdown(predictions, battingAverage)`, `performanceToMarkdown(alignmentScore, legBreakdown, positions, totalValue, format)`
+     - Each function generates structured markdown with tables, headers, and metadata
+
+   - **`REDACTED`** (CREATED)
+     - MIT License, Copyright 2026 Fabian Aguilar
+
+   - **`REDACTED.md`** (CREATED)
+     - Getting started, development guide, project structure, adding data sources, adding signals, code style
+
+   - **`/Users/fabianaguilar/Projects/AsymmetricBridge/README.md`** (REWRITTEN)
+     - Was Vite boilerplate. Now has: quickstart, API key table, feature descriptions, stack, project structure, configuration guide, export docs
+
+   - **`/Users/fabianaguilar/Projects/AsymmetricBridge/.env.example`** (UPDATED)
+     - Added setup instructions, links to sign up pages, clarified which are required vs optional, noted Telegram secrets are Supabase Edge Function secrets not client-side
+
+   - **`/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/conviction/ConvictionScorecard.jsx`** (MODIFIED)
+     - Added import of `copyToClipboard, downloadFile, predictionsToMarkdown` from export-utils
+     - Added "Copy .md" and "Download .md" buttons in the Conviction Ledger header area, only shown when predictions.length > 0
+
+   - **`/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/performance-lab/PerformanceView.jsx`** (MODIFIED)
+     - Added import of `copyToClipboard, downloadFile, performanceToMarkdown` from export-utils
+     - Added "Copy .md" and "Download .md" buttons in the badge row alongside Total Value, Format, Rows
+
+   - **`/Users/fabianaguilar/Projects/AsymmetricBridge/src/design-tokens/terminal.js`** (MODIFIED)
+     - Changed `textMuted` from `"rgba(255,255,255,0.35)"` to `"rgba(255,255,255,0.48)"` for WCAG contrast
+     - Added `lineHeight: { heading: 1.2, body: 1.5, label: 1 }` to typography tokens
+
+   - **`/Users/fabianaguilar/Projects/AsymmetricBridge/src/design-tokens/observatory.js`** (MODIFIED)
+     - Added `lineHeight: { heading: 1.2, body: 1.55, label: 1 }` to typography tokens
+
+   - **`/Users/fabianaguilar/Projects/AsymmetricBridge/src/index.css`** (MODIFIED)
+     - Added `line-height: 1.5` to body
+     - Added `:focus-visible` outline styles for all elements and specifically for button/select/input/textarea
+
+   - **`/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/GlossaryTooltip.jsx`** (MODIFIED)
+     - Removed `outline: "none"` from the anchor span style to allow focus-visible outlines to work
+
+   - **`/Users/fabianaguilar/Projects/AsymmetricBridge/index.html`** (REWRITTEN)
+     - Title changed from "asymmetricbridge" to "Asymmetric Bridge"
+     - Added meta description, og:title, og:description, og:type, theme-color (#0D0D0F)
+
+   - **`.env`** file contains actual API keys:
+     - FRED: `f8b1c41f4514379b57e71cd94c87b091`
+     - Twelve Data: `f2816abfe77441db8956d373392f4afb`
+     - Supabase URL: `https://slyhwbmbeqoaanvloraa.supabase.co`
+
+4. Errors and Fixes:
+   - **FRED CORS errors on Vercel**: All FRED API calls fail with CORS errors from the deployed Vercel site. The Playwright test captured 72 console errors, all FRED-related. This is a known issue — FRED API doesn't support CORS from browser origins. Needs a proxy (Supabase Edge Function or Vercel serverless function) for v3.
+   - **Playwright nav click timeout**: The Dashboard button click timed out because `<div></div> from <div>…</div> subtree intercepts pointer events` — likely the GuidedTour overlay or mobile drawer backdrop intercepting clicks. The test captured screenshots up to that point but couldn't complete section navigation testing.
+   - **dangerouslySetInnerHTML in DigestView**: The web-design-guidelines audit found `dangerouslySetInnerHTML` usage in DigestView.jsx for rendering digest HTML content. This is a potential XSS vector if digest content isn't sanitized.
+
+5. Problem Solving:
+   - **Group C commit workflow**: Checked git status (on v2/digest-engine branch), verified build, staged all 11 files, committed with descriptive message, checked out main, merged (fast-forward), pushed. Clean workflow.
+   - **Export utilities design**: Created a shared utility rather than duplicating export logic in each component. DigestView already had its own export via useDigests hook, so only ConvictionScorecard and PerformanceView needed the new utilities wired in.
+   - **Quality pipeline consolidation**: Instead of running 4 separate skill invocations (design-review, baseline-ui, fixing-accessibility, fixing-metadata), combined all findings into one audit pass and one commit. More efficient.
+   - **Variant confusion**: User asked if variants were built or collapsed. Clarified both Terminal and Observatory are live with ThemeToggle in nav. The broader `/design-explore` exercise (3-5 directions with working code) wasn't done — only the two specced variants were implemented.
+
+6. All User Messages:
+   - "let's do Group D and then the quality pipeline"
+   - "I guess we're not using Gemini"
+   - "OK, but like didn't we make Variance or we just completely updated it to one design."
+   - "All right, let's push it and open it. I wanna go ahead and take a look at this website."
+   - [Extensive feedback about onboarding UX]: "Need: Aligning page that describes what this is... Some descriptions are just there's no description... take a look at this: This wizard creates your local thesis config and saves it via `useThesis().updateThesis()` when complete. RESUME INGESTION (REGEX HEURISTICS)... Some of these terms don't necessarily need to be explained here... In part three of the on boarding workflow in the thesis set up it should be clear that... Also, I think it would be good to let the person know why they need the keys... I love the tool tips and the movement to each section. It's really nice and clean. The guided tour is great... And the digest is of underwhelming... the differences between the terminal and observatory are so minimal that's very disappointing... Overall, it just feels a little bit jolting to jump in here and very confusing... I think what we need to do is really have a page... Also, I completed it with all the fake information and as soon as I get in there and it took me to my ultimate supreme dashboard..."
+   - "OK, but can you give me like a fake résumé for this person?"
+   - "can you give me the keys for both FRED and Twelve data. Also, I really thought version two was going to add more things that we could automate like getting stock prices and things like that. It's like a Yahoo API we need to add down the list for V3 which we're gonna do immediately after this cause I'm already not happy with the weight. It's turning out so far, but I am not giving what's can we complete the on boarding? I have not committed everything yet, but I already have tons of notes for you. But give me the keys for these now so we can complete the on boarding."
+   - "Here is more feedback: [detailed onboarding feedback - captured above]"
+   - "I believe there's a lot Vercel Skills that we can use to test out the website can you research them?"
+   - "yes run all three" (referring to webapp-testing, web-design-guidelines, onboarding-cro)
+   - "Are they working right now because I'm done testing out myself"
+
+7. Pending Tasks:
+   - **Three background agents still running**: Playwright testing, Web Design Guidelines audit, Onboarding CRO audit — all three launched in parallel, results not yet collected
+   - **v3 planning**: User explicitly said v3 is happening "immediately after this" with focus on: landing page, non-technical onboarding rewrite, Yahoo Finance API, AI-powered digests (BYO key), more dramatic theme variant differentiation, FRED CORS proxy
+   - **"Supreme version"**: User wants a personal edition that doesn't require onboarding, has all their data pre-filled, and is updated via Claude Code
+   - **FRED CORS fix**: All FRED API calls fail from Vercel due to CORS — needs a server-side proxy
+
+8. Current Work:
+   Three background audit agents were launched and are still running:
+   1. **Playwright agent** (add2e42721e03fc13) — Completed onboarding flow testing, captured screenshots (01_initial_load.png through 03_dashboard_after_onboarding.png, ERROR_state.png), found 72 console errors (all FRED CORS), hit timeout on Dashboard nav click due to overlay intercepting pointer events. Still running trying to recover.
+   2. **Web Design Guidelines agent** (ade6c410d1eb5a8ab) — Auditing against Vercel's Web Interface Guidelines, checking for touch-action, overscroll-behavior, text-wrap, preconnect, spellcheck, heading semantics, image alt tags, font-display, dangerouslySetInnerHTML, beforeunload, etc. Still running.
+   3. **Onboarding CRO agent** (afa1c9d58f7f25da1) — Read all onboarding components, fabian-thesis.js (full 637 lines), checking for empty states, first-run patterns, guided tour integration. Still running.
+
+   The user said: "Are they working right now because I'm done testing out myself" — indicating they're ready to receive the results and move forward.
+
+9. Optional Next Step:
+   Collect results from all three background agents when they complete, then present a consolidated findings report to the user. This directly follows from the user's request to "run all three" and their follow-up "Are they working right now because I'm done testing out myself."
+
+   After presenting results, the user has indicated they want to move into v3 immediately: "It's like a Yahoo API we need to add down the list for V3 which we're gonna do immediately after this."
+
+   Git state on main after all work:
+   ```
+   b4b8f8b fix: Design review + accessibility + metadata polish
+   09615a3 feat: Add Group D — OSS packaging, export utilities, and documentation
+   7758425 feat: Add Group C — conviction ledger + signal digest engine
+   d58e618 feat: Add Group B — onboarding, education, signals, performance lab, design system
+   1c223a3 Add retry env validation for api
+   b988400 feat: Add config layer + nav architecture (v2 Group A)
+   01f0258 feat: Add v2 spec, architecture, and design brief
+   ```
+
+   Live at: https://asymmetric-bridge.vercel.app
+   Vercel project: `asymmetric-bridge` (prj_rDuZo9HeoBV6qJGe4w9pEAPwHmDN)
+
+If you need specific details from before compaction (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/fabianaguilar/.REDACTED.jsonl
+Please continue the conversation from where we left off without asking the user any further questions. Continue with the last task that you were asked to work on.
+
+---
+
+<task-notification>
+<task-id>ade6c410d1eb5a8ab</task-id>
+<tool-use-id>REDACTED</tool-use-id>
+<status>completed</status>
+<summary>Agent "Web design guidelines audit" completed</summary>
+<result>I now have all the data needed for a thorough audit. Here is the complete report.
+
+---
+
+# Vercel Web Interface Guidelines Audit -- AsymmetricBridge
+
+**Audited files:** 13 primary files + referenced sub-components
+**Guidelines version:** Vercel Web Interface Guidelines (100+ rules)
+**Confidence:** HIGH (all files read in full, pattern searches confirmed)
+
+---
+
+## CRITICAL (Must Fix -- Accessibility/Usability Broken)
+
+### C1. `outline: "none"` on inputs without `:focus-visible` replacement (6 files)
+
+The global CSS in `index.css` provides a `:focus-visible` outline, but inline `outline: "none"` on input styles **overrides it**, leaving these inputs with no focus indicator at all.
+
+**Guideline violated:** "Never `outline-none` / `outline: none` without focus replacement" (Anti-patterns)
+
+| File | Line |
+|------|------|
+| `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/onboarding/CareerProfile.jsx` | 202 |
+| `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/onboarding/APIKeySetup.jsx` | 207 |
+| `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/onboarding/ThesisSetup.jsx` | 215 |
+| `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/onboarding/ResumeIngestion.jsx` | 231 |
+| `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/SignalUpdateForm.jsx` | 63 |
+| `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/digests/DigestView.jsx` | 68 |
+
+**Fix:** Remove `outline: "none"` from all inline `inputStyle` / `selectStyle` objects. The global `:focus-visible` rule in `index.css:48-58` already handles focus styling correctly.
+
+---
+
+### C2. No `prefers-reduced-motion` respect (codebase-wide)
+
+Multiple CSS animations (`pulse`, `domino-alert-pulse`, `conviction-border-pulse`) and JS transitions exist throughout the codebase. Zero references to `prefers-reduced-motion` anywhere.
+
+**Guideline violated:** "Honor `prefers-reduced-motion` (provide reduced variant or disable)"
+
+**Files affected:**
+- `/Users/fabianaguilar/Projects/AsymmetricBridge/src/index.css` lines 136-187 (3 keyframe animations)
+- `/Users/fabianaguilar/Projects/AsymmetricBridge/src/design-tokens/terminal.js` line 93 (`motion.default: "all 0.2s"`)
+- `/Users/fabianaguilar/Projects/AsymmetricBridge/src/design-tokens/observatory.js` line 98 (`motion.default: "250ms cubic-bezier..."`)
+
+**Fix:** Add a media query in `index.css`:
+```css
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+```
+
+---
+
+### C3. No `aria-live` regions for async feedback (codebase-wide)
+
+Feedback messages from API calls, form validation errors, digest generation results, and CSV parsing status are rendered as plain `<div>` elements. Screen readers will not announce these changes.
+
+**Guideline violated:** "Async updates (toasts, validation) need `aria-live='polite'`"
+
+**Files affected:**
+- `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/digests/DigestView.jsx` lines 204-214 (feedback messages)
+- `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/conviction/ConvictionScorecard.jsx` lines 810-818 (form errors)
+- `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/performance-lab/CSVUpload.jsx` lines 233-247 (parse errors)
+- `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/onboarding/OnboardingWizard.jsx` line 346 (submit error)
+- `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/onboarding/APIKeySetup.jsx` lines 152-153 (test results)
+
+**Fix:** Add `aria-live="polite"` to feedback/error containers and `role="alert"` for error messages.
+
+---
+
+### C4. No skip-to-content link
+
+No skip navigation link exists anywhere in the app. Keyboard users must tab through all nav items on every page.
+
+**Guideline violated:** "Headings hierarchical h1-h6; include skip link for main content"
+
+**File:** `/Users/fabianaguilar/Projects/AsymmetricBridge/src/App.jsx` (should be added in `AppShell`, before `<Navigation />`)
+
+**Fix:** Add a visually-hidden skip link before the `<Navigation />` component:
+```jsx
+<a href="#main-content" className="skip-link">Skip to main content</a>
+```
+And add `id="main-content"` to the `<Routes>` wrapper.
+
+---
+
+### C5. No semantic headings in most views
+
+The dashboard, performance lab, conviction scorecard, and digests all use styled `<div>` elements for headings rather than `<h1>`-`<h6>` tags. Only `LucidBoxHeader.jsx` and `SourceMaterials.jsx` use `<h1>`.
+
+**Guideline violated:** "Headings hierarchical h1-h6" and "Use semantic HTML before ARIA"
+
+**Files affected:**
+- `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/conviction/ConvictionScorecard.jsx` -- "Conviction Ledger" heading is `S.label` (a `<div>`)
+- `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/performance-lab/PerformanceView.jsx` line 153 -- "Portfolio Thesis Alignment" is a `<div>`
+- `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/digests/DigestView.jsx` line 151 -- "Signal Digest Engine" is a `<div>`
+- `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/onboarding/OnboardingWizard.jsx` line 226 -- "Build your thesis profile" is a `<div>`
+
+---
+
+## HIGH (Significant Quality/Performance Issues)
+
+### H1. `transition: "all 0.2s"` used pervasively (16+ instances)
+
+The `transition: all` anti-pattern is used in the design token system itself (`motion.default: "all 0.2s"`) and propagates through every `S.tab()` and `S.sectionTab()` call, plus many inline styles.
+
+**Guideline violated:** "Never `transition: all` -- list properties explicitly"
+
+**Primary source:**
+- `/Users/fabianaguilar/Projects/AsymmetricBridge/src/design-tokens/terminal.js` line 93: `default: "all 0.2s"`
+- `/Users/fabianaguilar/Projects/AsymmetricBridge/src/styles.js` lines 90-91, 107-108 (used in `tab()` and `sectionTab()`)
+- `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/performance-lab/CSVUpload.jsx` line 153
+
+**Fix:** Change `motion.default` to list specific properties: `"background 0.2s, border-color 0.2s, color 0.2s, opacity 0.2s"`. The observatory variant at line 98 should also be updated.
+
+---
+
+### H2. No `autocomplete` attribute on any form input
+
+Zero `autocomplete` attributes found across all input fields in the entire codebase. The onboarding wizard collects role, industry, and API key data without any autocomplete hints.
+
+**Guideline violated:** "Inputs need `autocomplete` and meaningful `name`"
+
+**Files affected:**
+- `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/onboarding/CareerProfile.jsx` lines 75, 89, 103, 117 (all inputs)
+- `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/onboarding/APIKeySetup.jsx` lines 141, 170 (API key inputs should have `autocomplete="off"`)
+- `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/conviction/ConvictionScorecard.jsx` all number inputs
+
+**Fix:** Add `autocomplete="off"` to API key fields, and appropriate `autocomplete` values to career profile fields. Also add `name` attributes to all inputs.
+
+---
+
+### H3. No `spellCheck={false}` on API key and code inputs
+
+API key inputs in `APIKeySetup.jsx` and other technical inputs lack `spellCheck={false}`, causing red squiggly underlines under API keys.
+
+**Guideline violated:** "Disable spellcheck on emails, codes, usernames"
+
+**Files:**
+- `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/onboarding/APIKeySetup.jsx` lines 141, 170
+
+---
+
+### H4. `font-variant-numeric: tabular-nums` missing from numeric displays
+
+The app is a financial intelligence platform showing percentages, currency values, scores, and batting averages -- all in proportional font rendering. Numbers in columns will misalign.
+
+**Guideline violated:** "`font-variant-numeric: tabular-nums` for number columns/comparisons"
+
+**Files affected (numeric displays):**
+- `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/performance-lab/PerformanceView.jsx` lines 321, 329, 340 (Actual/Target/Delta percentages)
+- `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/conviction/ConvictionScorecard.jsx` line 193 (batting average percent)
+- `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/performance-lab/CSVUpload.jsx` lines 296-308 (table columns)
+
+**Fix:** Add `fontVariantNumeric: "tabular-nums"` to all numeric display styles. Best done globally on `body` or on the mono font family in `index.css`.
+
+---
+
+### H5. No `<link rel="preconnect">` for Google Fonts CDN
+
+Fonts are loaded from `fonts.googleapis.com` and `fonts.gstatic.com` via a CSS `@import`, with no `preconnect` hints. This adds latency to the critical rendering path.
+
+**Guideline violated:** "Add `<link rel='preconnect'>` for CDN/asset domains" and "Critical fonts: `<link rel='preload' as='font'>` with `font-display: swap`"
+
+**File:** `/Users/fabianaguilar/Projects/AsymmetricBridge/index.html`
+
+**Fix:** Add before the CSS import:
+```html
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+```
+
+---
+
+### H6. No `color-scheme: dark` on `<html>`
+
+The app is a dark-mode-only interface but doesn't declare `color-scheme: dark`. This means scrollbars, native inputs, and form controls may render with light-mode system defaults.
+
+**Guideline violated:** "`color-scheme: dark` on `<html>` for dark themes (fixes scrollbar, inputs)"
+
+**File:** `/Users/fabianaguilar/Projects/AsymmetricBridge/index.html` and `/Users/fabianaguilar/Projects/AsymmetricBridge/src/index.css`
+
+**Fix:** Add `color-scheme: dark;` to the `:root` or `html` selector in `index.css`, or add `<meta name="color-scheme" content="dark">` in `index.html`.
+
+---
+
+### H7. No `beforeunload` guard on onboarding wizard
+
+The multi-step onboarding wizard with career profile, thesis setup, and API keys has no navigation guard. Users can accidentally close the tab and lose all progress.
+
+**Guideline violated:** "Warn before navigation with unsaved changes (`beforeunload` or router guard)"
+
+**File:** `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/onboarding/OnboardingWizard.jsx`
+
+---
+
+### H8. `dangerouslySetInnerHTML` used for digest content without sanitization mention
+
+Digest HTML content is rendered via `dangerouslySetInnerHTML` in two places. While the content appears to come from internal generation, this is a security risk if any user input flows into digest content.
+
+**Files:**
+- `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/digests/DigestView.jsx` line 282
+- `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/digests/DigestView.jsx` line 356
+
+---
+
+## MEDIUM
+
+### M1. Placeholders missing trailing ellipsis
+
+Several placeholder strings use full sentences without the `...` (should be `...` or better, the actual ellipsis character) convention.
+
+**Guideline violated:** "Placeholders end with `...` and show example pattern"
+
+| File | Line | Current | Should Be |
+|------|------|---------|-----------|
+| `CareerProfile.jsx` | 144 | `"Add a goal and press Enter"` | `"Add a goal and press Enter..."` |
+| `CSVUpload.jsx` | 169 | `"Symbol,Quantity,Market Value"` | (This is fine as example pattern) |
+| `ConvictionScorecard.jsx` | 806 | `"Why this call matters for your thesis"` | `"Why this call matters for your thesis..."` |
+
+---
+
+### M2. Loading states using `...` instead of proper ellipsis `...`
+
+The three-dot ASCII sequence is used instead of the Unicode ellipsis character.
+
+**Guideline violated:** "Use `...` not `...`" (Typography)
+
+| File | Line | Current |
+|------|------|---------|
+| `OnboardingWizard.jsx` | 278 | `"Saving..."` |
+| `APIKeySetup.jsx` | 14 | `"Testing..."` |
+| `DigestView.jsx` | 184 | `"Generating..."` |
+| `CSVUpload.jsx` | 353 | `"Analyzing Portfolio..."` |
+
+**Fix:** Replace all `...` with the Unicode ellipsis `\u2026` or the HTML entity. Note that the guideline also says loading states should end with this character, which they do -- just with the wrong character.
+
+---
+
+### M3. `text-wrap: balance` not used on headings
+
+No heading in the app uses `text-wrap: balance` or `text-pretty` to prevent orphan/widow lines.
+
+**Guideline violated:** "Use `text-wrap: balance` or `text-pretty` on headings (prevents widows)"
+
+**Files:** All heading-style divs across every view.
+
+---
+
+### M4. No `touch-action: manipulation` on interactive elements
+
+No instance of `touch-action` found in the codebase, causing a 300ms double-tap-zoom delay on mobile.
+
+**Guideline violated:** "`touch-action: manipulation` (prevents double-tap zoom delay)"
+
+**Fix:** Add to `index.css` globally:
+```css
+button, a, [role="button"] {
+  touch-action: manipulation;
+}
+```
+
+---
+
+### M5. Mobile drawer missing `overscroll-behavior: contain`
+
+The mobile navigation drawer in `Navigation.jsx` scrolls but does not prevent scroll chaining to the body.
+
+**Guideline violated:** "`overscroll-behavior: contain` in modals/drawers/sheets"
+
+**File:** `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/Navigation.jsx` line 209
+
+**Fix:** Add `overscrollBehavior: "contain"` to the drawer div's style object.
+
+---
+
+### M6. URL does not reflect UI state (tabs, filters, periods)
+
+The Command Center uses `useState` for section tabs (`lucidbox`, `signals`, `thesis`, `jobs`), sub-tabs, and the digest view uses `useState` for period selection. None of these sync to the URL.
+
+**Guideline violated:** "URL reflects state -- filters, tabs, pagination, expanded panels in query params" and "Deep-link all stateful UI"
+
+**Files:**
+- `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/CommandCenter.jsx` lines 81-85
+- `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/digests/DigestView.jsx` line 54
+
+---
+
+### M7. Buttons using navigation semantics should be links
+
+The navigation buttons in `Navigation.jsx` use `<button>` elements with `onClick` handlers that call `navigate()`. These should be `<a>` or `<Link>` elements to support Cmd/Ctrl+click and middle-click.
+
+**Guideline violated:** "`<button>` for actions, `<a>`/`<Link>` for navigation" and "Links use `<a>`/`<Link>` (Cmd/Ctrl+click, middle-click support)"
+
+**File:** `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/Navigation.jsx` lines 72-89 (`renderNavButton`)
+
+---
+
+### M8. Native `<select>` elements missing explicit `background-color` and `color` for dark mode
+
+The `<select>` in `DigestView.jsx` line 166 sets both colors correctly. But several `<select>` elements in `CareerProfile.jsx` and `ConvictionScorecard.jsx` rely on inherited or transparent backgrounds which will break on Windows dark mode.
+
+**Guideline violated:** "Native `<select>`: explicit `background-color` and `color` (Windows dark mode)"
+
+---
+
+## LOW
+
+### L1. Button labels could be more specific
+
+Some buttons use generic labels that don't describe the specific action.
+
+**Guideline violated:** "Specific button labels: 'Save API Key' not 'Continue'"
+
+| File | Line | Current | Suggested |
+|------|------|---------|-----------|
+| `OnboardingWizard.jsx` | 266 | `"Continue"` | `"Continue to {next step name}"` |
+| `OnboardingWizard.jsx` | 262 | `"Back"` | `"Back to {prev step name}"` |
+
+---
+
+### L2. Hardcoded date format in `ConvictionScorecard.jsx`
+
+The `formatDate` function on line 42 uses hardcoded `toLocaleDateString("en-US", ...)` instead of a reusable `Intl.DateTimeFormat` instance. `DigestView.jsx` does this correctly with `DATE_FORMATTER` and `DATETIME_FORMATTER`.
+
+**Guideline violated:** "Dates/times: use `Intl.DateTimeFormat` not hardcoded formats"
+
+**File:** `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/conviction/ConvictionScorecard.jsx` lines 41-48
+
+---
+
+### L3. Version date hardcoded in footer
+
+The Command Center footer at line 347 contains `"Feb 22, 2026"` as a hardcoded string.
+
+**File:** `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/CommandCenter.jsx` line 347
+
+---
+
+### L4. `<select>` background color not set for Windows dark mode on `DigestView.jsx`
+
+The `selectStyle` object sets `background: tokens.colors.surface` (correct) and `color: tokens.colors.text` (correct), but the `outline: "none"` on line 68 removes focus indication.
+
+---
+
+### L5. Onboarding step buttons missing `hover:` state
+
+The step indicator buttons in `OnboardingWizard.jsx` line 235 use `S.tab()` which inherits `transition: all` but has no explicit hover style differentiation.
+
+**Guideline violated:** "Buttons/links need `hover:` state (visual feedback)"
+
+---
+
+---
+
+## Summary
+
+| Severity | Count | Key Theme |
+|----------|-------|-----------|
+| **Critical** | 5 | Focus removal, motion a11y, aria-live, skip link, semantic headings |
+| **High** | 8 | `transition: all`, autocomplete, spellcheck, tabular-nums, preconnect, color-scheme, beforeunload, dangerouslySetInnerHTML |
+| **Medium** | 8 | Ellipsis chars, text-wrap, touch-action, overscroll, URL state, nav semantics, select styling |
+| **Low** | 5 | Button labels, date formatting, hardcoded date, hover states |
+
+**Total: 26 findings**
+
+The highest-impact fixes would be:
+1. Remove all `outline: "none"` from inline input styles (C1) -- 5-minute fix, immediate a11y win
+2. Add `prefers-reduced-motion` media query to `index.css` (C2) -- 5-minute fix
+3. Replace `transition: "all 0.2s"` in design tokens with explicit properties (H1) -- fixes 16+ instances at the source
+4. Add `color-scheme: dark` and `preconnect` hints to `index.html` (H5, H6) -- 2-minute fix
+5. Add `aria-live="polite"` to feedback containers (C3) -- 15-minute fix across files</result>
+<usage><total_tokens>96232</total_tokens><tool_uses>49</tool_uses><duration_ms>169691</duration_ms></usage>
+</task-notification>
+Full transcript available at: REDACTED.output
+
+---
+
+<task-notification>
+<task-id>afa1c9d58f7f25da1</task-id>
+<tool-use-id>toolu_01AAkaPZvDNLqdsfpeGAAQQP</tool-use-id>
+<status>completed</status>
+<summary>Agent "Onboarding CRO audit" completed</summary>
+<result>Now I have a complete picture of the codebase. Let me compile the full audit.
+
+---
+
+# Asymmetric Bridge -- Onboarding CRO Audit
+
+## 1. Current Flow Analysis
+
+### What Exists Today
+
+The onboarding is a 5-step wizard (`OnboardingWizard.jsx`) gating access to the dashboard:
+
+| Step | Component | Purpose |
+|------|-----------|---------|
+| 0 - Welcome | `WelcomeStep` (inline) | Two sentences of context |
+| 1 - Career Profile | `CareerProfile.jsx` + `ResumeIngestion.jsx` | Collect role, target role, industry, experience, goals |
+| 2 - Thesis Setup | `ThesisSetup.jsx` | Enable/disable 6 dominos, edit names/descriptions/thresholds |
+| 3 - API Key Setup | `APIKeySetup.jsx` | FRED + Twelve Data API keys |
+| 4 - Complete | `CompleteStep` (inline) | Review summary, "Finish & Open Dashboard" |
+
+**Gate logic** (`App.jsx` lines 16-27, 96-98): If `localStorage` has no `ab-thesis-config`, user is force-redirected to `/onboarding`. After completion, `handleComplete` calls `updateThesis(candidate)` which persists to localStorage and navigates to `/`.
+
+**Post-onboarding**: A `GuidedTour.jsx` component fires on first dashboard load if `ab-guided-tour-complete` is not in localStorage.
+
+### What Works
+
+1. **Career Profile step is well-structured.** Clear fields, validation, placeholders with real examples, an experience dropdown, and goal suggestions with one-click add. This is the most polished step.
+2. **Resume Ingestion is a clever feature.** Paste-and-parse to prefill fields is genuinely useful and differentiating.
+3. **API key testing with inline feedback.** The "Test" button with success/error status and direct links to get free keys is solid UX.
+4. **Review step before save.** Showing a summary before committing is correct wizard behavior.
+5. **Step tabs allow going back.** Users can revisit completed steps without losing data.
+6. **Local-first architecture.** No server dependency for onboarding is a good OSS decision.
+
+### What Does Not Work
+
+Seven clear failures, each mapped to the user feedback:
+
+**F1: "Jolting and confusing" -- No context before the wizard starts.**
+There is no landing page, hero section, or explanation of what Asymmetric Bridge IS before the user enters the wizard. The first thing a new user sees is "Build your thesis profile" with zero explanation of what a thesis profile is, why they need one, or what they will get when they are done. The Welcome step (lines 287-301) is two sentences about data storage mechanics -- not about the product.
+
+**F2: "Developer jargon visible to users."**
+- `OnboardingWizard.jsx` line 230: `"This wizard creates your local thesis config and saves it via useThesis().updateThesis() when complete."` -- This is a React hook name exposed to end users.
+- `ResumeIngestion.jsx` line 211: The section title is literally `"Resume Ingestion (Regex Heuristics)"`. Users see the words "Regex Heuristics" in a heading.
+
+**F3: "Thesis setup doesn't explain these are assumptions from articles."**
+The `ThesisSetup.jsx` component shows dominos and signals without any context about their origin. The `fabian-thesis.js` file contains rich source attribution (the `SOURCES` array with Citrini Research, Leopold Aschenbrenner, Michael X. Bloch, Arya Deniz) but NONE of this context is surfaced in the onboarding. Users see "SaaS Compression" and "Ghost GDP" without knowing these come from specific research articles with specific bear/bull arguments.
+
+**F4: "API keys section doesn't explain WHY or WHAT."**
+`APIKeySetup.jsx` line 131-133 says: `"Keys are stored locally in this browser (localStorage) for OSS onboarding convenience."` -- This tells the user WHERE keys are stored but not WHY they need them or WHAT they unlock. A new user has no idea that FRED provides Federal Reserve economic data or that Twelve Data provides stock/market prices, or that without these keys the dashboard will show placeholder data instead of live signals.
+
+**F5: "Assumes people are very technical."**
+The entire wizard uses language calibrated for developers: "thesis config", "domino cascade", "signal thresholds", "OSS onboarding", "useThesis()", "regex heuristics", "localStorage". The Career Profile step uses "Experience Band" instead of "Years of Experience". The thesis metadata asks for "Author" as if this is a scholarly publication.
+
+**F6: "Takes too long to get your bearings."**
+The critical problem: users must complete ALL 5 steps before they see anything. There is no preview of the dashboard, no sample data, no "skip for now" option on optional steps. The Thesis Setup step alone requires understanding 6 dominos with 24 signals and their thresholds -- an enormous cognitive load for someone who does not yet know what the product does.
+
+**F7: "After completing with fake data, it loaded the personal supreme dashboard."**
+This is the most critical bug. `ThesisContext.jsx` lines 34-46 show the `getInitialThesis()` function: if no stored thesis exists OR stored thesis fails validation, it falls back to `fabianThesis` (the hardcoded Fabian-specific data from `fabian-thesis.js`). After a new user completes onboarding, `updateThesis(candidate)` saves their config. But the CommandCenter loads data from hooks that reference `FRED_API_KEY` and `TWELVE_DATA_API_KEY` from lib files, and static data from `data/dominos.js`, `data/products.js`, etc. The dashboard appears to show Fabian's personal thesis data (Lucid Box products, portfolio legs, career profile) rather than the user's freshly configured thesis.
+
+---
+
+## 2. Activation Moment Identification
+
+**Current "aha" moment: Does not exist.**
+
+The user goes through 5 steps of configuration and then arrives at a dashboard that either shows Fabian's personal data (bug F7) or empty/broken states (no API keys). There is no moment where the user thinks "Oh, THIS is what this tool does for me."
+
+**Recommended "aha" moment: Seeing one live signal update in context.**
+
+The activation moment for a macro thesis tracker should be: **"I see a signal I care about, it has a status, and I understand how it connects to my career."** This needs to happen BEFORE asking the user to configure anything.
+
+The ideal aha sequence:
+1. User lands on an explanation of what AB is (30 seconds of reading)
+2. User sees a demo/preview of the dashboard with sample data (10 seconds of visual scanning)
+3. User configures their career profile (1 minute)
+4. User sees their career profile reflected in the thesis framing ("Based on your role in enterprise sales, here's why SaaS Compression matters to you")
+5. That is the aha moment -- macro signals connected to personal career impact
+
+---
+
+## 3. Friction Points with Specific Fixes
+
+### FP-1: No Product Explanation (CRITICAL)
+
+**Current state**: Welcome step is 2 sentences about data storage.
+
+**Fix**: Replace `WelcomeStep` in `OnboardingWizard.jsx` (lines 287-301) with a proper landing/welcome that explains:
+- What Asymmetric Bridge is (a macro thesis tracker that connects economic disruption signals to your career and positioning)
+- What the 6-domino cascade model is (a chain of cause-and-effect disruption vectors from specific research)
+- What you get when you finish (a personalized dashboard with live economic signals, career positioning, and portfolio tracking)
+- Show a screenshot or mini-preview of the completed dashboard
+
+### FP-2: Developer Jargon in UI Copy (CRITICAL)
+
+**File**: `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/onboarding/OnboardingWizard.jsx`
+- **Line 230**: `"This wizard creates your local thesis config and saves it via useThesis().updateThesis() when complete."` --> Replace with: `"Your setup is saved locally in your browser. Nothing is sent to any server."`
+
+**File**: `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/onboarding/ResumeIngestion.jsx`
+- **Line 211**: `"Resume Ingestion (Regex Heuristics)"` --> Replace with: `"Quick-Fill from Resume"` or `"Auto-Fill from Resume"`
+
+### FP-3: Missing Source Attribution in Thesis Setup (HIGH)
+
+**File**: `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/onboarding/ThesisSetup.jsx`
+
+The `SOURCES` array in `fabian-thesis.js` (lines 407-552) contains rich context about where the dominos come from: Citrini Research's bear thesis, Leopold Aschenbrenner's capability thesis, Bloch's bull rebuttal, and Deniz's trade expression. None of this is shown during onboarding.
+
+**Fix**: Add a context card at the top of `ThesisSetup.jsx` before the domino configuration:
+```
+"These 6 dominos are a cause-and-effect chain derived from specific macro research articles. 
+Each domino represents a disruption vector -- when one falls, it increases pressure on the next. 
+You can enable/disable dominos and adjust signal thresholds to match your own views."
+```
+And for each domino card, show which source article it maps to (the `sources` data already exists in the thesis config).
+
+### FP-4: API Keys Lack Purpose Explanation (HIGH)
+
+**File**: `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/onboarding/APIKeySetup.jsx`
+
+**Fix**: Replace the description on line 131-133 with:
+
+```
+"Asymmetric Bridge pulls live economic data to keep your thesis signals current. 
+FRED (Federal Reserve Economic Data) provides employment, GDP, and monetary indicators. 
+Twelve Data provides stock and market prices for portfolio tracking. 
+
+Both offer free API keys. Without them, the dashboard will use cached sample data instead of live feeds."
+```
+
+Also add a "Skip for now (use sample data)" option. API keys should NOT be a required step.
+
+### FP-5: Thesis Setup Cognitive Overload (HIGH)
+
+**File**: `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/onboarding/ThesisSetup.jsx`
+
+Currently, all 6 dominos with all 24 signals and all threshold inputs are shown at once. This is the most intimidating step.
+
+**Fix**:
+- Default all dominos to enabled (already the case -- good)
+- Collapse all domino details by default -- only show domino name, description, and enabled/disabled toggle
+- Show signal thresholds as "advanced" behind an expand action
+- Add a "Use defaults" prominent option: "These thresholds are pre-configured based on the source research. You can customize them later from the dashboard."
+- Consider making this entire step optional during onboarding and accessible from settings post-onboarding
+
+### FP-6: No "Skip" or "Use Defaults" Fast Path (MEDIUM)
+
+**File**: `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/onboarding/OnboardingWizard.jsx`
+
+There is no way to skip optional steps. For a first-time user who just wants to SEE the product, the minimum required input should be:
+1. Career profile (4 fields + goals)
+2. Everything else uses defaults
+
+**Fix**: Add a "Quick Start (use all defaults)" button on the Welcome step that skips to Career Profile, uses default thesis config, and skips API keys.
+
+### FP-7: Post-Onboarding Shows Wrong Data (CRITICAL -- BUG)
+
+**Files**:
+- `/Users/fabianaguilar/Projects/AsymmetricBridge/src/config/ThesisContext.jsx`
+- `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/CommandCenter.jsx`
+
+The `CommandCenter` imports static data from `data/dominos.js`, `data/products.js`, `data/revenue.js`, `data/twitter.js` alongside the thesis context. These static imports contain Fabian's personal Lucid Box data. The dashboard needs to distinguish between "thesis data" (from the user's config) and "Fabian's personal data" (Lucid Box products, revenue scenarios, Twitter pillars, ALOS components).
+
+**Fix**: The CommandCenter should check whether the loaded thesis matches the default `fabianThesis` config. If the user completed onboarding with their own data, the dashboard should show THEIR dominos, THEIR career profile, and either hide or clearly label the Lucid Box/portfolio sections as "template" content. New users should see their configured dominos and signals with appropriate empty states where they have not added data.
+
+---
+
+## 4. Recommended Flow Changes
+
+### Current Flow (5 steps, linear, all required):
+
+```
+Welcome --> Career Profile --> Thesis Setup --> API Keys --> Review --> Dashboard
+```
+
+### Recommended Flow (3 required + 2 optional, with preview):
+
+```
+STEP 0: Product Landing (NEW)
+  "What is Asymmetric Bridge?"
+  - 3-sentence value prop
+  - Visual preview of the dashboard
+  - Source attribution (which articles this is built on)
+  - Two paths: "Quick Start" / "Custom Setup"
+
+STEP 1: Career Profile (REQUIRED, streamlined)
+  - Same fields but cleaner copy
+  - Resume quick-fill stays (rename from "Regex Heuristics")
+  - Remove "Experience Band" label, use "Years of Experience"
+
+STEP 2: Thesis Preview (REPLACES current "Thesis Setup")
+  - Show the 6-domino cascade as a READ-ONLY visual with source attribution
+  - "These are pre-configured from [sources]. You can customize after setup."
+  - Single toggle: "Use default thesis" (checked) / "Customize now" (unchecked)
+  - If customize: expand to current ThesisSetup but with collapsed signals
+
+STEP 3: Data Sources (REPLACES current "API Key Setup", OPTIONAL)
+  - Explain what each key does and what data it provides
+  - "Skip for now -- use sample data" as the PRIMARY action
+  - "Add API keys for live data" as secondary
+  - Show a before/after: "Sample data" vs "Live data" preview
+
+STEP 4: Review + Launch (same as current Complete)
+  - Summary of choices
+  - "Open Your Dashboard"
+```
+
+### Key Changes:
+- **Added**: Product Landing (Step 0) -- addresses "jolting and confusing"
+- **Changed**: Thesis Setup becomes Thesis Preview -- addresses cognitive overload
+- **Changed**: API Keys becomes optional with skip -- addresses "assumes technical"
+- **Removed**: Nothing removed, but 2 steps become skippable
+- **Net effect**: Minimum path is 3 clicks (Landing --> Career Profile --> Review) instead of 5 mandatory steps
+
+---
+
+## 5. Copy/UX Recommendations for Each Step
+
+### Step 0: Product Landing
+
+**Current title**: "Asymmetric Bridge OSS Onboarding"
+**Recommended title**: "Asymmetric Bridge"
+
+**Current subtitle**: "Build your thesis profile"
+**Recommended subtitle**: "Track macro disruption signals that affect your career and positioning"
+
+**Current description**: "This wizard creates your local thesis config and saves it via `useThesis().updateThesis()` when complete."
+**Recommended description**: "Asymmetric Bridge connects economic disruption signals to your career trajectory. Built on research from Citrini, Aschenbrenner, Bloch, and Deniz -- it tracks a 6-domino chain of cause-and-effect disruption vectors so you can position ahead of structural shifts. Everything stays in your browser. Setup takes about 2 minutes."
+
+### Step 1: Career Profile
+
+**Current section title**: "Career Profile"
+**Recommended section title**: "About You"
+**Recommended description (add)**: "This helps Asymmetric Bridge connect macro signals to your specific career context."
+
+**Field label changes**:
+- "Current Role" -- keep as-is (good)
+- "Target Role" -- keep as-is (good)
+- "Industry Focus" -- keep as-is (good)
+- "Experience Band" --> "Years of Experience"
+- "Goals (tags)" --> "Career Goals" with subtext "What are you working toward?"
+
+**Resume Ingestion**:
+- "Resume Ingestion (Regex Heuristics)" --> "Quick-Fill from Resume"
+- "Paste resume text and extract job titles, companies, experience band, and skill keywords to prefill your profile." --> "Paste your resume text to auto-fill the fields below."
+- "Parse Resume" button --> "Extract" or "Auto-Fill"
+
+### Step 2: Thesis Preview
+
+**Add intro copy**: "The Asymmetric Bridge thesis tracks a chain of economic dominos. Each one represents a disruption force -- when one tips, it puts pressure on the next. These defaults come from research by Citrini Research, Leopold Aschenbrenner, and others. You can adjust them anytime from the dashboard."
+
+**Domino cards**: Show domino name, one-line description, and signal count. Collapse threshold editing behind "Customize" toggle.
+
+**Signal threshold labels**: Instead of raw signal names like "Public SaaS Net Revenue Retention", show them as "SaaS Revenue Retention (NRR)" with the `whyItMatters` text visible.
+
+### Step 3: Data Sources
+
+**Replace entire intro copy with**:
+```
+Live Data Connections (Optional)
+
+Asymmetric Bridge can pull real-time economic data to keep your signals current.
+
+FRED -- Federal Reserve Economic Data
+  Powers: Employment figures, GDP growth, M2 money velocity, deficit tracking
+  Free at: fredaccount.stlouisfed.org/apikeys
+
+Twelve Data -- Market Prices
+  Powers: Stock prices for portfolio tracking (NVDA, CRM, BX, etc.)
+  Free at: twelvedata.com/apikey
+
+Without API keys, the dashboard uses sample data so you can still explore the full interface.
+```
+
+### Step 4: Review
+
+**Current**: Shows Career Summary, Thesis Summary, API Keys status.
+**Add**: A mini visual preview of what the dashboard will look like with their configuration. Even a static mockup helps set expectations.
+
+---
+
+## 6. Empty State and First-Run Improvements
+
+### Problem: No distinction between "Fabian's dashboard" and "new user's dashboard"
+
+The `CommandCenter.jsx` imports hardcoded data:
+```javascript
+import { ALOS_COMPONENTS } from "../data/alos-components";
+import { DOMINOS } from "../data/dominos";
+import { PRODUCTS } from "../data/products";
+import { REVENUE_SCENARIOS } from "../data/revenue";
+import { TWITTER_PILLARS } from "../data/twitter";
+```
+
+These are Fabian's personal data (Lucid Box products, ALOS components, etc.). A new user completing onboarding with their own career profile should NOT see "Lucid Box" products or Fabian's Twitter pillars.
+
+### Recommended Fixes:
+
+**A. Thesis-derived dashboard sections should read from `useThesis()`:**
+- Dominos and signals: Already in thesis context (good)
+- Portfolio legs: Already in thesis context (good)
+- Career profile: Already in thesis context (good)
+
+**B. Personal sections need empty states:**
+- Products (`PRODUCTS`): Should show an empty state: "Add your products and services to track against thesis signals" for new users
+- Revenue scenarios (`REVENUE_SCENARIOS`): Empty state: "Model revenue scenarios based on thesis outcomes"
+- Twitter pillars (`TWITTER_PILLARS`): Empty state or hide entirely for non-Fabian users
+- ALOS components (`ALOS_COMPONENTS`): Hide for non-Fabian users
+
+**C. Detection logic**: Compare `thesis.meta.author` against "Fabian Aguilar" or check a `isDefaultThesis` flag. If not the default thesis, hide personal sections and show thesis-derived sections with the user's data.
+
+**D. No-API-key empty state**: When FRED/Twelve Data keys are missing, signal cards should show: "Sample data -- add your FRED API key in settings for live updates" instead of silently showing stale or no data.
+
+**E. Guided Tour needs updating**: The `GuidedTour.jsx` references portfolio sections and signal cards that may not be populated for a new user. The tour should be context-aware: if the user has no API keys configured, the tour should mention that signals are showing sample data.
+
+---
+
+## 7. Specific Code Changes Needed
+
+### CRITICAL PRIORITY (Ship-blocking)
+
+| # | File | Change | Lines |
+|---|------|--------|-------|
+| C1 | `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/onboarding/OnboardingWizard.jsx` | Replace line 230 developer jargon: `"This wizard creates your local thesis config and saves it via useThesis().updateThesis() when complete."` --> `"Your setup is saved locally in your browser. Nothing leaves your machine."` | 230 |
+| C2 | `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/onboarding/ResumeIngestion.jsx` | Replace line 211: `"Resume Ingestion (Regex Heuristics)"` --> `"Quick-Fill from Resume"` | 211 |
+| C3 | `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/onboarding/OnboardingWizard.jsx` | Rewrite `WelcomeStep` (lines 287-301) with product explanation, value prop, and source attribution | 287-301 |
+| C4 | `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/CommandCenter.jsx` | Add conditional rendering: if `thesis.meta.author !== "Fabian Aguilar"`, hide Lucid Box personal sections (PRODUCTS, REVENUE_SCENARIOS, TWITTER_PILLARS, ALOS_COMPONENTS) and show user's thesis-derived data with appropriate empty states | Throughout |
+
+### HIGH PRIORITY (First-week fixes)
+
+| # | File | Change | Lines |
+|---|------|--------|-------|
+| H1 | `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/onboarding/APIKeySetup.jsx` | Replace description (line 131-133) with explanation of what FRED and Twelve Data provide, why they matter, and what happens without them | 131-133 |
+| H2 | `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/onboarding/APIKeySetup.jsx` | Add "Skip for now -- use sample data" button that advances to next step without requiring keys | New |
+| H3 | `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/onboarding/ThesisSetup.jsx` | Add source attribution intro card explaining the domino cascade comes from specific research articles. Reference `thesis.sources` data that already exists in `fabian-thesis.js` | Top of component |
+| H4 | `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/onboarding/ThesisSetup.jsx` | Collapse all signal threshold editing by default. Add "Use defaults (recommended)" / "Customize thresholds" toggle. Defaults should be the primary path | Lines 133-201 |
+| H5 | `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/onboarding/OnboardingWizard.jsx` | Add "Quick Start" button on Welcome step that skips Thesis Setup and API Keys, using defaults for both | Lines 287-301 |
+
+### MEDIUM PRIORITY (Polish)
+
+| # | File | Change | Lines |
+|---|------|--------|-------|
+| M1 | `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/onboarding/CareerProfile.jsx` | Rename "Experience Band" label to "Years of Experience". Rename "Goals (tags)" to "Career Goals" with subtext | 72, 133 |
+| M2 | `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/onboarding/ThesisSetup.jsx` | Rename "Thesis Metadata" to "Name Your Thesis". Rename "Author" to "Your Name" | 69, 85 |
+| M3 | `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/GuidedTour.jsx` | Make tour context-aware: check for API keys and adjust descriptions. Step about signals should mention sample data if no keys configured | Throughout |
+| M4 | `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/onboarding/OnboardingWizard.jsx` | Add step progress indicator: "Step 2 of 5" with estimated time "~30 seconds" per step | 233-246 |
+| M5 | `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/onboarding/ThesisSetup.jsx` | For each domino, surface the `whyItMatters` text from the first signal as a human-readable explanation of why this domino matters | Lines 136-200 |
+
+---
+
+## Summary of Root Causes
+
+The onboarding has three root problems that cascade into all the feedback:
+
+1. **Builder-audience mismatch.** The onboarding was written by a developer for a developer. Every label, description, and flow decision assumes the user already knows what Asymmetric Bridge is, what a "domino cascade" is, what FRED is, and why they should care. The user does not.
+
+2. **No progressive disclosure.** All complexity is front-loaded. The user must configure 6 dominos with 24 signal thresholds before they see anything. The correct pattern is: show the value first, then let the user customize. The thesis defaults are GOOD defaults -- let people use them and customize later.
+
+3. **No user/creator separation.** The app was built as Fabian's personal dashboard first, then the onboarding was layered on top. But the CommandCenter still loads Fabian's personal data (Lucid Box, ALOS, revenue scenarios) regardless of who completed onboarding. The thesis context correctly stores user data, but the dashboard does not fully consume it.
+
+The fix priority should be: **C3 (Welcome rewrite) --> C1+C2 (jargon removal) --> C4 (user/creator separation) --> H5 (Quick Start) --> H1+H2 (API key context) --> H3+H4 (thesis setup simplification)**. That sequence addresses all 8 pieces of user feedback in order of impact.</result>
+<usage><total_tokens>61902</total_tokens><tool_uses>14</tool_uses><duration_ms>159609</duration_ms></usage>
+</task-notification>
+Full transcript available at: REDACTED.output
+
+---
+
+OK Sopha F7 what I'm saying is I went through all that process of putting in that fake information and when I finished rather than seeing what it would look like with the synthetic data and the synthetic person that we made up and seeing their data in the command center rather I only saw mine. I don't need to go through an on boarding. Mine should just be there. The on boarding is just there for me to test out what it would be like for someone who would be using this for the first time, does that make s. And I think it's fine to have the financial technical information there but we should make it clear what it means in plain English there should be like a glossary away for someone to get their bearings and in a product landing, you know I'm not selling this. This is a portfolio piece, but there definitely needs to be a product landing inspired page in terms of orienting the user appropriately. And then we want to add in some true analysis like right like so we'll need to open it like we'll need someone to bring their own keys for that as well. Can you think of three other ways in which we can improve this and then can we think of ways in which we can make sure what we planned is actually executed I feel like hardly anything we planned on was actually done.
+
+---
+
+I want to do V point one all the way all the way to V .3 I just want you to be honest with me and what gives us the highest likelihood of delivering the best output of getting what we want getting what my vision is
+
+---
+
+[Request interrupted by user for tool use]
