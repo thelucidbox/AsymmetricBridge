@@ -3,24 +3,20 @@
   "checkpoint_id": "a53fcc3903d8",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 5,
+  "checkpoints_count": 1,
   "files_touched": [
-    "ARCHITECTURE.md",
-    "BRIEF.md",
-    "CLAUDE.md",
-    "DECOMPOSITION.md",
-    "DESIGN-BRIEF.md",
-    "FORGE_LOG.md",
-    "SPEC.md",
-    "productivity/TODO.md",
-    "src/components/lucid-box/LucidBoxDominos.jsx",
-    "src/components/lucid-box/LucidBoxMarket.jsx",
-    "src/components/lucid-box/LucidBoxSignals.jsx",
-    "src/config/ThesisContext.jsx",
-    "src/config/fabian-thesis.js",
-    "src/config/thesis-schema.js",
-    "src/lib/data-sources.js",
-    "src/main.jsx"
+    ".env.example",
+    "CONTRIBUTING.md",
+    "LICENSE",
+    "README.md",
+    "index.html",
+    "src/components/GlossaryTooltip.jsx",
+    "src/components/conviction/ConvictionScorecard.jsx",
+    "src/components/performance-lab/PerformanceView.jsx",
+    "src/design-tokens/observatory.js",
+    "src/design-tokens/terminal.js",
+    "src/index.css",
+    "src/lib/export-utils.js"
   ],
   "sessions": [
     {
@@ -32,10 +28,10 @@
     }
   ],
   "token_usage": {
-    "input_tokens": 1380,
-    "cache_creation_tokens": 312643,
-    "cache_read_tokens": 13462396,
-    "output_tokens": 24246,
-    "api_call_count": 118
+    "input_tokens": 89,
+    "cache_creation_tokens": 127539,
+    "cache_read_tokens": 8436184,
+    "output_tokens": 9366,
+    "api_call_count": 71
   }
 }
