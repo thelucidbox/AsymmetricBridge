@@ -190,3 +190,88 @@ OK, I wanna work with it with tree with Work trees to be honest with you just be
 
 yes commit it first
 
+### Prompt 29
+
+Here is the codex prompt, and I named the tree 'back-endv2' Implemented all 5 backend-hardening deliverables with additive changes and preserved adapter function signatures.
+
+- [x] Retry utility created: [src/lib/retry.js](/Users/fabianaguilar/Projects/AsymmetricBridge/src/lib/retry.js#L1)
+  - `withRetry(fn, { maxRetries, baseDelay, maxDelay, onRetry })`
+  - Exponential backoff + jitter (`0-500ms`)
+  - Returns `{ data, error, attempts }`
+
+- [x] API adapters wrapped with retry + 429 detection + s...
+
+### Prompt 30
+
+what should I do here
+
+### Prompt 31
+
+[Image: source: /Users/fabianaguilar/Desktop/Screenshot 2026-02-23 at 2.25.39 PM.png]
+
+### Prompt 32
+
+done, what's next
+
+### Prompt 33
+
+[Image: source: /Users/fabianaguilar/Desktop/Screenshot 2026-02-23 at 2.28.33 PM.png]
+
+### Prompt 34
+
+Let's do it!
+
+### Prompt 35
+
+ran them all. Here's is what codex gave me from the 5th prompt, which I ran after the first four had finished: Implemented all 5 deliverables plus responsive behavior and verification.
+
+**What I changed**
+- Created Terminal token set: [terminal.js](/Users/fabianaguilar/Projects/AsymmetricBridge/src/design-tokens/terminal.js:1)
+- Created Observatory token set (including `useGlass` + glass tokens): [observatory.js](/Users/fabianaguilar/Projects/AsymmetricBridge/src/design-tokens/observatory.js:1)
+...
+
+### Prompt 36
+
+lets
+
+### Prompt 37
+
+I completed these. I have not committed the last seven prompts, this group.
+
+### Prompt 38
+
+This session is being continued from a previous conversation that ran out of context. The summary below covers the earlier portion of the conversation.
+
+Analysis:
+Let me chronologically analyze the entire conversation:
+
+**Session Start (continued from previous context compression)**
+The conversation was continued from a previous session that had already:
+- Reviewed AsymmetricBridge thoroughly using Gemini and Claude web reviews
+- Proposed 33 recommendations across 6 categories
+- Created SPEC.md ...
+
+### Prompt 39
+
+let's do Group D and then the quality pipeline
+
+### Prompt 40
+
+Base directory for this skill: /Users/fabianaguilar/.claude/skills/design-review
+
+# Design Review (Zoom-In Method)
+
+Progressive design refinement: 50% → 99% → 100%. Run after `frontend-design` generates initial code.
+
+## Usage
+
+- `/design-review` — Run the full 3-pass review on the most recent UI generation
+- `/design-review <file>` — Review a specific file
+- `/design-review pipeline` — Show the full ALOS design pipeline
+
+## The Zoom-In Method
+
+### Pass 1: Self-Review (50% → 99%)
+
+Re...
+
