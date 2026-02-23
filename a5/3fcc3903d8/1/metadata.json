@@ -1,39 +1,23 @@
 {
   "cli_version": "0.4.4",
   "checkpoint_id": "a53fcc3903d8",
+  "session_id": "bea57195-96e1-4ea1-8b3f-dee286cbeebe",
   "strategy": "manual-commit",
+  "created_at": "2026-02-23T23:41:00.882718Z",
   "branch": "main",
-  "checkpoints_count": 2,
+  "checkpoints_count": 1,
   "files_touched": [
     ".env.example",
-    "ARCHITECTURE.md",
-    "CLAUDE.md",
     "CODEX-REVIEW-PROMPT.md",
-    "CONTRIBUTING.md",
-    "DECOMPOSITION.md",
-    "DESIGN-BRIEF.md",
-    "LICENSE",
-    "README.md",
-    "SPEC.md",
-    "index.html",
-    "productivity/TODO.md",
     "src/App.jsx",
     "src/components/CommandCenter.jsx",
     "src/components/GlossaryPage.jsx",
-    "src/components/GlossaryTooltip.jsx",
     "src/components/Navigation.jsx",
-    "src/components/conviction/ConvictionScorecard.jsx",
     "src/components/lucid-box/LucidBoxHeader.jsx",
     "src/components/onboarding/OnboardingWizard.jsx",
     "src/components/onboarding/ResearchDiscovery.jsx",
     "src/components/onboarding/ThesisSetup.jsx",
-    "src/components/performance-lab/PerformanceView.jsx",
     "src/config/ThesisContext.jsx",
-    "src/design-tokens/observatory.js",
-    "src/design-tokens/terminal.js",
-    "src/index.css",
-    "src/lib/export-utils.js",
-    "src/main.jsx",
     "test-screenshots/01_initial_load.png",
     "test-screenshots/02a_onboarding_step1_welcome.png",
     "test-screenshots/02b_career_validation_errors.png",
@@ -51,27 +35,22 @@
     "test-screenshots/run_tests.py",
     "test-screenshots/test_report.json"
   ],
-  "sessions": [
-    {
-      "metadata": "/a5/3fcc3903d8/0/metadata.json",
-      "transcript": "/a5/3fcc3903d8/0/full.jsonl",
-      "context": "/a5/3fcc3903d8/0/context.md",
-      "content_hash": "/a5/3fcc3903d8/0/content_hash.txt",
-      "prompt": "/a5/3fcc3903d8/0/prompt.txt"
-    },
-    {
-      "metadata": "/a5/3fcc3903d8/1/metadata.json",
-      "transcript": "/a5/3fcc3903d8/1/full.jsonl",
-      "context": "/a5/3fcc3903d8/1/context.md",
-      "content_hash": "/a5/3fcc3903d8/1/content_hash.txt",
-      "prompt": "/a5/3fcc3903d8/1/prompt.txt"
-    }
-  ],
+  "agent": "Claude Code",
   "token_usage": {
-    "input_tokens": 152,
-    "cache_creation_tokens": 401847,
-    "cache_read_tokens": 13977716,
-    "output_tokens": 20115,
-    "api_call_count": 110
-  }
+    "input_tokens": 84,
+    "cache_creation_tokens": 266985,
+    "cache_read_tokens": 8896744,
+    "output_tokens": 12470,
+    "api_call_count": 72
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-02-23T23:41:00.335816Z",
+    "agent_lines": 1338,
+    "human_added": 0,
+    "human_modified": 359,
+    "human_removed": 441,
+    "total_committed": 1697,
+    "agent_percentage": 78.8450206246317
+  },
+  "transcript_path": ".claude/projects/-Users-fabianaguilar-Projects-ALOS/bea57195-96e1-4ea1-8b3f-dee286cbeebe.jsonl"
 }
