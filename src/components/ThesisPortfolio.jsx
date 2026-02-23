@@ -130,7 +130,9 @@ export default function ThesisPortfolio() {
       </div>
 
       {/* Portfolio Positioning */}
-      <div style={S.label}>Portfolio Positioning (5 Legs)</div>
+      <div data-tour="portfolio-section" style={S.label}>
+        Portfolio Positioning (5 Legs)
+      </div>
       {POSITIONING.map((p, i) => (
         <div key={i} style={{ ...S.card(`${p.color}15`), marginBottom: 8 }}>
           <div
@@ -281,6 +283,18 @@ export default function ThesisPortfolio() {
               <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)" }}>
                 {s.author}
               </div>
+              {s.tldr && (
+                <div
+                  style={{
+                    marginTop: 5,
+                    fontSize: 11,
+                    color: "rgba(255,255,255,0.58)",
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {s.tldr}
+                </div>
+              )}
             </div>
             <span
               style={{

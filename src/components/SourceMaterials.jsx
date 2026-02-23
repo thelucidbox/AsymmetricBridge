@@ -29,6 +29,18 @@ export default function SourceMaterials() {
                 </div>
                 <div style={{ fontSize: 16, fontWeight: 600, color: "#E8E4DF", marginBottom: 2 }}>{s.title}</div>
                 <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)" }}>{s.author}</div>
+                {s.tldr && (
+                  <div
+                    style={{
+                      marginTop: 5,
+                      fontSize: 11,
+                      color: "rgba(255,255,255,0.58)",
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {s.tldr}
+                  </div>
+                )}
               </div>
               <span style={{ color: "rgba(255,255,255,0.2)", transform: expanded === i ? "rotate(180deg)" : "rotate(0)", transition: "transform 0.2s" }}>▾</span>
             </div>

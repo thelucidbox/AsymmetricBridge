@@ -1,32 +1,134 @@
 import { createElement } from "react";
+import { getThemeTokens, useTheme } from "./design-tokens";
+
+function buildStatusConfig(tokens) {
+  return {
+    green: {
+      label: "Baseline",
+      bg: tokens.colors.baselineBg,
+      border: tokens.colors.baselineBorder,
+      dot: tokens.colors.baseline,
+      text: tokens.colors.baseline,
+    },
+    amber: {
+      label: "Watch",
+      bg: tokens.colors.watchBg,
+      border: tokens.colors.watchBorder,
+      dot: tokens.colors.watch,
+      text: tokens.colors.watchText,
+    },
+    red: {
+      label: "Alert",
+      bg: tokens.colors.alertBg,
+      border: tokens.colors.alertBorder,
+      dot: tokens.colors.alert,
+      text: tokens.colors.alert,
+    },
+  };
+}
 
 export const STATUS_CFG = {
-  green: { label: "Baseline", bg: "rgba(42,157,143,0.12)", border: "rgba(42,157,143,0.3)", dot: "#2A9D8F", text: "#2A9D8F" },
-  amber: { label: "Watch", bg: "rgba(244,162,97,0.12)", border: "rgba(244,162,97,0.3)", dot: "#F4A261", text: "#E9C46A" },
-  red: { label: "Alert", bg: "rgba(230,57,70,0.12)", border: "rgba(230,57,70,0.3)", dot: "#E63946", text: "#E63946" },
+  get green() {
+    return buildStatusConfig(getThemeTokens()).green;
+  },
+  get amber() {
+    return buildStatusConfig(getThemeTokens()).amber;
+  },
+  get red() {
+    return buildStatusConfig(getThemeTokens()).red;
+  },
 };
+
+function maybeGlassCard(tokens) {
+  if (!tokens.useGlass) return {};
+  return {
+    backdropFilter: tokens.glass.blur,
+    WebkitBackdropFilter: tokens.glass.blur,
+    boxShadow: tokens.glass.shadow,
+    willChange: "transform",
+  };
+}
 
 export const S = {
-  label: { fontSize: 10, color: "rgba(255,255,255,0.35)", textTransform: "uppercase", letterSpacing: "1.2px", marginBottom: 6, fontFamily: "'IBM Plex Mono', monospace" },
-  card: (c) => ({ background: "rgba(255,255,255,0.025)", border: `1px solid ${c || "rgba(255,255,255,0.06)"}`, borderRadius: 10, padding: "14px 16px", marginBottom: 10 }),
-  tab: (a, c) => ({ padding: "7px 12px", fontSize: 11, fontWeight: a ? 700 : 500, color: a ? c : "rgba(255,255,255,0.4)", background: a ? `${c}15` : "transparent", border: `1px solid ${a ? `${c}33` : "transparent"}`, borderRadius: 7, cursor: "pointer", transition: "all 0.2s" }),
-  sectionTab: (a, c) => ({ padding: "10px 20px", fontSize: 13, fontWeight: a ? 700 : 500, color: a ? "#E8E4DF" : "rgba(255,255,255,0.35)", background: a ? `${c}18` : "transparent", border: `1px solid ${a ? `${c}44` : "rgba(255,255,255,0.06)"}`, borderRadius: 8, cursor: "pointer", transition: "all 0.2s", letterSpacing: "-0.2px" }),
+  get label() {
+    const tokens = getThemeTokens();
+    return {
+      fontSize: tokens.typography.sizes.label,
+      color: tokens.colors.textMuted,
+      textTransform: "uppercase",
+      letterSpacing: tokens.typography.letterSpacing.label,
+      marginBottom: tokens.spacing.labelMarginBottom,
+      fontFamily: tokens.typography.fontMono,
+    };
+  },
+
+  card: (borderColor) => {
+    const tokens = getThemeTokens();
+    return {
+      background: tokens.colors.surface,
+      border: `${tokens.shape.borderWidth}px solid ${borderColor || tokens.colors.border}`,
+      borderRadius: tokens.shape.cardRadius,
+      padding: tokens.spacing.cardPadding,
+      marginBottom: tokens.spacing.cardMarginBottom,
+      ...maybeGlassCard(tokens),
+    };
+  },
+
+  tab: (isActive, accentColor) => {
+    const tokens = getThemeTokens();
+    const activeColor = accentColor || tokens.colors.accent;
+
+    return {
+      padding: tokens.spacing.tabPadding,
+      fontSize: tokens.typography.sizes.tab,
+      fontWeight: isActive ? tokens.typography.weights.bold : tokens.typography.weights.medium,
+      color: isActive ? activeColor : tokens.colors.textSoft,
+      background: isActive ? `${activeColor}15` : "transparent",
+      border: `${tokens.shape.borderWidth}px solid ${isActive ? `${activeColor}33` : "transparent"}`,
+      borderRadius: tokens.shape.tabRadius,
+      cursor: "pointer",
+      transition: tokens.motion.default,
+    };
+  },
+
+  sectionTab: (isActive, accentColor) => {
+    const tokens = getThemeTokens();
+    const activeColor = accentColor || tokens.colors.accent;
+
+    return {
+      padding: tokens.spacing.sectionPadding,
+      fontSize: tokens.typography.sizes.sectionTab,
+      fontWeight: isActive ? tokens.typography.weights.bold : tokens.typography.weights.medium,
+      color: isActive ? tokens.colors.text : tokens.colors.textMuted,
+      background: isActive ? `${activeColor}18` : "transparent",
+      border: `${tokens.shape.borderWidth}px solid ${isActive ? `${activeColor}44` : tokens.colors.border}`,
+      borderRadius: tokens.shape.sectionTabRadius,
+      cursor: "pointer",
+      transition: tokens.motion.default,
+      letterSpacing: tokens.typography.letterSpacing.sectionTab,
+    };
+  },
 };
 
-export const Badge = ({ text, color }) => (
-  createElement(
+export const Badge = ({ text, color }) => {
+  const { tokens } = useTheme();
+  const activeTokens = tokens || getThemeTokens();
+  const badgeColor = color || activeTokens.colors.accent;
+
+  return createElement(
     "span",
     {
       style: {
-        fontSize: 9,
-        fontWeight: 700,
-        color,
-        background: `${color}15`,
-        padding: "2px 6px",
-        borderRadius: 3,
-        letterSpacing: "0.5px",
+        fontSize: activeTokens.typography.sizes.badge,
+        fontWeight: activeTokens.typography.weights.bold,
+        fontFamily: activeTokens.typography.fontSans,
+        color: badgeColor,
+        background: `${badgeColor}15`,
+        padding: activeTokens.spacing.badgePadding,
+        borderRadius: activeTokens.shape.badgeRadius,
+        letterSpacing: activeTokens.typography.letterSpacing.badge,
       },
     },
-    text
-  )
-);
+    text,
+  );
+};

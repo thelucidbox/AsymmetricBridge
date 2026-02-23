@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { ThemeToggle, useTheme } from "../design-tokens";
+import { DISPLAY_MODES, setDisplayMode, useDisplayMode } from "../hooks/useDisplayMode";
+import GuidedTour from "./GuidedTour";
 import { S } from "../styles";
 
 const DEFAULT_SECTIONS = [
@@ -22,6 +25,8 @@ function isPathActive(pathname, path) {
 export default function Navigation({ sections, activeSection, onSectionChange }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { tokens } = useTheme();
+  const displayMode = useDisplayMode();
   const [isMobile, setIsMobile] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -50,6 +55,7 @@ export default function Navigation({ sections, activeSection, onSectionChange })
   const resolvedActive = activeSection
     ? activeSection
     : navSections.find((section) => isPathActive(location.pathname, section.path))?.id;
+  const simplifiedMode = displayMode === DISPLAY_MODES.simplified;
 
   const handleSelect = (section) => {
     setIsMenuOpen(false);
@@ -74,7 +80,7 @@ export default function Navigation({ sections, activeSection, onSectionChange })
           background: isActive
             ? `${section.color}18`
             : vertical
-              ? "rgba(255,255,255,0.01)"
+              ? tokens.colors.surfaceSoft
               : "transparent",
         }}
       >
@@ -89,17 +95,17 @@ export default function Navigation({ sections, activeSection, onSectionChange })
         style={{
           position: "sticky",
           top: 0,
-          zIndex: 50,
-          background: "rgba(13,13,15,0.96)",
-          borderBottom: "1px solid rgba(255,255,255,0.06)",
-          backdropFilter: "blur(12px)",
+          zIndex: tokens.zIndex.nav,
+          background: tokens.colors.navBg,
+          borderBottom: `1px solid ${tokens.colors.border}`,
+          backdropFilter: tokens.useGlass ? tokens.glass.blur : "blur(12px)",
+          WebkitBackdropFilter: tokens.useGlass ? tokens.glass.blur : "blur(12px)",
         }}
       >
         <div
+          className="ab-content-shell"
           style={{
-            maxWidth: 920,
-            margin: "0 auto",
-            padding: "10px 14px",
+            padding: tokens.spacing.navPadding,
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
@@ -108,19 +114,64 @@ export default function Navigation({ sections, activeSection, onSectionChange })
         >
           <div
             style={{
-              fontSize: 10,
-              color: "rgba(255,255,255,0.4)",
-              letterSpacing: "0.8px",
+              fontSize: tokens.typography.sizes.label,
+              color: tokens.colors.textSoft,
+              letterSpacing: tokens.typography.letterSpacing.mono,
               textTransform: "uppercase",
-              fontFamily: "'IBM Plex Mono', monospace",
+              fontFamily: tokens.typography.fontMono,
             }}
           >
             Asymmetric Bridge
           </div>
 
           {!isMobile && (
-            <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+            <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
               {navSections.map((section) => renderNavButton(section))}
+              <div
+                style={{
+                  display: "flex",
+                  gap: 6,
+                  alignItems: "center",
+                  marginLeft: 4,
+                  paddingLeft: 8,
+                  borderLeft: `1px solid ${tokens.colors.border}`,
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: tokens.typography.sizes.label,
+                    color: tokens.colors.textMuted,
+                    fontFamily: tokens.typography.fontMono,
+                    letterSpacing: tokens.typography.letterSpacing.mono,
+                  }}
+                >
+                  View
+                </span>
+                <button
+                  onClick={() => setDisplayMode(DISPLAY_MODES.simplified)}
+                  style={S.tab(simplifiedMode, "#2A9D8F")}
+                  aria-pressed={simplifiedMode}
+                >
+                  Simplified
+                </button>
+                <button
+                  onClick={() => setDisplayMode(DISPLAY_MODES.full)}
+                  style={S.tab(!simplifiedMode, "#E9C46A")}
+                  aria-pressed={!simplifiedMode}
+                >
+                  Full
+                </button>
+              </div>
+
+              <div
+                style={{
+                  marginLeft: 2,
+                  paddingLeft: 8,
+                  borderLeft: `1px solid ${tokens.colors.border}`,
+                }}
+              >
+                <ThemeToggle />
+              </div>
             </div>
           )}
 
@@ -148,7 +199,7 @@ export default function Navigation({ sections, activeSection, onSectionChange })
             inset: 0,
             border: "none",
             background: "rgba(0,0,0,0.45)",
-            zIndex: 45,
+            zIndex: tokens.zIndex.nav - 1,
             cursor: "pointer",
           }}
         />
@@ -160,22 +211,67 @@ export default function Navigation({ sections, activeSection, onSectionChange })
             position: "fixed",
             top: 0,
             left: isMenuOpen ? 0 : -260,
-            width: 250,
+            width: "min(250px, 82vw)",
             height: "100vh",
-            zIndex: 46,
-            background: "rgba(13,13,15,0.98)",
-            borderRight: "1px solid rgba(255,255,255,0.08)",
+            zIndex: tokens.zIndex.nav + 1,
+            background: tokens.colors.drawerBg,
+            borderRight: `1px solid ${tokens.colors.border}`,
             padding: "70px 12px 12px",
             display: "flex",
             flexDirection: "column",
             gap: 8,
             transition: "left 0.2s ease",
-            backdropFilter: "blur(16px)",
+            backdropFilter: tokens.useGlass ? tokens.glass.blur : "blur(16px)",
+            WebkitBackdropFilter: tokens.useGlass ? tokens.glass.blur : "blur(16px)",
           }}
         >
           {navSections.map((section) => renderNavButton(section, true))}
+
+          <div
+            style={{
+              marginTop: 10,
+              paddingTop: 10,
+              borderTop: `1px solid ${tokens.colors.border}`,
+              display: "flex",
+              flexDirection: "column",
+              gap: 8,
+            }}
+          >
+            <div
+              style={{
+                fontSize: tokens.typography.sizes.label,
+                color: tokens.colors.textMuted,
+                fontFamily: tokens.typography.fontMono,
+                letterSpacing: tokens.typography.letterSpacing.mono,
+              }}
+            >
+              Display Mode
+            </div>
+            <div style={{ display: "flex", gap: 6 }}>
+              <button
+                onClick={() => setDisplayMode(DISPLAY_MODES.simplified)}
+                style={{ ...S.tab(simplifiedMode, "#2A9D8F"), flex: 1 }}
+                aria-pressed={simplifiedMode}
+              >
+                Simplified
+              </button>
+              <button
+                onClick={() => setDisplayMode(DISPLAY_MODES.full)}
+                style={{ ...S.tab(!simplifiedMode, "#E9C46A"), flex: 1 }}
+                aria-pressed={!simplifiedMode}
+              >
+                Full
+              </button>
+            </div>
+
+            <div style={{ marginTop: 4 }}>
+              <ThemeToggle />
+            </div>
+          </div>
         </div>
       )}
+
+      <GuidedTour />
     </>
   );
 }

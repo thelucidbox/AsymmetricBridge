@@ -2,6 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.jsx";
 import { ThesisProvider } from "./config/ThesisContext.jsx";
+import { ThemeProvider } from "./design-tokens";
 import { validateEnv } from "./lib/env-check.js";
 import "./index.css";
 
@@ -22,8 +23,10 @@ if (envValidation.warnings.length > 0) {
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <ThesisProvider>
-      <App />
-    </ThesisProvider>
+    <ThemeProvider>
+      <ThesisProvider>
+        <App />
+      </ThesisProvider>
+    </ThemeProvider>
   </StrictMode>,
 );

@@ -91,6 +91,7 @@ export default function LucidBoxMarket({
       </div>
 
       <div
+        data-tour="status-colors"
         style={{
           display: "grid",
           gridTemplateColumns: "1fr 1fr 1fr 1fr",

@@ -10,6 +10,7 @@ import { DOMINOS } from "../data/dominos";
 import { PRODUCTS } from "../data/products";
 import { REVENUE_SCENARIOS } from "../data/revenue";
 import { TWITTER_PILLARS } from "../data/twitter";
+import { useTheme } from "../design-tokens";
 import { useCryptoData } from "../hooks/useCryptoData";
 import { useFredData } from "../hooks/useFredData";
 import { useSignalStatuses } from "../hooks/useSignalStatuses";
@@ -36,35 +37,107 @@ const PRODUCT_STATUS_COLORS = {
   build_quarter_3: "#264653",
 };
 
+function normalizeFeedError(error, source = "unknown") {
+  if (!error) return null;
+
+  if (typeof error === "object" && "code" in error && "message" in error) {
+    return {
+      code: error.code || "NETWORK_ERROR",
+      message: error.message || "Unknown error",
+      retryable: Boolean(error.retryable),
+      source: error.source || source,
+    };
+  }
+
+  if (error instanceof Error) {
+    return {
+      code: "NETWORK_ERROR",
+      message: error.message,
+      retryable: true,
+      source,
+    };
+  }
+
+  return {
+    code: "NETWORK_ERROR",
+    message: String(error),
+    retryable: true,
+    source,
+  };
+}
+
+function latestTimestamp(values) {
+  const valid = values
+    .map((value) => new Date(value))
+    .filter((date) => !Number.isNaN(date.getTime()));
+
+  if (!valid.length) return null;
+  valid.sort((a, b) => b.getTime() - a.getTime());
+  return valid[0].toISOString();
+}
+
 export default function CommandCenter() {
+  const { tokens } = useTheme();
   const [section, setSection] = useState("lucidbox");
   const [subTab, setSubTab] = useState("products");
   const [activeDominos, setActiveDominos] = useState(new Set([1]));
   const [expandedProduct, setExpandedProduct] = useState(3);
   const [signalSubTab, setSignalSubTab] = useState("tracker");
 
-  const { data: fredData, isLoading: fredLoading } = useFredData();
-  const { data: stockData, isLoading: stockLoading } = useStockData();
-  const { data: cryptoData, isLoading: cryptoLoading } = useCryptoData();
-  const { data: signalStatuses } = useSignalStatuses();
+  const fredQuery = useFredData();
+  const stockQuery = useStockData();
+  const cryptoQuery = useCryptoData();
+  const signalStatusesQuery = useSignalStatuses();
+
+  const {
+    data: fredData,
+    isLoading: fredLoading,
+    isFetching: fredFetching,
+    error: fredQueryError,
+    dataUpdatedAt: fredDataUpdatedAt,
+  } = fredQuery;
+  const {
+    data: stockData,
+    isLoading: stockLoading,
+    isFetching: stockFetching,
+    error: stockQueryError,
+    dataUpdatedAt: stockDataUpdatedAt,
+  } = stockQuery;
+  const {
+    data: cryptoData,
+    isLoading: cryptoLoading,
+    isFetching: cryptoFetching,
+    error: cryptoQueryError,
+    dataUpdatedAt: cryptoDataUpdatedAt,
+  } = cryptoQuery;
+  const {
+    data: signalStatuses,
+    isLoading: signalStatusesLoading,
+  } = signalStatusesQuery;
 
   const thresholdResult = useAutoThreshold({ fredData, stockData, cryptoData, signalStatuses });
 
   const liveDominos = useMemo(() => {
-    if (!signalStatuses?.length) return DOMINOS;
     return DOMINOS.map((domino) => ({
       ...domino,
       signals: domino.signals.map((signal) => {
-        const live = signalStatuses.find(
+        const live = signalStatuses?.find(
           (status) => status.domino_id === domino.id && status.signal_name === signal.name,
         );
-        if (!live) return signal;
-        return {
+        const baseSignal = {
           ...signal,
+          dominoId: domino.id,
+        };
+        if (!live) return baseSignal;
+        return {
+          ...baseSignal,
           currentStatus: live.status,
           isOverride: live.is_override,
           updatedAt: live.updated_at,
           updatedBy: live.updated_by,
+          statusReason: live.reason || live.notes || null,
+          signalId: live.signal_id || signal.signalId || null,
+          statusRowId: live.id,
         };
       }),
     }));
@@ -99,10 +172,96 @@ export default function CommandCenter() {
           ? "#E9C46A"
           : "#2A9D8F";
 
+  const fredSeries = useMemo(() => {
+    if (
+      !fredData ||
+      typeof fredData !== "object" ||
+      Array.isArray(fredData) ||
+      "error" in fredData
+    ) {
+      return [];
+    }
+    return Object.values(fredData).filter(
+      (entry) => entry && typeof entry === "object",
+    );
+  }, [fredData]);
+
+  const fredSuccessfulSeries = fredSeries.filter(
+    (entry) => Array.isArray(entry.observations),
+  );
+  const fredNestedErrors = fredSeries
+    .map((entry) => normalizeFeedError(entry.error, "fred"))
+    .filter(Boolean);
+  const fredError =
+    normalizeFeedError(fredData?.error, "fred") ||
+    fredNestedErrors.find((error) => error.code === "RATE_LIMITED") ||
+    fredNestedErrors[0] ||
+    normalizeFeedError(fredQueryError, "fred");
+  const fredConnected = fredSuccessfulSeries.length > 0;
+  const fredLastSuccess =
+    latestTimestamp(fredSuccessfulSeries.map((entry) => entry.fetchedAt)) ||
+    (fredConnected && fredDataUpdatedAt
+      ? new Date(fredDataUpdatedAt).toISOString()
+      : null);
+
+  const stockConnected = Boolean(
+    stockData &&
+      typeof stockData === "object" &&
+      !Array.isArray(stockData) &&
+      !("error" in stockData) &&
+      Object.keys(stockData).length > 0,
+  );
+  const stockError =
+    normalizeFeedError(stockData?.error, "twelve_data") ||
+    normalizeFeedError(stockQueryError, "twelve_data");
+  const stockLastSuccess =
+    stockConnected && stockDataUpdatedAt
+      ? new Date(stockDataUpdatedAt).toISOString()
+      : null;
+
+  const cryptoConnected = Boolean(
+    cryptoData &&
+      typeof cryptoData === "object" &&
+      !Array.isArray(cryptoData) &&
+      Array.isArray(cryptoData.coins),
+  );
+  const cryptoError =
+    normalizeFeedError(cryptoData?.error, "coingecko") ||
+    normalizeFeedError(cryptoQueryError, "coingecko");
+  const cryptoLastSuccess =
+    cryptoConnected
+      ? cryptoData.fetchedAt ||
+        (cryptoDataUpdatedAt ? new Date(cryptoDataUpdatedAt).toISOString() : null)
+      : null;
+
   const feeds = [
-    { name: "FRED", active: !!FRED_API_KEY, loading: fredLoading, data: !!fredData },
-    { name: "Stocks", active: !!TWELVE_DATA_API_KEY, loading: stockLoading, data: !!stockData },
-    { name: "Crypto", active: true, loading: cryptoLoading, data: !!cryptoData },
+    {
+      name: "FRED",
+      active: !!FRED_API_KEY,
+      loading: fredLoading || fredFetching,
+      connected: fredConnected,
+      data: fredConnected,
+      lastSuccessfulFetch: fredLastSuccess,
+      error: fredError,
+    },
+    {
+      name: "Twelve Data",
+      active: !!TWELVE_DATA_API_KEY,
+      loading: stockLoading || stockFetching,
+      connected: stockConnected,
+      data: stockConnected,
+      lastSuccessfulFetch: stockLastSuccess,
+      error: stockError,
+    },
+    {
+      name: "CoinGecko",
+      active: true,
+      loading: cryptoLoading || cryptoFetching,
+      connected: cryptoConnected,
+      data: cryptoConnected,
+      lastSuccessfulFetch: cryptoLastSuccess,
+      error: cryptoError,
+    },
   ];
 
   const switchSection = (nextSection) => {
@@ -115,13 +274,13 @@ export default function CommandCenter() {
     <div
       style={{
         minHeight: "100vh",
-        background: "#0D0D0F",
-        color: "#E8E4DF",
-        fontFamily: "'IBM Plex Sans', -apple-system, sans-serif",
-        padding: "20px 14px",
+        background: tokens.colors.bg,
+        color: tokens.colors.text,
+        fontFamily: tokens.typography.fontSans,
+        padding: tokens.spacing.pagePadding,
       }}
     >
-      <div style={{ maxWidth: 920, margin: "0 auto" }}>
+      <div className="ab-content-shell">
         <LucidBoxHeader section={section} onSwitchSection={switchSection} threat={threat} threatClr={threatClr} />
 
         {section === "lucidbox" && (
@@ -149,6 +308,7 @@ export default function CommandCenter() {
               feeds={feeds}
               thresholdResult={thresholdResult}
               signalStatuses={signalStatuses}
+              isSignalsLoading={signalStatusesLoading}
               threatClr={threatClr}
               threat={threat}
               greenCt={greenCt}

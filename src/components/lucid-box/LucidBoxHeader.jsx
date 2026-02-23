@@ -70,6 +70,7 @@ export default function LucidBoxHeader({
         </button>
         <button
           onClick={() => onSwitchSection("signals")}
+          data-tour="section-signals"
           style={S.sectionTab(section === "signals", "#E9C46A")}
         >
           Signals
@@ -86,6 +87,7 @@ export default function LucidBoxHeader({
         </button>
         <button
           onClick={() => onSwitchSection("thesis")}
+          data-tour="section-portfolio-tab"
           style={S.sectionTab(section === "thesis", "#6D6875")}
         >
           Thesis & Portfolio

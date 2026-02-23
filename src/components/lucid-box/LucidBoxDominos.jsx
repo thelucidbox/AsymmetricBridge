@@ -1,4 +1,5 @@
 import { S } from "../../styles";
+import GlossaryTooltip from "../GlossaryTooltip";
 import DominoSection from "../DominoSection";
 
 export default function LucidBoxDominos({
@@ -9,6 +10,7 @@ export default function LucidBoxDominos({
   return (
     <>
       <div
+        data-tour="domino-cascade"
         style={{
           marginBottom: 20,
           padding: "16px",
@@ -17,7 +19,9 @@ export default function LucidBoxDominos({
           borderRadius: 10,
         }}
       >
-        <div style={{ ...S.label, marginBottom: 12 }}>Domino Cascade</div>
+        <div style={{ ...S.label, marginBottom: 12 }}>
+          <GlossaryTooltip term="domino">Domino Cascade</GlossaryTooltip>
+        </div>
         <div
           style={{
             display: "flex",
@@ -28,7 +32,8 @@ export default function LucidBoxDominos({
           {liveDominos.map((d, i) => {
             const sc = { green: 0, amber: 0, red: 0 };
             d.signals.forEach((s) => sc[s.currentStatus]++);
-            const heat = (sc.red * 2 + sc.amber) / (d.signals.length * 2);
+            const denominator = Math.max(d.signals.length * 2, 1);
+            const heat = (sc.red * 2 + sc.amber) / denominator;
             return (
               <div key={d.id} style={{ display: "flex", alignItems: "center" }}>
                 <div
@@ -107,12 +112,14 @@ export default function LucidBoxDominos({
         </div>
       </div>
 
-      {liveDominos.map((d) => (
+      {liveDominos.map((d, index) => (
         <DominoSection
           key={d.id}
           domino={d}
           isActive={activeDominos.has(d.id)}
           onToggle={() => onToggleDomino(d.id)}
+          showConnector={index < liveDominos.length - 1}
+          nextDominoColor={liveDominos[index + 1]?.color}
         />
       ))}
 
@@ -128,10 +135,13 @@ export default function LucidBoxDominos({
           lineHeight: 1.6,
         }}
       >
-        <strong style={{ color: "rgba(255,255,255,0.45)" }}>How to Use:</strong> Update
-        signal statuses as new data arrives. Green = baseline. Amber = approaching
-        threshold. Red = threshold breached. Track monthly; weekly during earnings
-        season.
+        <strong style={{ color: "rgba(255,255,255,0.45)" }}>How to Use:</strong> Update{" "}
+        <GlossaryTooltip term="signal">signal</GlossaryTooltip> statuses as new data
+        arrives. Green = <GlossaryTooltip term="baseline">baseline</GlossaryTooltip>.
+        Amber = <GlossaryTooltip term="watch">watch</GlossaryTooltip>. Red ={" "}
+        <GlossaryTooltip term="alert">alert</GlossaryTooltip>. Review when a{" "}
+        <GlossaryTooltip term="threshold">threshold</GlossaryTooltip> is crossed,
+        then track weekly during earnings season.
       </div>
     </>
   );
