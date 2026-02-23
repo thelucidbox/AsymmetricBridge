@@ -1,0 +1,502 @@
+Implement the following plan:
+
+# AsymmetricBridge v3 Plan
+
+## Context: What Happened with v2 and Why v3 Exists
+
+**v2 was ambitious.** 11 features, 60 tasks, 4 parallel implementation groups farmed out to Codex. The result: 85% of features exist as screens you can click through, but only ~40% actually work end-to-end. The UI shells are there. The wiring underneath is not.
+
+**What went wrong:**
+1. "UI first, wire backend later" — and "later" never happened
+2. Parallel Codex agents built screens from a spec but nobody verified if things actually worked
+3. Testing happened after everything was built instead of after each piece
+4. The spec was too big for one pass — 33 recommendations across 6 groups
+
+**What v3 fixes:** Smaller batches. I build each one. You test each one on Vercel before the next starts. If something doesn't work, we catch it immediately — not 4 groups later.
+
+---
+
+## The Honest Assessment
+
+**What actually works today:**
+- Navigation, routing, theme switching (Terminal/Observatory)
+- Live data fetching from FRED, Twelve Data, CoinGecko (when API keys are configured)
+- Signal status tracking via Supabase
+- Glossary tooltips, guided tour, display mode toggle
+- CSV upload + portfolio alignment scoring
+- Export to markdown (conviction + performance views)
+- OSS packaging (README, LICENSE, CONTRIBUTING)
+
+**What exists as UI but doesn't fully work:**
+- Onboarding shows Fabian's data after completion (not the new user's)
+- Digest engine formats data but has no AI analysis
+- Conviction ledger has scoring logic written but the automation to run it isn't deployed
+- Performance Lab uploads parse but data doesn't persist across sessions
+- Supabase Edge Functions are written but never deployed
+
+**What's missing entirely:**
+- Product landing / orientation page
+- User vs. creator separation (everyone sees Fabian's personal data)
+- AI-powered narrative digests (BYO key)
+- Yahoo Finance or additional data sources
+- "What If" cascade modeling
+
+---
+
+## v3 Batches
+
+### v3.1 — "Make It Presentable" (Portfolio Piece Ready)
+
+**Goal:** A visitor understands what AB is within 30 seconds. The onboarding feels approachable, not intimidating. New users see their own data. Fabian has a dedicated personal edition.
+
+---
+
+#### 1. Fix the Live Site
+Add API keys to Vercel project settings so live data actually loads for visitors.
+
+#### 2. Personal Edition vs. Open Source Edition
+
+**One codebase, two editions** based on deployment configuration — not a mode toggle.
+
+**Personal Edition (Fabian's Vercel deployment):**
+- Fabian's thesis data (`fabian-thesis.js`) is pre-loaded automatically
+- Onboarding is skipped — his career profile, Lucid Box products, ALOS components, revenue scenarios, Twitter pillars, portfolio legs are all there from the start
+- How: An environment variable (`VITE_OWNER_MODE=true`) tells the app to auto-populate the thesis config on first load and skip the onboarding gate
+- All personal sections (Lucid Box, ALOS, Twitter, Revenue) are visible because it's HIS dashboard
+
+**Open Source Edition (anyone who clones the repo):**
+- No `VITE_OWNER_MODE` env var → onboarding gate activates
+- User goes through onboarding, configures their own thesis, career profile, signals
+- After onboarding, they see THEIR data — personal sections (Lucid Box, ALOS, etc.) are hidden because that's Fabian-specific content
+- `fabian-thesis.js` becomes a reference example, not the active config
+
+**Testing the OSS experience from Fabian's deployment:**
+- A "Test as new user" option (in settings or nav) clears the thesis config from localStorage and re-enables the onboarding gate
+- Fabian can go through onboarding with synthetic data (Sarah Chen) to see exactly what an OSS user would experience
+- Reloading or clicking "Return to my dashboard" restores Fabian's personal config
+
+#### 3. Product Landing / Orientation
+Replace the current empty Welcome step with a real product orientation:
+
+- **What AB is:** "Asymmetric Bridge tracks economic disruption signals and connects them to your career positioning. It monitors a chain of 6 cause-and-effect disruption forces — when one falls, it puts pressure on the next."
+- **Who it's for:** "Professionals navigating career transitions in an AI-disrupted economy. Whether you're in enterprise sales, engineering, consulting, or creative work — these macro forces affect your positioning."
+- **What the 6-domino model is:** Visual preview of the cascade — SaaS Compression → White-Collar Displacement → Friction Collapse → Ghost GDP → Financial Contagion → Policy Response — with one-line plain English descriptions
+- **Where the research comes from:** "Built on macro research from Citrini Research, Leopold Aschenbrenner, Michael Bloch, and Arya Deniz. These aren't predictions — they're a structured way to track disruption signals."
+- **What you get when you finish:** Screenshot or mini-preview of the completed dashboard
+- **Two paths:** "Quick Start (2 minutes)" and "Custom Setup (5 minutes)"
+
+#### 4. Make Every Screen Less Daunting (Specific Copy Changes)
+
+**Onboarding Wizard (OnboardingWizard.jsx):**
+- "This wizard creates your local thesis config and saves it via useThesis().updateThesis() when complete." → "Your setup is saved in your browser. Nothing is sent to any server."
+- Add "Step 2 of 5 · About 30 seconds" progress indicator on each step
+- "Build your thesis profile" → "Set Up Your Dashboard"
+
+**Career Profile (CareerProfile.jsx):**
+- "Experience Band" → "Years of Experience"
+- "Goals (tags)" → "Career Goals" with subtext "What are you working toward?"
+- "Career Profile" → "About You" with subtext "This helps connect macro signals to your specific career context."
+
+**Resume Quick-Fill (ResumeIngestion.jsx):**
+- "Resume Ingestion (Regex Heuristics)" → "Quick-Fill from Resume"
+- "Paste resume text and extract job titles, companies, experience band, and skill keywords to prefill your profile." → "Paste your resume text to auto-fill the fields below."
+- "Parse Resume" button → "Auto-Fill"
+
+**Thesis Setup (ThesisSetup.jsx):**
+- Add context card at top: "These 6 dominos are a cause-and-effect chain from specific macro research. Each represents a disruption force. Defaults are pre-configured — you can customize anytime from the dashboard."
+- Collapse ALL signal thresholds by default — only show domino name, one-line description, and on/off toggle
+- "Use defaults (recommended)" as the primary action, "Customize thresholds" as secondary
+- "Thesis Metadata" → "Name Your Thesis"
+- "Author" → "Your Name"
+- For each domino, surface the source article it comes from (this data already exists in fabian-thesis.js)
+
+**API Key Setup (APIKeySetup.jsx):**
+- Replace the current description with:
+  - "Asymmetric Bridge pulls live economic data to keep your signals current."
+  - "FRED (Federal Reserve Economic Data) — Employment figures, GDP growth, money velocity, deficit tracking. Free key."
+  - "Twelve Data — Stock and market prices for portfolio tracking (NVIDIA, Salesforce, Blackstone, etc.). Free key."
+  - "Without API keys, the dashboard uses sample data so you can still explore everything."
+- **"Skip for now — use sample data" as the PRIMARY button** (bigger, more prominent)
+- "Add API keys for live data" as secondary
+- Add spellCheck={false} and autocomplete="off" on key input fields
+
+**Glossary Expansion:**
+- Keep existing GlossaryTooltip system (it's good)
+- Add a dedicated "Glossary" section accessible from the nav or footer — a full-page reference of all financial/macro terms with plain English definitions + analogies
+- In the Thesis Setup step, financial terms that appear should be auto-linked to glossary tooltips (some already are, expand coverage)
+
+#### 5. OSS Edition Dashboard Experience
+When someone clones the repo and completes onboarding with their own data:
+- Dashboard shows THEIR dominos, THEIR career profile, THEIR thesis
+- Fabian-specific sections are hidden: Lucid Box products, ALOS components, Twitter pillars, revenue scenarios — these only appear in Personal Edition (when `VITE_OWNER_MODE=true`)
+- Empty sections show helpful guidance instead of blank space: "Upload your portfolio CSV to see thesis alignment", "Generate your first digest to see signal analysis"
+- Signal cards show "Sample data — add your FRED API key in Settings for live updates" when no API keys are configured
+- The app works fully without API keys — sample/cached data fills all signal cards so the user can explore the entire interface before deciding to add keys
+
+#### 6. Research Discovery (Help Users Find Their Own Sources)
+The thesis sources (Citrini, Aschenbrenner, etc.) are manually curated. For OSS users who want to add their own:
+- **In-app research prompt generator:** A section in settings or thesis setup that says "Find macro research relevant to your thesis" — generates a ready-to-copy prompt the user can paste into ChatGPT, Claude, or Perplexity. The prompt is pre-filled with their career profile + domino names.
+- **In v3.3:** If the user has added a BYO AI key, this search happens in-app — the AI finds and summarizes relevant macro research articles based on the user's thesis and career.
+
+#### 7. Quick Web Fixes (From Audit)
+- Remove outline:"none" from 6 input style objects (restores keyboard focus indicators)
+- Add prefers-reduced-motion media query (respects users who get motion sick)
+- Add color-scheme: dark to HTML (fixes scrollbar and form control appearance)
+- Add preconnect hints for Google Fonts (faster loading)
+- Fix transition:"all" in design tokens (use specific properties)
+- Add font-variant-numeric: tabular-nums on numeric displays (numbers align in columns)
+- Add touch-action: manipulation globally (removes 300ms tap delay on mobile)
+
+---
+
+**Verification:**
+1. You visit the Vercel URL fresh (incognito). You see the product landing and understand what AB is.
+2. You go through onboarding as Sarah Chen. Every step makes sense in plain English. Nothing is jargon-y.
+3. After onboarding, you see Sarah's data — not yours. Lucid Box sections are hidden.
+4. You switch to Fabian Edition and all your personal data is there, no onboarding needed.
+5. You switch back to "Test as new user" and experience the OSS flow again.
+
+---
+
+### v3.2 — "Make It Actually Work" (Complete the Backend)
+
+**Goal:** Everything that has a UI actually functions end-to-end. Data persists. Automation runs.
+
+**Deliverables:**
+1. **Deploy Supabase tables** — Create the missing tables (portfolio_snapshots, predictions, digests) so data actually saves
+2. **Wire Performance Lab persistence** — CSV uploads save to Supabase so your portfolio data survives page refreshes
+3. **Deploy Edge Functions** — Get the threshold evaluator and Telegram alert functions actually running
+4. **Activate conviction scoring** — Connect the scoring logic to the cron job so batting averages actually calculate
+5. **Digest persistence** — Generated digests save properly and show in the archive
+6. **Context-aware guided tour** — Tour adapts based on whether user has API keys, what sections are visible
+7. **Remaining accessibility fixes** — aria-live regions, skip-to-content link, semantic headings, spellcheck on API key fields
+
+**Verification:** You upload a CSV, refresh the page, and your portfolio data is still there. You trigger a signal change and a Telegram alert fires. Generated digests appear in the archive. Conviction predictions get scored over time.
+
+---
+
+### v3.3 — "Make It Impressive" (AI Analysis + New Data)
+
+**Goal:** The dashboard provides actual insight, not just formatted data. AI makes the thesis come alive. This is what makes AB a portfolio piece that stands out.
+
+**Deliverables:**
+1. **AI-powered digest narratives** — BYO OpenAI or Anthropic key. When you generate a digest, it synthesizes signal movements into a real narrative: "SaaS compression signals intensified this week as SNOW dropped 8% while FRED employment data showed continued white-collar displacement..." This is the killer feature — turning raw data into intelligence.
+2. **AI-powered research discovery** — With BYO key, users can search for macro research relevant to their thesis directly in the app. "Find articles about AI's impact on consulting jobs" → AI searches and summarizes relevant sources, which the user can add to their thesis sources. (In v3.1, this is a copy-paste prompt. In v3.3, it happens in-app.)
+3. **Yahoo Finance integration** — Add as a new data source for broader market data beyond the current 7 tickers
+4. **Signal alert feed** — A chronological timeline of threshold crossings: "Feb 18: Unemployment claims crossed your 220K threshold" — gives users a reason to come back
+5. **"What If" cascade mode** — Toggle dominos on/off and see how downstream effects change. "What if SaaS Compression doesn't materialize?" Interactive thesis modeling.
+6. **More dramatic theme differentiation** — Observatory variant gets distinct personality (glass-morphism, different layout density, unique color palette) so switching themes feels like a different app
+
+**Verification:** You generate a digest with your Claude API key and get a real narrative analysis. You use the research search to find a new article and add it to your thesis. You toggle a domino off and see the cascade update. Yahoo Finance data appears in the signal cards. The two themes feel meaningfully different.
+
+---
+
+## Execution Strategy
+
+### Why This Approach Is Different From v2
+
+| v2 Approach | v3 Approach |
+|-------------|-------------|
+| 33 recommendations, 1 massive spec | 3 batches of 5-7 focused items |
+| Farmed to parallel Codex agents | I build each batch myself |
+| Testing after everything was done | You test each batch on Vercel before next starts |
+| UI shells first, backend "later" | v3.2 is entirely backend completion |
+| No acceptance criteria | Each batch has "verification" you personally run |
+
+### Sequence and Dependencies
+
+```
+v3.1 (Presentable)     → You test → Approve
+v3.2 (Backend works)   → You test → Approve
+v3.3 (AI + new data)   → You test → Ship
+```
+
+Each batch ships to Vercel. You test. We fix issues. Then next batch.
+
+### What Gets Cut If Time Is Short
+
+**v3.1 is non-negotiable** — the portfolio piece has to make sense to visitors.
+
+**v3.2 is high-value** — but if time is tight, we prioritize: Supabase tables + digest persistence + accessibility fixes. Edge Function deployment and conviction scoring can wait.
+
+**v3.3 is the stretch goal** — AI digests are the centerpiece. Yahoo Finance and What-If mode are nice-to-haves. Theme differentiation is polish.
+
+**Minimum viable v3:** v3.1 + AI digests from v3.3. That gives you a presentable portfolio piece with the AI analysis differentiator.
+
+---
+
+## Critical Files (For Implementation Reference)
+
+**v3.1 — Onboarding + UX + Fabian Edition:**
+- `src/App.jsx` — Routing: check VITE_OWNER_MODE env var, gate logic for Personal vs OSS edition
+- `.env` / `.env.example` — Add VITE_OWNER_MODE variable
+- `src/components/onboarding/OnboardingWizard.jsx` — Complete rewrite of Welcome step, jargon removal, progress indicators, Quick Start path
+- `src/components/onboarding/ResumeIngestion.jsx` — Rename to "Quick-Fill from Resume"
+- `src/components/onboarding/APIKeySetup.jsx` — Add skip option, explain what FRED/Twelve Data provide, spellcheck off
+- `src/components/onboarding/ThesisSetup.jsx` — Collapse thresholds, add source attribution, "Use defaults" primary path
+- `src/components/onboarding/CareerProfile.jsx` — Rename labels to plain English
+- `src/components/CommandCenter.jsx` — User/creator separation (hide Fabian sections for OSS users, show empty states)
+- `src/config/ThesisContext.jsx` — Fabian Edition detection + mode switching
+- `src/config/fabian-thesis.js` — Already complete, used as Fabian Edition default
+- `src/data/glossary.js` — Expand coverage, potentially add full glossary page
+- `src/index.css` — Web fixes (motion, color-scheme, touch-action, tabular-nums)
+- `index.html` — preconnect hints, color-scheme meta
+- `src/design-tokens/terminal.js` + `observatory.js` — Fix transition:all
+- 6 onboarding/form files — Remove outline:"none" from inline styles
+
+**v3.2 — Backend Completion:**
+- `supabase/functions/evaluate-thresholds/index.ts` — Deploy + schedule cron
+- `supabase/functions/signal-alert/index.ts` — Deploy + test Telegram
+- `supabase/migrations/` — Create portfolio_snapshots, predictions, digests tables
+- `src/hooks/useDigests.js` — Wire Supabase persistence
+- `src/components/performance-lab/PerformanceView.jsx` — Save snapshots to Supabase
+- `src/components/conviction/ConvictionScorecard.jsx` — Wire prediction scoring
+- `src/components/GuidedTour.jsx` — Make context-aware (check API keys, visible sections)
+- Multiple files — aria-live regions, skip-to-content link, semantic headings
+
+**v3.3 — AI Analysis + New Data:**
+- `src/lib/ai-client.js` — New: BYO key Claude/OpenAI client
+- `src/lib/digest-aggregator.js` — Add AI narrative synthesis step
+- `src/lib/research-search.js` — New: AI-powered macro research discovery
+- `src/hooks/useStockData.js` — Add Yahoo Finance data source
+- `src/components/CommandCenter.jsx` — Signal alert feed section
+- `src/components/cascade/WhatIfMode.jsx` — New: interactive domino toggling
+- `src/design-tokens/observatory.js` — Dramatically differentiate theme
+
+
+If you need specific details from before exiting plan mode (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/fabianaguilar/.REDACTED.jsonl
+
+If this plan can be broken down into multiple independent tasks, consider using the TeamCreate tool to create a team and parallelize the work.
+
+---
+
+This session is being continued from a previous conversation that ran out of context. The summary below covers the earlier portion of the conversation.
+
+Analysis:
+Let me chronologically analyze the conversation:
+
+1. The user provided a detailed v3.1 plan for AsymmetricBridge with 7 major items
+2. I explored the codebase thoroughly using an Explore agent and direct file reads
+3. I created a team (ab-v3-1) and broke work into 6 tasks
+4. I implemented the changes using a mix of direct edits and sub-agents
+5. The user then requested a Codex prompt for comprehensive codebase review
+6. I was in the process of writing that Codex prompt when the file write was blocked by a security hook
+
+Let me trace through each task and the specific changes:
+
+**Task 1: Quick Web Fixes** - Dispatched to web-fixes sub-agent
+- index.html: Added preconnect hints and color-scheme meta
+- index.css: Added touch-action: manipulation, prefers-reduced-motion, color-scheme: dark, .ab-tabular-nums
+- terminal.js: Changed motion.default from "all 0.2s" to specific properties
+- Removed outline:"none" from 4 onboarding files
+
+**Task 2: VITE_OWNER_MODE Foundation** - I did this myself
+- .env.example: Added VITE_OWNER_MODE variable
+- ThesisContext.jsx: Complete rewrite with isOwnerMode, enterTestMode, exitTestMode, hasThesis
+- App.jsx: Updated to use useThesis() hasThesis and isTestMode instead of localStorage check
+
+**Task 3: WelcomeStep Rewrite** - I did this myself
+- OnboardingWizard.jsx: Complete rewrite with product landing, 6-domino preview, Quick Start/Custom Setup, step progress indicators
+
+**Task 4: Onboarding Copy Changes** - Dispatched to copy-changes sub-agent
+- CareerProfile.jsx: "Career Profile" → "About You", "Experience Band" → "Years of Experience", "Goals (tags)" → "Career Goals", generic goal suggestions
+- ResumeIngestion.jsx: "Resume Ingestion (Regex Heuristics)" → "Quick-Fill from Resume", "Parse Resume" → "Auto-Fill"
+- APIKeySetup.jsx: New description explaining FRED/Twelve Data, spellCheck={false}, autoComplete="off"
+
+**Task 5: CommandCenter OSS** - I did this myself
+- CommandCenter.jsx: Edition-aware, hides Lucid Box for OSS, shows EmptyStateCard and SampleDataBanner
+- LucidBoxHeader.jsx: Edition badge, conditional section tabs
+- Navigation.jsx: Added "Test as new user" button for owner mode
+
+**Task 6: Glossary + Research Discovery** - Dispatched to glossary-agent
+- glossary.js: Added 8 new terms
+- GlossaryPage.jsx: New searchable full-page glossary
+- ResearchDiscovery.jsx: New prompt generator component
+- Added glossary route to App.jsx and Navigation
+
+**Errors encountered:**
+1. ThesisSetup.jsx write failed with "file has been modified since read" - fixed by re-reading and rewriting
+2. Lint errors after implementation: unused isOwnerMode import in App.jsx, unused quickStart prop in ThesisSetup, react-refresh/only-export-components warning - all fixed
+3. Security hook blocked the CODEX-REVIEW-PROMPT.md write because it contained the string "dangerouslySetInnerHTML" (in the review instructions asking to verify its absence)
+
+**User messages:**
+1. Initial plan with "Implement the following plan:" 
+2. Mid-implementation: "When you're finished, I want you to write a Codex Prompt to review the entire code base in an extensive way"
+
+The Codex prompt write was the last action attempted and it was blocked by a security hook.
+
+Summary:
+1. Primary Request and Intent:
+   The user provided a comprehensive v3.1 plan ("Make It Presentable") for AsymmetricBridge and asked to **implement** it. The plan had 7 major items across the "Portfolio Piece Ready" batch. Mid-implementation, the user added a second request: **write a Codex prompt for an extensive codebase review** after finishing the implementation.
+
+   The v3.1 plan items were:
+   1. Fix the Live Site (API keys on Vercel - manual, not code)
+   2. Personal Edition vs Open Source Edition (VITE_OWNER_MODE env var)
+   3. Product Landing / Orientation (WelcomeStep rewrite)
+   4. Make Every Screen Less Daunting (copy changes across onboarding)
+   5. OSS Edition Dashboard Experience (CommandCenter conditional rendering)
+   6. Research Discovery (prompt generator)
+   7. Quick Web Fixes (accessibility, performance)
+
+2. Key Technical Concepts:
+   - **Edition System**: `VITE_OWNER_MODE` env var distinguishes Personal Edition (Fabian's deployment) from Open Source Edition (anyone who clones)
+   - **React 19 + Vite 7 + Supabase** stack, no TypeScript, no test framework
+   - **ThesisContext** pattern: React Context with localStorage persistence, validation via thesis-schema.js
+   - **Design Tokens**: Two themes (terminal/observatory) with token-based inline styles via `S.card()`, `S.tab()`, `getThemeTokens()`
+   - **Onboarding Gate**: App.jsx redirects to `/onboarding` when no thesis config exists
+   - **Test Mode**: Owner can simulate OSS experience via `enterTestMode()`/`exitTestMode()` which manipulates localStorage
+   - **Team-based parallel implementation**: Used TeamCreate with sub-agents in worktrees for independent file groups
+
+3. Files and Code Sections:
+
+   - **`.env.example`**
+     - Added `VITE_OWNER_MODE=` at top with documentation comment
+     - Controls Personal vs OSS edition
+
+   - **`src/config/ThesisContext.jsx`** (CRITICAL - Foundation of edition system)
+     - Complete rewrite adding edition-aware logic
+     - Key exports: `isOwnerMode` (const), `ThesisProvider`, `useThesis()`
+     - Context now provides: `thesis`, `updateThesis`, `hasThesis`, `isTestMode`, `enterTestMode`, `exitTestMode`
+     - `getInitialThesis()`: When owner mode + not testing → auto-loads fabianThesis; when OSS → returns null if no stored config
+     - `enterTestMode()`: Sets localStorage flag, clears thesis, sets state to null
+     - `exitTestMode()`: Removes flag, restores fabianThesis
+     ```jsx
+     export const isOwnerMode =
+       import.meta.env.VITE_OWNER_MODE === "true" ||
+       import.meta.env.VITE_OWNER_MODE === true;
+     ```
+
+   - **`src/App.jsx`** (Routing and onboarding gate)
+     - Removed old `hasStoredThesisConfig()` localStorage check
+     - Now uses `useThesis()` hook: `const { hasThesis, isTestMode } = useThesis()`
+     - Gate logic: `const needsOnboarding = !hasThesis || isTestMode;`
+     - Added GlossaryPage route, removed unused `isOwnerMode` import
+
+   - **`src/components/onboarding/OnboardingWizard.jsx`** (Major rewrite)
+     - New `STEPS` array with estimates: Welcome, About You, Your Thesis, Data Sources, Review
+     - New `DOMINO_PREVIEWS` constant with 6-domino cascade summaries
+     - `WelcomeStep` completely rewritten: explains what AB is, shows 6-domino cascade, research sources, Quick Start / Custom Setup buttons, test mode banner with "Return to my dashboard"
+     - Header changed: "Build your thesis profile" → "Set Up Your Dashboard"
+     - Technical description replaced: "saves via useThesis().updateThesis()" → "Your setup is saved in your browser. Nothing is sent to any server."
+     - Step progress: "Step X of 4 · About N seconds"
+     - `CompleteStep` labels updated: "Career Summary" → "About You", "Thesis Summary" → "Your Thesis", "API Keys" → "Data Sources"
+     - Removed `quickStart` state variable (unused after ThesisSetup prop removal)
+
+   - **`src/components/onboarding/CareerProfile.jsx`**
+     - "Career Profile" → "About You" with subtext about connecting macro signals
+     - "Experience Band" → "Years of Experience"
+     - "Goals (tags)" → "Career Goals" with "What are you working toward?" subtext
+     - GOAL_SUGGESTIONS made generic (removed Fabian-specific goals)
+     - `outline: "none"` removed from inputStyle
+
+   - **`src/components/onboarding/ResumeIngestion.jsx`**
+     - "Resume Ingestion (Regex Heuristics)" → "Quick-Fill from Resume"
+     - Description simplified to "Paste your resume text to auto-fill the fields below."
+     - "Parse Resume" → "Auto-Fill"
+     - `outline: "none"` removed from inline textarea style
+
+   - **`src/components/onboarding/ThesisSetup.jsx`**
+     - Added context card explaining 6 dominos at top
+     - "Thesis Metadata" → "Name Your Thesis"
+     - "Author" → "Your Name"
+     - Added "Use defaults (recommended)" / "Customize thresholds" toggle
+     - Thresholds collapsed by default (`expandedDominoId` starts null, `showThresholds` starts false)
+     - Domino cards show name + description inline, toggle button "On"/"Off" instead of "Enabled"/"Disabled"
+     - Signal source attribution shown when expanding
+     - `outline: "none"` removed from inputStyle
+     - Removed unused `quickStart` prop
+
+   - **`src/components/onboarding/APIKeySetup.jsx`**
+     - New description explaining what FRED and Twelve Data provide in plain English
+     - "Without API keys, the dashboard uses sample data" note
+     - Added `spellCheck={false}` and `autoComplete="off"` on key inputs
+     - `outline: "none"` removed from inputStyle
+
+   - **`src/components/CommandCenter.jsx`** (Edition-aware dashboard)
+     - Imports `isOwnerMode` from ThesisContext, `S` from styles
+     - Default section: `isOwnerMode ? "lucidbox" : "signals"` (OSS users start on signals)
+     - New `EmptyStateCard` component for OSS users where Lucid Box would be
+     - New `SampleDataBanner` component shown when no API keys configured
+     - `LucidBoxPortfolio` only renders when `isOwnerMode`
+     - Footer updated to "v3.1"
+     - Passes `isOwnerMode` prop to `LucidBoxHeader`
+
+   - **`src/components/lucid-box/LucidBoxHeader.jsx`**
+     - Accepts new `isOwnerMode` prop
+     - Badge: "PERSONAL EDITION" vs "COMMAND CENTER"
+     - Subtitle changes based on edition
+     - First tab: "Lucid Box" (owner) vs "My Dashboard" (OSS)
+
+   - **`src/components/Navigation.jsx`**
+     - Imports `isOwnerMode` and `useThesis` from ThesisContext
+     - Added `enterTestMode` from useThesis and `handleTestAsNewUser` function
+     - "Test as new user" button in desktop nav (after ThemeToggle) and mobile drawer
+     - Only visible when `isOwnerMode` is true
+     - Glossary entry already added to DEFAULT_SECTIONS by sub-agent
+
+   - **`index.html`**
+     - Added `<link rel="preconnect" href="https://fonts.googleapis.com" />`
+     - Added `<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />`
+     - Added `<meta name="color-scheme" content="dark" />`
+
+   - **`src/index.css`**
+     - Added `touch-action: manipulation;` to global `*` selector
+     - Added `color-scheme: dark;` to `html, body, #root`
+     - Added `.ab-tabular-nums` utility class
+     - Added `@media (prefers-reduced-motion: reduce)` at end of file
+
+   - **`src/design-tokens/terminal.js`**
+     - `motion.default` changed from `"all 0.2s"` to `"color 0.2s, background 0.2s, border-color 0.2s, opacity 0.2s, box-shadow 0.2s"`
+
+   - **`src/data/glossary.js`**
+     - Added 8 new terms: SaaS compression, white-collar displacement, friction collapse, Ghost GDP, financial contagion, policy response, take rate, JOLTS
+
+   - **`src/components/GlossaryPage.jsx`** (NEW)
+     - Full-page searchable glossary with filter input
+     - Renders all GLOSSARY entries with definition, analogy, related terms
+     - Route: `/glossary`
+
+   - **`src/components/onboarding/ResearchDiscovery.jsx`** (NEW)
+     - Generates copy-paste AI prompt pre-filled with user's career profile and domino names
+     - Clipboard API with fallback for older browsers
+     - "Copy Prompt" button with success feedback
+
+4. Errors and fixes:
+   - **ThesisSetup.jsx write failed**: "File has been modified since read" error because the linter modified the file after the sub-agent removed `outline: "none"`. Fixed by re-reading the file and writing the complete new version.
+   - **Lint error - unused `isOwnerMode` in App.jsx**: The import `{ isOwnerMode, useThesis }` had `isOwnerMode` unused (only `useThesis` was needed in App.jsx). Fixed by changing to `{ useThesis }`.
+   - **Lint error - unused `quickStart` in ThesisSetup**: The `quickStart` prop was accepted but never used after the ThesisSetup rewrite. Fixed by removing the prop from the destructured params and removing the state variable + prop passing in OnboardingWizard.
+   - **Lint warning - react-refresh/only-export-components in ThesisContext**: Exporting the `isOwnerMode` constant alongside components triggers this warning. Fixed by adding `// eslint-disable-next-line react-refresh/only-export-components`.
+   - **Security hook blocked CODEX-REVIEW-PROMPT.md write**: The file content contained the string "dangerouslySetInnerHTML" (in a review instruction asking Codex to verify its absence), which triggered the security reminder hook. The write was rejected.
+
+5. Problem Solving:
+   - Successfully parallelized work using TeamCreate with 3 sub-agents (web-fixes, copy-changes, glossary-agent) plus direct implementation for architecturally critical tasks
+   - Build verified clean: `npm run build` succeeds with 198 modules, 702KB bundle
+   - All `outline: "none"` instances removed (verified via grep)
+   - All copy changes verified via grep
+   - Pre-existing lint errors (in useDigests.js, usePredictions.js, export-utils.js, design-tokens/index.js) were NOT introduced by v3.1 changes
+
+6. All user messages:
+   - **Message 1**: "Implement the following plan:" followed by the complete AsymmetricBridge v3 Plan document covering v3.1, v3.2, v3.3 batches with context, assessment, and critical files
+   - **Message 2** (mid-implementation system reminder): "When you're finished, I want you to write a Codex Prompt to review the entire code base in an extensive way"
+
+7. Pending Tasks:
+   - **Write the Codex review prompt**: The file write to `CODEX-REVIEW-PROMPT.md` was blocked by a security hook. The full content was prepared but needs to be written successfully (the hook triggered on "dangerouslySetInnerHTML" string in the review instructions).
+   - **Team cleanup**: Shutdown requests were sent to 3 sub-agents (web-fixes, copy-changes, glossary-agent) but TeamDelete hasn't been called yet
+   - **Git commit**: No commit has been made. 17 files changed, 2 new files untracked.
+
+8. Current Work:
+   The v3.1 implementation is **complete** (all 6 tasks done, build passes). I was attempting to write the Codex review prompt to `CODEX-REVIEW-PROMPT.md` when the security hook blocked the write because the content contained the string "dangerouslySetInnerHTML" in a review instruction ("No `dangerouslySetInnerHTML` — confirm this"). The full prompt content was already composed.
+
+9. Optional Next Step:
+   Retry writing the Codex review prompt, either by removing/rephrasing the "dangerouslySetInnerHTML" reference that triggered the security hook, or by outputting the prompt directly as text in the conversation. The user explicitly asked: **"When you're finished, I want you to write a Codex Prompt to review the entire code base in an extensive way"**
+
+If you need specific details from before compaction (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/fabianaguilar/.REDACTED.jsonl
+Please continue the conversation from where we left off without asking the user any further questions. Continue with the last task that you were asked to work on.
+
+---
+
+Give it to me give me the prompt here so I can just drop it in the Codex app. You should remember that that I use the Codex macOS app.
+
+---
+
+yes commit please
