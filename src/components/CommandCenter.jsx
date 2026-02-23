@@ -1,5 +1,7 @@
 import { useState, useMemo } from "react";
 import DominoSection from "./DominoSection";
+import WorkflowInfo from "./WorkflowInfo";
+import SignalUpdateForm from "./SignalUpdateForm";
 import { Badge, S } from "../styles";
 import { ALOS_COMPONENTS } from "../data/alos-components";
 import { DOMINOS } from "../data/dominos";
@@ -19,6 +21,7 @@ export default function CommandCenter() {
   const [subTab, setSubTab] = useState("products");
   const [activeDominos, setActiveDominos] = useState(new Set([1]));
   const [expandedProduct, setExpandedProduct] = useState(3);
+  const [signalSubTab, setSignalSubTab] = useState("tracker");
 
   // Live data feeds
   const { data: fredData, isLoading: fredLoading } = useFredData();
@@ -1034,317 +1037,363 @@ export default function CommandCenter() {
         {/* ================= SIGNALS SECTION ================= */}
         {section === "signals" && (
           <div>
-            {/* Live Feed Status */}
+            {/* Signal Sub-Tabs */}
             <div
               style={{
                 display: "flex",
-                alignItems: "center",
-                gap: 12,
-                marginBottom: 12,
-                padding: "8px 12px",
-                background: "rgba(255,255,255,0.02)",
-                border: "1px solid rgba(255,255,255,0.06)",
-                borderRadius: 8,
+                gap: 4,
+                marginBottom: 14,
+                flexWrap: "wrap",
               }}
             >
-              <span
-                style={{
-                  fontSize: 9,
-                  color: "rgba(255,255,255,0.35)",
-                  textTransform: "uppercase",
-                  letterSpacing: "1px",
-                  fontFamily: "'IBM Plex Mono'",
-                }}
-              >
-                Feeds
-              </span>
-              {feeds.map((f) => (
-                <div
-                  key={f.name}
-                  style={{ display: "flex", alignItems: "center", gap: 4 }}
+              {[
+                { id: "tracker", label: "Tracker", c: "#E9C46A" },
+                { id: "howItWorks", label: "How It Works", c: "#2A9D8F" },
+                { id: "update", label: "Update Signal", c: "#F4A261" },
+              ].map((t) => (
+                <button
+                  key={t.id}
+                  onClick={() => setSignalSubTab(t.id)}
+                  style={S.tab(signalSubTab === t.id, t.c)}
                 >
-                  <div
-                    style={{
-                      width: 6,
-                      height: 6,
-                      borderRadius: "50%",
-                      background: f.loading
-                        ? "#E9C46A"
-                        : f.data
-                          ? "#2A9D8F"
-                          : f.active
-                            ? "#F4A261"
-                            : "rgba(255,255,255,0.15)",
-                      boxShadow: f.data ? "0 0 4px #2A9D8F66" : "none",
-                    }}
-                  />
-                  <span
-                    style={{
-                      fontSize: 10,
-                      color: f.data
-                        ? "rgba(255,255,255,0.5)"
-                        : "rgba(255,255,255,0.25)",
-                    }}
-                  >
-                    {f.name}
-                  </span>
-                </div>
+                  {t.label}
+                </button>
               ))}
-              {thresholdResult && (
-                <span
-                  style={{
-                    marginLeft: "auto",
-                    fontSize: 9,
-                    color: "rgba(255,255,255,0.25)",
-                    fontFamily: "'IBM Plex Mono'",
-                  }}
-                >
-                  Auto: {thresholdResult.evaluated} eval ·{" "}
-                  {thresholdResult.manualOnly} manual
-                  {thresholdResult.applied > 0 && (
-                    <span style={{ color: "#E9C46A" }}>
-                      {" "}
-                      · {thresholdResult.applied} updated
-                    </span>
-                  )}
-                </span>
-              )}
-              {!thresholdResult && signalStatuses && (
-                <span
-                  style={{
-                    marginLeft: "auto",
-                    fontSize: 9,
-                    color: "rgba(255,255,255,0.2)",
-                    fontFamily: "'IBM Plex Mono'",
-                  }}
-                >
-                  {signalStatuses.length ? "Supabase connected" : "Static mode"}
-                </span>
-              )}
             </div>
 
-            {/* Overall Status */}
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr 1fr 1fr",
-                gap: 8,
-                marginBottom: 20,
-              }}
-            >
-              <div
-                style={{
-                  background: `linear-gradient(135deg, ${threatClr}15, ${threatClr}08)`,
-                  border: `1px solid ${threatClr}33`,
-                  borderRadius: 10,
-                  padding: "14px 12px",
-                  textAlign: "center",
-                }}
-              >
+            {/* How It Works */}
+            {signalSubTab === "howItWorks" && <WorkflowInfo />}
+
+            {/* Update Signal */}
+            {signalSubTab === "update" && <SignalUpdateForm />}
+
+            {/* Tracker (default) */}
+            {signalSubTab === "tracker" && (
+              <div>
+                {/* Live Feed Status */}
                 <div
                   style={{
-                    fontSize: 9,
-                    color: "rgba(255,255,255,0.35)",
-                    textTransform: "uppercase",
-                    letterSpacing: "1.2px",
-                    marginBottom: 6,
-                    fontFamily: "'IBM Plex Mono'",
-                  }}
-                >
-                  Threat Level
-                </div>
-                <div
-                  style={{
-                    fontSize: 20,
-                    fontWeight: 700,
-                    color: threatClr,
-                    letterSpacing: "1px",
-                  }}
-                >
-                  {threat}
-                </div>
-              </div>
-              {[
-                { l: "Baseline", c: greenCt, clr: "#2A9D8F" },
-                { l: "Watch", c: amberCt, clr: "#F4A261" },
-                { l: "Alert", c: redCt, clr: "#E63946" },
-              ].map((x) => (
-                <div
-                  key={x.l}
-                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 12,
+                    marginBottom: 12,
+                    padding: "8px 12px",
                     background: "rgba(255,255,255,0.02)",
                     border: "1px solid rgba(255,255,255,0.06)",
-                    borderRadius: 10,
-                    padding: "14px 12px",
-                    textAlign: "center",
+                    borderRadius: 8,
                   }}
                 >
-                  <div
+                  <span
                     style={{
                       fontSize: 9,
                       color: "rgba(255,255,255,0.35)",
                       textTransform: "uppercase",
-                      letterSpacing: "1.2px",
-                      marginBottom: 6,
+                      letterSpacing: "1px",
                       fontFamily: "'IBM Plex Mono'",
                     }}
                   >
-                    {x.l}
-                  </div>
-                  <div style={{ fontSize: 24, fontWeight: 700, color: x.clr }}>
-                    {x.c}
-                  </div>
-                  <div
-                    style={{ fontSize: 10, color: "rgba(255,255,255,0.25)" }}
-                  >
-                    of {totalSig}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Cascade */}
-            <div
-              style={{
-                marginBottom: 20,
-                padding: "16px",
-                background: "rgba(255,255,255,0.02)",
-                border: "1px solid rgba(255,255,255,0.06)",
-                borderRadius: 10,
-              }}
-            >
-              <div style={{ ...S.label, marginBottom: 12 }}>Domino Cascade</div>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                {liveDominos.map((d, i) => {
-                  const sc = { green: 0, amber: 0, red: 0 };
-                  d.signals.forEach((s) => sc[s.currentStatus]++);
-                  const heat = (sc.red * 2 + sc.amber) / (d.signals.length * 2);
-                  return (
+                    Feeds
+                  </span>
+                  {feeds.map((f) => (
                     <div
-                      key={d.id}
-                      style={{ display: "flex", alignItems: "center" }}
+                      key={f.name}
+                      style={{ display: "flex", alignItems: "center", gap: 4 }}
                     >
                       <div
-                        onClick={() => toggleDomino(d.id)}
                         style={{
-                          width: 48,
-                          height: 48,
+                          width: 6,
+                          height: 6,
                           borderRadius: "50%",
-                          background: `radial-gradient(circle, ${d.color}${Math.round(
-                            heat * 80 + 20,
-                          )
-                            .toString(16)
-                            .padStart(2, "0")}, transparent)`,
-                          border: `2px solid ${d.color}${Math.round(
-                            heat * 200 + 55,
-                          )
-                            .toString(16)
-                            .padStart(2, "0")}`,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          cursor: "pointer",
-                          position: "relative",
+                          background: f.loading
+                            ? "#E9C46A"
+                            : f.data
+                              ? "#2A9D8F"
+                              : f.active
+                                ? "#F4A261"
+                                : "rgba(255,255,255,0.15)",
+                          boxShadow: f.data ? "0 0 4px #2A9D8F66" : "none",
+                        }}
+                      />
+                      <span
+                        style={{
+                          fontSize: 10,
+                          color: f.data
+                            ? "rgba(255,255,255,0.5)"
+                            : "rgba(255,255,255,0.25)",
                         }}
                       >
-                        <span
-                          style={{
-                            fontSize: 10,
-                            fontWeight: 700,
-                            color: d.color,
-                          }}
-                        >
-                          {d.id}
-                        </span>
-                        {heat > 0.5 && (
-                          <div
-                            style={{
-                              position: "absolute",
-                              top: -2,
-                              right: -2,
-                              width: 8,
-                              height: 8,
-                              borderRadius: "50%",
-                              background: heat > 0.75 ? "#E63946" : "#F4A261",
-                              boxShadow: `0 0 5px ${heat > 0.75 ? "#E63946" : "#F4A261"}`,
-                            }}
-                          />
-                        )}
-                      </div>
-                      {i < liveDominos.length - 1 && (
-                        <div
-                          style={{
-                            width: 30,
-                            height: 2,
-                            background: `linear-gradient(90deg, ${d.color}44, ${liveDominos[i + 1].color}44)`,
-                            margin: "0 3px",
-                          }}
-                        />
-                      )}
+                        {f.name}
+                      </span>
                     </div>
-                  );
-                })}
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  marginTop: 6,
-                  padding: "0 2px",
-                }}
-              >
-                {liveDominos.map((d) => (
+                  ))}
+                  {thresholdResult && (
+                    <span
+                      style={{
+                        marginLeft: "auto",
+                        fontSize: 9,
+                        color: "rgba(255,255,255,0.25)",
+                        fontFamily: "'IBM Plex Mono'",
+                      }}
+                    >
+                      Auto: {thresholdResult.evaluated} eval ·{" "}
+                      {thresholdResult.manualOnly} manual
+                      {thresholdResult.applied > 0 && (
+                        <span style={{ color: "#E9C46A" }}>
+                          {" "}
+                          · {thresholdResult.applied} updated
+                        </span>
+                      )}
+                    </span>
+                  )}
+                  {!thresholdResult && signalStatuses && (
+                    <span
+                      style={{
+                        marginLeft: "auto",
+                        fontSize: 9,
+                        color: "rgba(255,255,255,0.2)",
+                        fontFamily: "'IBM Plex Mono'",
+                      }}
+                    >
+                      {signalStatuses.length
+                        ? "Supabase connected"
+                        : "Static mode"}
+                    </span>
+                  )}
+                </div>
+
+                {/* Overall Status */}
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr 1fr 1fr",
+                    gap: 8,
+                    marginBottom: 20,
+                  }}
+                >
                   <div
-                    key={d.id}
                     style={{
-                      width: 48,
+                      background: `linear-gradient(135deg, ${threatClr}15, ${threatClr}08)`,
+                      border: `1px solid ${threatClr}33`,
+                      borderRadius: 10,
+                      padding: "14px 12px",
                       textAlign: "center",
-                      fontSize: 8,
-                      color: "rgba(255,255,255,0.25)",
-                      fontFamily: "'IBM Plex Mono'",
                     }}
                   >
-                    {d.name.split(" ")[0]}
+                    <div
+                      style={{
+                        fontSize: 9,
+                        color: "rgba(255,255,255,0.35)",
+                        textTransform: "uppercase",
+                        letterSpacing: "1.2px",
+                        marginBottom: 6,
+                        fontFamily: "'IBM Plex Mono'",
+                      }}
+                    >
+                      Threat Level
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 20,
+                        fontWeight: 700,
+                        color: threatClr,
+                        letterSpacing: "1px",
+                      }}
+                    >
+                      {threat}
+                    </div>
                   </div>
+                  {[
+                    { l: "Baseline", c: greenCt, clr: "#2A9D8F" },
+                    { l: "Watch", c: amberCt, clr: "#F4A261" },
+                    { l: "Alert", c: redCt, clr: "#E63946" },
+                  ].map((x) => (
+                    <div
+                      key={x.l}
+                      style={{
+                        background: "rgba(255,255,255,0.02)",
+                        border: "1px solid rgba(255,255,255,0.06)",
+                        borderRadius: 10,
+                        padding: "14px 12px",
+                        textAlign: "center",
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontSize: 9,
+                          color: "rgba(255,255,255,0.35)",
+                          textTransform: "uppercase",
+                          letterSpacing: "1.2px",
+                          marginBottom: 6,
+                          fontFamily: "'IBM Plex Mono'",
+                        }}
+                      >
+                        {x.l}
+                      </div>
+                      <div
+                        style={{ fontSize: 24, fontWeight: 700, color: x.clr }}
+                      >
+                        {x.c}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: 10,
+                          color: "rgba(255,255,255,0.25)",
+                        }}
+                      >
+                        of {totalSig}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Cascade */}
+                <div
+                  style={{
+                    marginBottom: 20,
+                    padding: "16px",
+                    background: "rgba(255,255,255,0.02)",
+                    border: "1px solid rgba(255,255,255,0.06)",
+                    borderRadius: 10,
+                  }}
+                >
+                  <div style={{ ...S.label, marginBottom: 12 }}>
+                    Domino Cascade
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    {liveDominos.map((d, i) => {
+                      const sc = { green: 0, amber: 0, red: 0 };
+                      d.signals.forEach((s) => sc[s.currentStatus]++);
+                      const heat =
+                        (sc.red * 2 + sc.amber) / (d.signals.length * 2);
+                      return (
+                        <div
+                          key={d.id}
+                          style={{ display: "flex", alignItems: "center" }}
+                        >
+                          <div
+                            onClick={() => toggleDomino(d.id)}
+                            style={{
+                              width: 48,
+                              height: 48,
+                              borderRadius: "50%",
+                              background: `radial-gradient(circle, ${d.color}${Math.round(
+                                heat * 80 + 20,
+                              )
+                                .toString(16)
+                                .padStart(2, "0")}, transparent)`,
+                              border: `2px solid ${d.color}${Math.round(
+                                heat * 200 + 55,
+                              )
+                                .toString(16)
+                                .padStart(2, "0")}`,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              cursor: "pointer",
+                              position: "relative",
+                            }}
+                          >
+                            <span
+                              style={{
+                                fontSize: 10,
+                                fontWeight: 700,
+                                color: d.color,
+                              }}
+                            >
+                              {d.id}
+                            </span>
+                            {heat > 0.5 && (
+                              <div
+                                style={{
+                                  position: "absolute",
+                                  top: -2,
+                                  right: -2,
+                                  width: 8,
+                                  height: 8,
+                                  borderRadius: "50%",
+                                  background:
+                                    heat > 0.75 ? "#E63946" : "#F4A261",
+                                  boxShadow: `0 0 5px ${heat > 0.75 ? "#E63946" : "#F4A261"}`,
+                                }}
+                              />
+                            )}
+                          </div>
+                          {i < liveDominos.length - 1 && (
+                            <div
+                              style={{
+                                width: 30,
+                                height: 2,
+                                background: `linear-gradient(90deg, ${d.color}44, ${liveDominos[i + 1].color}44)`,
+                                margin: "0 3px",
+                              }}
+                            />
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      marginTop: 6,
+                      padding: "0 2px",
+                    }}
+                  >
+                    {liveDominos.map((d) => (
+                      <div
+                        key={d.id}
+                        style={{
+                          width: 48,
+                          textAlign: "center",
+                          fontSize: 8,
+                          color: "rgba(255,255,255,0.25)",
+                          fontFamily: "'IBM Plex Mono'",
+                        }}
+                      >
+                        {d.name.split(" ")[0]}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Domino Sections */}
+                {liveDominos.map((d) => (
+                  <DominoSection
+                    key={d.id}
+                    domino={d}
+                    isActive={activeDominos.has(d.id)}
+                    onToggle={() => toggleDomino(d.id)}
+                  />
                 ))}
+
+                <div
+                  style={{
+                    marginTop: 16,
+                    padding: "14px",
+                    background: "rgba(255,255,255,0.02)",
+                    border: "1px solid rgba(255,255,255,0.06)",
+                    borderRadius: 10,
+                    fontSize: 11,
+                    color: "rgba(255,255,255,0.3)",
+                    lineHeight: 1.6,
+                  }}
+                >
+                  <strong style={{ color: "rgba(255,255,255,0.45)" }}>
+                    How to Use:
+                  </strong>{" "}
+                  Update signal statuses as new data arrives. Green = baseline.
+                  Amber = approaching threshold. Red = threshold breached. Track
+                  monthly; weekly during earnings season.
+                </div>
               </div>
-            </div>
-
-            {/* Domino Sections */}
-            {liveDominos.map((d) => (
-              <DominoSection
-                key={d.id}
-                domino={d}
-                isActive={activeDominos.has(d.id)}
-                onToggle={() => toggleDomino(d.id)}
-              />
-            ))}
-
-            <div
-              style={{
-                marginTop: 16,
-                padding: "14px",
-                background: "rgba(255,255,255,0.02)",
-                border: "1px solid rgba(255,255,255,0.06)",
-                borderRadius: 10,
-                fontSize: 11,
-                color: "rgba(255,255,255,0.3)",
-                lineHeight: 1.6,
-              }}
-            >
-              <strong style={{ color: "rgba(255,255,255,0.45)" }}>
-                How to Use:
-              </strong>{" "}
-              Update signal statuses as new data arrives. Green = baseline.
-              Amber = approaching threshold. Red = threshold breached. Track
-              monthly; weekly during earnings season.
-            </div>
+            )}
           </div>
         )}
 

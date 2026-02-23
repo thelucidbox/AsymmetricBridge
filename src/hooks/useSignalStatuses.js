@@ -100,7 +100,26 @@ export function useUpdateSignalStatus() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["signal-statuses"] });
       queryClient.invalidateQueries({ queryKey: ["signal-history"] });
+      queryClient.invalidateQueries({ queryKey: ["signal-history-recent"] });
     },
+  });
+}
+
+export function useRecentHistory() {
+  return useQuery({
+    queryKey: ["signal-history-recent"],
+    queryFn: async () => {
+      if (!supabase) return [];
+      const { data, error } = await supabase
+        .from("signal_history")
+        .select("*")
+        .order("changed_at", { ascending: false })
+        .limit(10);
+      if (error) throw error;
+      return data || [];
+    },
+    staleTime: 30 * 1000,
+    enabled: !!supabase,
   });
 }
 
