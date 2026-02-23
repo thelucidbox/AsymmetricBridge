@@ -13,7 +13,7 @@ const terminalTokens = {
     borderStrong: "rgba(255,255,255,0.1)",
     borderSubtle: "rgba(255,255,255,0.04)",
     text: "#E8E4DF",
-    textMuted: "rgba(255,255,255,0.35)",
+    textMuted: "rgba(255,255,255,0.48)",
     textSoft: "rgba(255,255,255,0.4)",
     textSubtle: "rgba(255,255,255,0.25)",
     baseline: "#2A9D8F",
@@ -55,6 +55,11 @@ const terminalTokens = {
       medium: 500,
       semibold: 600,
       bold: 700,
+    },
+    lineHeight: {
+      heading: 1.2,
+      body: 1.5,
+      label: 1,
     },
     letterSpacing: {
       heading: "-0.8px",

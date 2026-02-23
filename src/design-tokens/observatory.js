@@ -55,6 +55,11 @@ const observatoryTokens = {
       semibold: 600,
       bold: 700,
     },
+    lineHeight: {
+      heading: 1.2,
+      body: 1.55,
+      label: 1,
+    },
     letterSpacing: {
       heading: "-1px",
       subHeading: "-0.5px",

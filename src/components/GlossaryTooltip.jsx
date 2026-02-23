@@ -181,7 +181,9 @@ export default function GlossaryTooltip({ term, children }) {
                 lineHeight: 1.5,
               }}
             >
-              <strong style={{ color: "rgba(255,255,255,0.72)" }}>Analogy:</strong>{" "}
+              <strong style={{ color: "rgba(255,255,255,0.72)" }}>
+                Analogy:
+              </strong>{" "}
               {entry.analogy}
             </div>
             <div
@@ -249,7 +251,6 @@ export default function GlossaryTooltip({ term, children }) {
           textUnderlineOffset: 3,
           color: "inherit",
           borderRadius: 3,
-          outline: "none",
         }}
       >
         {children}
