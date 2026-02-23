@@ -1,0 +1,31 @@
+{
+  "cli_version": "0.4.4",
+  "checkpoint_id": "963e2c03d486",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "files_touched": [
+    ".claude/skills/signal-update/SKILL.md",
+    ".env.example",
+    "src/hooks/useSignalStatuses.js",
+    "src/lib/supabase.js",
+    "supabase/migrations/001_create_tables.sql",
+    "supabase/seed.sql"
+  ],
+  "sessions": [
+    {
+      "metadata": "/96/3e2c03d486/0/metadata.json",
+      "transcript": "/96/3e2c03d486/0/full.jsonl",
+      "context": "/96/3e2c03d486/0/context.md",
+      "content_hash": "/96/3e2c03d486/0/content_hash.txt",
+      "prompt": "/96/3e2c03d486/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 40,
+    "cache_creation_tokens": 18608,
+    "cache_read_tokens": 5087838,
+    "output_tokens": 5620,
+    "api_call_count": 36
+  }
+}

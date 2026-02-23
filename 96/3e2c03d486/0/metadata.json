@@ -1,0 +1,38 @@
+{
+  "cli_version": "0.4.4",
+  "checkpoint_id": "963e2c03d486",
+  "session_id": "02ae455e-13a2-40df-b4ab-db6c504567e1",
+  "strategy": "manual-commit",
+  "created_at": "2026-02-23T03:26:32.068362Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "files_touched": [
+    ".claude/skills/signal-update/SKILL.md",
+    ".env.example",
+    "src/hooks/useSignalStatuses.js",
+    "src/lib/supabase.js",
+    "supabase/migrations/001_create_tables.sql",
+    "supabase/seed.sql"
+  ],
+  "agent": "Claude Code",
+  "transcript_identifier_at_start": "e63dd81c-1d7b-46b4-be80-35a5ecbfd837",
+  "checkpoint_transcript_start": 361,
+  "transcript_lines_at_start": 361,
+  "token_usage": {
+    "input_tokens": 40,
+    "cache_creation_tokens": 18608,
+    "cache_read_tokens": 5087838,
+    "output_tokens": 5620,
+    "api_call_count": 36
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-02-23T03:26:31.583859Z",
+    "agent_lines": 398,
+    "human_added": 1277,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 1675,
+    "agent_percentage": 23.761194029850746
+  },
+  "transcript_path": ".claude/projects/-Users-fabianaguilar-Projects-ALOS/02ae455e-13a2-40df-b4ab-db6c504567e1.jsonl"
+}
