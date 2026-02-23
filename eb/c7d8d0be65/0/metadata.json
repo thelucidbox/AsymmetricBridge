@@ -1,0 +1,41 @@
+{
+  "cli_version": "0.4.4",
+  "checkpoint_id": "ebc7d8d0be65",
+  "session_id": "02ae455e-13a2-40df-b4ab-db6c504567e1",
+  "strategy": "manual-commit",
+  "created_at": "2026-02-23T03:36:08.818291Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "src/hooks/useAutoThreshold.js",
+    "src/hooks/useCryptoData.js",
+    "src/hooks/useFredData.js",
+    "src/hooks/useStockData.js",
+    "src/lib/crypto.js",
+    "src/lib/fred.js",
+    "src/lib/stocks.js",
+    "src/lib/threshold-engine.js",
+    "src/lib/threshold-rules.js"
+  ],
+  "agent": "Claude Code",
+  "transcript_identifier_at_start": "a6d12341-9cf6-49f4-92c0-0cebfeafb1ae",
+  "checkpoint_transcript_start": 516,
+  "transcript_lines_at_start": 516,
+  "token_usage": {
+    "input_tokens": 18,
+    "cache_creation_tokens": 57346,
+    "cache_read_tokens": 1229457,
+    "output_tokens": 955,
+    "api_call_count": 12
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-02-23T03:36:08.226227Z",
+    "agent_lines": 673,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 284,
+    "total_committed": 673,
+    "agent_percentage": 100
+  },
+  "transcript_path": ".claude/projects/-Users-fabianaguilar-Projects-ALOS/02ae455e-13a2-40df-b4ab-db6c504567e1.jsonl"
+}

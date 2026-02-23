@@ -1,0 +1,34 @@
+{
+  "cli_version": "0.4.4",
+  "checkpoint_id": "ebc7d8d0be65",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "src/hooks/useAutoThreshold.js",
+    "src/hooks/useCryptoData.js",
+    "src/hooks/useFredData.js",
+    "src/hooks/useStockData.js",
+    "src/lib/crypto.js",
+    "src/lib/fred.js",
+    "src/lib/stocks.js",
+    "src/lib/threshold-engine.js",
+    "src/lib/threshold-rules.js"
+  ],
+  "sessions": [
+    {
+      "metadata": "/eb/c7d8d0be65/0/metadata.json",
+      "transcript": "/eb/c7d8d0be65/0/full.jsonl",
+      "context": "/eb/c7d8d0be65/0/context.md",
+      "content_hash": "/eb/c7d8d0be65/0/content_hash.txt",
+      "prompt": "/eb/c7d8d0be65/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 18,
+    "cache_creation_tokens": 57346,
+    "cache_read_tokens": 1229457,
+    "output_tokens": 955,
+    "api_call_count": 12
+  }
+}
