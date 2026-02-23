@@ -2,6 +2,8 @@ import { useState, useMemo } from "react";
 import DominoSection from "./DominoSection";
 import WorkflowInfo from "./WorkflowInfo";
 import SignalUpdateForm from "./SignalUpdateForm";
+import ThesisPortfolio from "./ThesisPortfolio";
+import AIJobs from "./AIJobs";
 import { Badge, S } from "../styles";
 import { ALOS_COMPONENTS } from "../data/alos-components";
 import { DOMINOS } from "../data/dominos";
@@ -198,24 +200,30 @@ export default function CommandCenter() {
               fontFamily: "'IBM Plex Mono'",
             }}
           >
-            Lucid Box Products · Signal Tracker · ALOS Productization · Revenue
-            Model · Twitter Strategy
+            Lucid Box · Signal Tracker · Thesis & Portfolio · AI Jobs
           </p>
         </div>
 
         {/* Section Switcher */}
-        <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+        <div
+          style={{
+            display: "flex",
+            gap: 8,
+            marginBottom: 16,
+            flexWrap: "wrap",
+          }}
+        >
           <button
             onClick={() => switchSection("lucidbox")}
             style={S.sectionTab(section === "lucidbox", "#E63946")}
           >
-            Lucid Box Business
+            Lucid Box
           </button>
           <button
             onClick={() => switchSection("signals")}
             style={S.sectionTab(section === "signals", "#E9C46A")}
           >
-            Signal Tracker
+            Signals
             <span
               style={{
                 marginLeft: 6,
@@ -226,6 +234,18 @@ export default function CommandCenter() {
             >
               {threat}
             </span>
+          </button>
+          <button
+            onClick={() => switchSection("thesis")}
+            style={S.sectionTab(section === "thesis", "#6D6875")}
+          >
+            Thesis & Portfolio
+          </button>
+          <button
+            onClick={() => switchSection("jobs")}
+            style={S.sectionTab(section === "jobs", "#2A9D8F")}
+          >
+            AI Jobs
           </button>
         </div>
 
@@ -1396,6 +1416,12 @@ export default function CommandCenter() {
             )}
           </div>
         )}
+
+        {/* ================= THESIS & PORTFOLIO SECTION ================= */}
+        {section === "thesis" && <ThesisPortfolio />}
+
+        {/* ================= AI JOBS SECTION ================= */}
+        {section === "jobs" && <AIJobs />}
 
         <div
           style={{

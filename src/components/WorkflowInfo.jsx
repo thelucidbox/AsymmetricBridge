@@ -1,5 +1,6 @@
 import { S, STATUS_CFG } from "../styles";
 import { THRESHOLD_RULES, RULE_STATS } from "../lib/threshold-rules";
+import { DOMINOS } from "../data/dominos";
 
 const AUTO_SIGNALS = THRESHOLD_RULES.filter(
   (r) => !r.manual_only && r.thresholds?.length > 0,
@@ -244,54 +245,126 @@ export default function WorkflowInfo() {
         </>
       )}
 
-      {/* Manual Signals */}
-      <div style={S.label}>Manual Signals ({MANUAL_SIGNALS.length})</div>
-      <div style={{ ...S.card("rgba(244,162,97,0.1)"), marginBottom: 14 }}>
+      {/* Manual Signals — Detailed Guide */}
+      <div style={S.label}>
+        Manual Signals — How to Update ({MANUAL_SIGNALS.length})
+      </div>
+      <div style={{ ...S.card("rgba(244,162,97,0.15)"), marginBottom: 14 }}>
         <div
           style={{
             fontSize: 11,
-            color: "rgba(255,255,255,0.45)",
-            marginBottom: 10,
-            lineHeight: 1.5,
+            color: "rgba(255,255,255,0.5)",
+            marginBottom: 6,
+            lineHeight: 1.6,
           }}
         >
-          These require reading earnings reports, government releases, and
-          industry data. Update via the Update Signal tab or Claude Code.
+          These signals require YOU to check external sources and update the
+          status. Here's exactly where to find the data and what to look for.
         </div>
-        {MANUAL_SIGNALS.map((rule, i) => (
-          <div
-            key={i}
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr auto",
-              gap: 8,
-              alignItems: "center",
-              padding: "8px 0",
-              borderBottom:
-                i < MANUAL_SIGNALS.length - 1
-                  ? "1px solid rgba(255,255,255,0.04)"
-                  : "none",
-            }}
-          >
-            <div>
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,0.7)" }}>
-                {rule.signal_name}
-              </div>
-              <div style={{ fontSize: 9, color: "rgba(255,255,255,0.25)" }}>
-                D{rule.domino_id}: {DOMINO_NAMES[rule.domino_id]}
-              </div>
-            </div>
+        <div
+          style={{
+            fontSize: 11,
+            color: "#F4A261",
+            fontWeight: 600,
+            marginBottom: 12,
+            padding: "6px 10px",
+            background: "rgba(244,162,97,0.08)",
+            borderRadius: 6,
+          }}
+        >
+          To update: go to the "Update Signal" tab → pick the signal → set
+          green/amber/red → write what you found → submit.
+        </div>
+        {MANUAL_SIGNALS.map((rule, i) => {
+          const domino = DOMINOS.find((d) => d.id === rule.domino_id);
+          const signal = domino?.signals.find(
+            (s) => s.name === rule.signal_name,
+          );
+          return (
             <div
+              key={i}
               style={{
-                fontSize: 9,
-                color: "#F4A261",
-                fontFamily: "'IBM Plex Mono'",
+                padding: "10px 0",
+                borderBottom:
+                  i < MANUAL_SIGNALS.length - 1
+                    ? "1px solid rgba(255,255,255,0.04)"
+                    : "none",
               }}
             >
-              MANUAL
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: 4,
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 12,
+                    fontWeight: 600,
+                    color: "rgba(255,255,255,0.75)",
+                  }}
+                >
+                  {rule.signal_name}
+                </div>
+                <div
+                  style={{
+                    fontSize: 8,
+                    color: "#F4A261",
+                    fontFamily: "'IBM Plex Mono'",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.5px",
+                  }}
+                >
+                  {signal?.frequency || "Manual"}
+                </div>
+              </div>
+              <div
+                style={{
+                  fontSize: 9,
+                  color: "rgba(255,255,255,0.25)",
+                  marginBottom: 4,
+                }}
+              >
+                D{rule.domino_id}: {DOMINO_NAMES[rule.domino_id]}
+              </div>
+              {signal && (
+                <div
+                  style={{
+                    fontSize: 10,
+                    lineHeight: 1.6,
+                    color: "rgba(255,255,255,0.4)",
+                  }}
+                >
+                  <div>
+                    <span style={{ color: "#2A9D8F", fontWeight: 600 }}>
+                      Source:
+                    </span>{" "}
+                    {signal.source}
+                  </div>
+                  <div>
+                    <span style={{ color: "#E9C46A", fontWeight: 600 }}>
+                      Baseline:
+                    </span>{" "}
+                    {signal.baseline}
+                  </div>
+                  <div>
+                    <span style={{ color: "#E63946", fontWeight: 600 }}>
+                      Red when:
+                    </span>{" "}
+                    {signal.threshold}
+                  </div>
+                  {signal.notes && (
+                    <div style={{ fontStyle: "italic", marginTop: 2 }}>
+                      {signal.notes}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* How to Update */}
