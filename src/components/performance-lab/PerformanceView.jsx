@@ -1,5 +1,10 @@
 import { useMemo } from "react";
 import { UNALIGNED_LEG_NAME } from "../../lib/leg-mapper";
+import {
+  copyToClipboard,
+  downloadFile,
+  performanceToMarkdown,
+} from "../../lib/export-utils";
 import { usePortfolioData } from "../../hooks/usePortfolioData";
 import { S } from "../../styles";
 import CSVUpload from "./CSVUpload";
@@ -101,7 +106,8 @@ export default function PerformanceView() {
 
   const comparisonRows = alignedLegs.map((row) => ({
     ...row,
-    targetForChart: row.targetPercent === null ? defaultTarget : row.targetPercent,
+    targetForChart:
+      row.targetPercent === null ? defaultTarget : row.targetPercent,
     usesDerivedTarget: row.targetPercent === null,
   }));
 
@@ -133,7 +139,9 @@ export default function PerformanceView() {
             >
               <ScoreRing score={alignmentScore.score} />
               <div style={{ minWidth: 0 }}>
-                <div style={{ ...S.label, marginBottom: 6 }}>Thesis Performance Lab</div>
+                <div style={{ ...S.label, marginBottom: 6 }}>
+                  Thesis Performance Lab
+                </div>
                 <div
                   style={{
                     fontSize: 20,
@@ -152,8 +160,9 @@ export default function PerformanceView() {
                     marginBottom: 10,
                   }}
                 >
-                  {formatPercent(alignmentScore.alignedPercent)} aligned to thesis legs.{" "}
-                  {formatPercent(alignmentScore.unalignedPercent)} sits outside your mapped thesis exposure.
+                  {formatPercent(alignmentScore.alignedPercent)} aligned to
+                  thesis legs. {formatPercent(alignmentScore.unalignedPercent)}{" "}
+                  sits outside your mapped thesis exposure.
                 </div>
 
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -192,9 +201,60 @@ export default function PerformanceView() {
                         padding: "4px 7px",
                       }}
                     >
-                      Rows: {lastImportMeta.totalRows} ({lastImportMeta.skippedRows} skipped)
+                      Rows: {lastImportMeta.totalRows} (
+                      {lastImportMeta.skippedRows} skipped)
                     </span>
                   )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const md = performanceToMarkdown(
+                        alignmentScore,
+                        legBreakdown,
+                        positions,
+                        totalPortfolioValue,
+                        detectedFormat,
+                      );
+                      copyToClipboard(md);
+                    }}
+                    style={{
+                      fontSize: 10,
+                      fontFamily: "'IBM Plex Mono', monospace",
+                      color: "rgba(255,255,255,0.5)",
+                      border: "1px solid rgba(255,255,255,0.14)",
+                      borderRadius: 5,
+                      padding: "4px 7px",
+                      background: "transparent",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Copy .md
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const md = performanceToMarkdown(
+                        alignmentScore,
+                        legBreakdown,
+                        positions,
+                        totalPortfolioValue,
+                        detectedFormat,
+                      );
+                      downloadFile(md, "performance-report.md");
+                    }}
+                    style={{
+                      fontSize: 10,
+                      fontFamily: "'IBM Plex Mono', monospace",
+                      color: "rgba(255,255,255,0.5)",
+                      border: "1px solid rgba(255,255,255,0.14)",
+                      borderRadius: 5,
+                      padding: "4px 7px",
+                      background: "transparent",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Download .md
+                  </button>
                 </div>
               </div>
             </div>
@@ -207,18 +267,24 @@ export default function PerformanceView() {
               }}
             >
               {alignedLegs.map((row) => {
-                const mappedLeg = legBreakdown.find((leg) => leg.legName === row.leg);
+                const mappedLeg = legBreakdown.find(
+                  (leg) => leg.legName === row.leg,
+                );
                 const hasTarget = row.targetPercent !== null;
-                const deltaColor = row.delta === null
-                  ? "rgba(255,255,255,0.45)"
-                  : row.delta > 4
-                    ? "#E63946"
-                    : row.delta < -4
-                      ? "#F4A261"
-                      : "#2A9D8F";
+                const deltaColor =
+                  row.delta === null
+                    ? "rgba(255,255,255,0.45)"
+                    : row.delta > 4
+                      ? "#E63946"
+                      : row.delta < -4
+                        ? "#F4A261"
+                        : "#2A9D8F";
 
                 return (
-                  <div key={row.leg} style={S.card(`${row.color || "#2A9D8F"}33`)}>
+                  <div
+                    key={row.leg}
+                    style={S.card(`${row.color || "#2A9D8F"}33`)}
+                  >
                     <div
                       style={{
                         fontSize: 14,
@@ -249,27 +315,40 @@ export default function PerformanceView() {
                       }}
                     >
                       <div>
-                        <div style={{ ...S.label, marginBottom: 3 }}>Actual</div>
+                        <div style={{ ...S.label, marginBottom: 3 }}>
+                          Actual
+                        </div>
                         <div style={{ fontSize: 16, fontWeight: 700 }}>
                           {formatPercent(row.actualPercent)}
                         </div>
                       </div>
                       <div>
-                        <div style={{ ...S.label, marginBottom: 3 }}>Target</div>
+                        <div style={{ ...S.label, marginBottom: 3 }}>
+                          Target
+                        </div>
                         <div style={{ fontSize: 16, fontWeight: 700 }}>
                           {hasTarget ? formatPercent(row.targetPercent) : "N/A"}
                         </div>
                       </div>
                       <div>
                         <div style={{ ...S.label, marginBottom: 3 }}>Delta</div>
-                        <div style={{ fontSize: 16, fontWeight: 700, color: deltaColor }}>
+                        <div
+                          style={{
+                            fontSize: 16,
+                            fontWeight: 700,
+                            color: deltaColor,
+                          }}
+                        >
                           {hasTarget ? formatPercent(row.delta) : "N/A"}
                         </div>
                       </div>
                     </div>
 
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,0.55)" }}>
-                      {mappedLeg?.positions?.length || 0} mapped positions · {formatCurrency(row.totalValue)}
+                    <div
+                      style={{ fontSize: 11, color: "rgba(255,255,255,0.55)" }}
+                    >
+                      {mappedLeg?.positions?.length || 0} mapped positions ·{" "}
+                      {formatCurrency(row.totalValue)}
                     </div>
                   </div>
                 );
@@ -277,27 +356,58 @@ export default function PerformanceView() {
             </div>
 
             <div style={S.card("rgba(233,196,106,0.24)")}>
-              <div style={{ ...S.label, marginBottom: 8 }}>Allocation Comparison</div>
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,0.62)", marginBottom: 10 }}>
+              <div style={{ ...S.label, marginBottom: 8 }}>
+                Allocation Comparison
+              </div>
+              <div
+                style={{
+                  fontSize: 12,
+                  color: "rgba(255,255,255,0.62)",
+                  marginBottom: 10,
+                }}
+              >
                 Actual vs target allocation by leg.
                 {comparisonRows.some((row) => row.usesDerivedTarget) && (
                   <span style={{ color: "rgba(255,255,255,0.45)" }}>
-                    {" "}If no target is defined, an equal-weight reference is used for comparison.
+                    {" "}
+                    If no target is defined, an equal-weight reference is used
+                    for comparison.
                   </span>
                 )}
               </div>
               <div style={{ display: "grid", gap: 10 }}>
                 {comparisonRows.map((row) => (
-                  <div key={`bars-${row.leg}`} style={{ display: "grid", gap: 5 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
-                      <div style={{ fontSize: 11, fontWeight: 600 }}>{row.leg}</div>
-                      <div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)" }}>
-                        {formatPercent(row.actualPercent)} vs {formatPercent(row.targetForChart)}
+                  <div
+                    key={`bars-${row.leg}`}
+                    style={{ display: "grid", gap: 5 }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        gap: 8,
+                      }}
+                    >
+                      <div style={{ fontSize: 11, fontWeight: 600 }}>
+                        {row.leg}
+                      </div>
+                      <div
+                        style={{ fontSize: 10, color: "rgba(255,255,255,0.5)" }}
+                      >
+                        {formatPercent(row.actualPercent)} vs{" "}
+                        {formatPercent(row.targetForChart)}
                       </div>
                     </div>
                     <div style={{ display: "flex", gap: 8 }}>
                       <div style={{ display: "grid", gap: 4, flex: 1 }}>
-                        <div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)" }}>Actual</div>
+                        <div
+                          style={{
+                            fontSize: 9,
+                            color: "rgba(255,255,255,0.4)",
+                          }}
+                        >
+                          Actual
+                        </div>
                         <div
                           style={{
                             height: 10,
@@ -316,7 +426,12 @@ export default function PerformanceView() {
                         </div>
                       </div>
                       <div style={{ display: "grid", gap: 4, flex: 1 }}>
-                        <div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)" }}>
+                        <div
+                          style={{
+                            fontSize: 9,
+                            color: "rgba(255,255,255,0.4)",
+                          }}
+                        >
                           {row.usesDerivedTarget ? "Ref Target" : "Target"}
                         </div>
                         <div
@@ -343,11 +458,16 @@ export default function PerformanceView() {
             </div>
 
             <div style={S.card("rgba(230,57,70,0.24)")}>
-              <div style={{ ...S.label, marginBottom: 8 }}>Unaligned Positions</div>
+              <div style={{ ...S.label, marginBottom: 8 }}>
+                Unaligned Positions
+              </div>
               {unalignedBucket?.positions?.length ? (
                 <div style={{ display: "grid", gap: 8 }}>
-                  <div style={{ fontSize: 12, color: "rgba(255,255,255,0.62)" }}>
-                    {unalignedBucket.positions.length} positions are currently unmapped to thesis legs.
+                  <div
+                    style={{ fontSize: 12, color: "rgba(255,255,255,0.62)" }}
+                  >
+                    {unalignedBucket.positions.length} positions are currently
+                    unmapped to thesis legs.
                   </div>
                   <div
                     style={{
@@ -384,7 +504,9 @@ export default function PerformanceView() {
                           fontSize: 11,
                         }}
                       >
-                        <span style={{ fontWeight: 700 }}>{position.symbol}</span>
+                        <span style={{ fontWeight: 700 }}>
+                          {position.symbol}
+                        </span>
                         <span style={{ color: "rgba(255,255,255,0.68)" }}>
                           {Number(position.quantity || 0).toFixed(4)}
                         </span>

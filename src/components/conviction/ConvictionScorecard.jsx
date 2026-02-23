@@ -3,12 +3,29 @@ import { ALL_SIGNALS } from "../../data/dominos";
 import { useTheme } from "../../design-tokens";
 import { usePredictions } from "../../hooks/usePredictions";
 import { useSignalStatuses } from "../../hooks/useSignalStatuses";
+import {
+  copyToClipboard,
+  downloadFile,
+  predictionsToMarkdown,
+} from "../../lib/export-utils";
 import { S } from "../../styles";
 
 const TEMPLATE_OPTIONS = [
-  { id: "threshold", label: "Threshold", description: "Signal X breaches Y by date Z" },
-  { id: "direction", label: "Direction", description: "Metric X goes up/down by date Z" },
-  { id: "range", label: "Range", description: "Metric X lands between Y and Z by date Z" },
+  {
+    id: "threshold",
+    label: "Threshold",
+    description: "Signal X breaches Y by date Z",
+  },
+  {
+    id: "direction",
+    label: "Direction",
+    description: "Metric X goes up/down by date Z",
+  },
+  {
+    id: "range",
+    label: "Range",
+    description: "Metric X lands between Y and Z by date Z",
+  },
 ];
 
 function clamp(value, min, max) {
@@ -38,7 +55,10 @@ function withAlpha(color, alpha) {
   if (raw.startsWith("#")) {
     let hex = raw.slice(1);
     if (hex.length === 3) {
-      hex = hex.split("").map((char) => `${char}${char}`).join("");
+      hex = hex
+        .split("")
+        .map((char) => `${char}${char}`)
+        .join("");
     }
     if (hex.length !== 6) return color;
     const r = Number.parseInt(hex.slice(0, 2), 16);
@@ -50,13 +70,15 @@ function withAlpha(color, alpha) {
   if (raw.startsWith("rgba(")) {
     const body = raw.slice(5, -1);
     const parts = body.split(",").map((part) => part.trim());
-    if (parts.length >= 3) return `rgba(${parts[0]}, ${parts[1]}, ${parts[2]}, ${safeAlpha})`;
+    if (parts.length >= 3)
+      return `rgba(${parts[0]}, ${parts[1]}, ${parts[2]}, ${safeAlpha})`;
   }
 
   if (raw.startsWith("rgb(")) {
     const body = raw.slice(4, -1);
     const parts = body.split(",").map((part) => part.trim());
-    if (parts.length >= 3) return `rgba(${parts[0]}, ${parts[1]}, ${parts[2]}, ${safeAlpha})`;
+    if (parts.length >= 3)
+      return `rgba(${parts[0]}, ${parts[1]}, ${parts[2]}, ${safeAlpha})`;
   }
 
   return color;
@@ -71,13 +93,14 @@ function toTargetDateISOString(dateInput) {
 function conditionLabel(prediction) {
   const condition = prediction.condition || {};
   if (prediction.type === "threshold") {
-    const operator = condition.operator === "gte"
-      ? ">="
-      : condition.operator === "gt"
-        ? ">"
-        : condition.operator === "lte"
-          ? "<="
-          : "<";
+    const operator =
+      condition.operator === "gte"
+        ? ">="
+        : condition.operator === "gt"
+          ? ">"
+          : condition.operator === "lte"
+            ? "<="
+            : "<";
     return `${operator} ${condition.threshold}`;
   }
 
@@ -121,7 +144,14 @@ function BattingRing({ battingAverage, tokens }) {
   const dash = (percent / 100) * circumference;
 
   return (
-    <div style={{ position: "relative", width: 150, height: 150, margin: "0 auto" }}>
+    <div
+      style={{
+        position: "relative",
+        width: 150,
+        height: 150,
+        margin: "0 auto",
+      }}
+    >
       <svg width="150" height="150" viewBox="0 0 150 150">
         <circle
           cx="75"
@@ -186,7 +216,9 @@ function PredictionCard({
   onManualScore,
   isLoading,
 }) {
-  const tone = isActive ? tokens.colors.accent : outcomeColor(prediction.outcome, tokens);
+  const tone = isActive
+    ? tokens.colors.accent
+    : outcomeColor(prediction.outcome, tokens);
   const label = isActive
     ? "Pending"
     : prediction.outcome === "hit"
@@ -206,7 +238,14 @@ function PredictionCard({
         "--ab-active-border-high": withAlpha(tone, 0.82),
       }}
     >
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 12, marginBottom: 8 }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          gap: 12,
+          marginBottom: 8,
+        }}
+      >
         <div style={{ minWidth: 0 }}>
           <div
             style={{
@@ -355,7 +394,8 @@ export default function ConvictionScorecard() {
   }, [signalStatuses]);
 
   const selectedSignal = useMemo(
-    () => signalOptions.find((option) => option.key === selectedSignalKey) || null,
+    () =>
+      signalOptions.find((option) => option.key === selectedSignalKey) || null,
     [signalOptions, selectedSignalKey],
   );
 
@@ -450,8 +490,70 @@ export default function ConvictionScorecard() {
       }}
     >
       <div className="ab-content-shell" style={{ display: "grid", gap: 12 }}>
-        <div style={{ ...S.card(withAlpha(tokens.colors.accent, 0.35)), marginBottom: 0 }}>
-          <div style={{ ...S.label, marginBottom: 10 }}>Conviction Ledger</div>
+        <div
+          style={{
+            ...S.card(withAlpha(tokens.colors.accent, 0.35)),
+            marginBottom: 0,
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 10,
+            }}
+          >
+            <div style={S.label}>Conviction Ledger</div>
+            {predictions.length > 0 && (
+              <div style={{ display: "flex", gap: 6 }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const md = predictionsToMarkdown(
+                      predictions,
+                      battingAverage,
+                    );
+                    copyToClipboard(md);
+                  }}
+                  style={{
+                    border: `1px solid ${tokens.colors.border}`,
+                    background: tokens.colors.surface,
+                    color: tokens.colors.textMuted,
+                    borderRadius: tokens.shape.buttonRadius,
+                    padding: "4px 8px",
+                    fontSize: tokens.typography.sizes.badge,
+                    fontFamily: tokens.typography.fontMono,
+                    cursor: "pointer",
+                  }}
+                >
+                  Copy .md
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const md = predictionsToMarkdown(
+                      predictions,
+                      battingAverage,
+                    );
+                    downloadFile(md, "conviction-ledger.md");
+                  }}
+                  style={{
+                    border: `1px solid ${tokens.colors.border}`,
+                    background: tokens.colors.surface,
+                    color: tokens.colors.textMuted,
+                    borderRadius: tokens.shape.buttonRadius,
+                    padding: "4px 8px",
+                    fontSize: tokens.typography.sizes.badge,
+                    fontFamily: tokens.typography.fontMono,
+                    cursor: "pointer",
+                  }}
+                >
+                  Download .md
+                </button>
+              </div>
+            )}
+          </div>
 
           <BattingRing battingAverage={battingAverage} tokens={tokens} />
 
@@ -463,14 +565,20 @@ export default function ConvictionScorecard() {
               color: tokens.colors.textMuted,
             }}
           >
-            {scoredPredictions.length} scored predictions across {predictions.length} total entries.
+            {scoredPredictions.length} scored predictions across{" "}
+            {predictions.length} total entries.
           </div>
 
           <div style={{ marginTop: 14 }}>
             <div style={{ ...S.label, marginBottom: 6 }}>Timeline</div>
             <div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}>
               {predictions.length === 0 && (
-                <span style={{ fontSize: tokens.typography.sizes.bodySmall, color: tokens.colors.textMuted }}>
+                <span
+                  style={{
+                    fontSize: tokens.typography.sizes.bodySmall,
+                    color: tokens.colors.textMuted,
+                  }}
+                >
                   No predictions yet.
                 </span>
               )}
@@ -491,12 +599,30 @@ export default function ConvictionScorecard() {
           </div>
         </div>
 
-        <div style={{ ...S.card(withAlpha(tokens.colors.watch, 0.28)), marginBottom: 0 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center" }}>
+        <div
+          style={{
+            ...S.card(withAlpha(tokens.colors.watch, 0.28)),
+            marginBottom: 0,
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              gap: 10,
+              alignItems: "center",
+            }}
+          >
             <div>
               <div style={{ ...S.label, marginBottom: 4 }}>Predictions</div>
-              <div style={{ fontSize: tokens.typography.sizes.bodySmall, color: tokens.colors.textMuted }}>
-                Record a thesis call, set a date, and let outcomes compound your batting average.
+              <div
+                style={{
+                  fontSize: tokens.typography.sizes.bodySmall,
+                  color: tokens.colors.textMuted,
+                }}
+              >
+                Record a thesis call, set a date, and let outcomes compound your
+                batting average.
               </div>
             </div>
             <button
@@ -514,8 +640,17 @@ export default function ConvictionScorecard() {
           </div>
 
           {isFormOpen && (
-            <form onSubmit={handleCreatePrediction} style={{ marginTop: 12, display: "grid", gap: 10 }}>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: 10 }}>
+            <form
+              onSubmit={handleCreatePrediction}
+              style={{ marginTop: 12, display: "grid", gap: 10 }}
+            >
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))",
+                  gap: 10,
+                }}
+              >
                 <label style={{ display: "grid", gap: 6 }}>
                   <span style={S.label}>Template</span>
                   <select
@@ -562,10 +697,20 @@ export default function ConvictionScorecard() {
               </label>
 
               {template === "threshold" && (
-                <div style={{ display: "grid", gridTemplateColumns: "120px 1fr", gap: 10 }}>
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "120px 1fr",
+                    gap: 10,
+                  }}
+                >
                   <label style={{ display: "grid", gap: 6 }}>
                     <span style={S.label}>Operator</span>
-                    <select value={operator} onChange={(event) => setOperator(event.target.value)} style={inputStyle}>
+                    <select
+                      value={operator}
+                      onChange={(event) => setOperator(event.target.value)}
+                      style={inputStyle}
+                    >
                       <option value="gte">&gt;=</option>
                       <option value="gt">&gt;</option>
                       <option value="lte">&lt;=</option>
@@ -587,7 +732,13 @@ export default function ConvictionScorecard() {
               )}
 
               {template === "direction" && (
-                <div style={{ display: "grid", gridTemplateColumns: "140px 1fr", gap: 10 }}>
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "140px 1fr",
+                    gap: 10,
+                  }}
+                >
                   <label style={{ display: "grid", gap: 6 }}>
                     <span style={S.label}>Direction</span>
                     <select
@@ -613,7 +764,13 @@ export default function ConvictionScorecard() {
               )}
 
               {template === "range" && (
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    gap: 10,
+                  }}
+                >
                   <label style={{ display: "grid", gap: 6 }}>
                     <span style={S.label}>Min Value</span>
                     <input
@@ -651,14 +808,34 @@ export default function ConvictionScorecard() {
               </label>
 
               {formError && (
-                <div style={{ fontSize: tokens.typography.sizes.bodySmall, color: tokens.colors.alert }}>
+                <div
+                  style={{
+                    fontSize: tokens.typography.sizes.bodySmall,
+                    color: tokens.colors.alert,
+                  }}
+                >
                   {formError}
                 </div>
               )}
 
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
-                <div style={{ fontSize: tokens.typography.sizes.bodySmall, color: tokens.colors.textMuted }}>
-                  {TEMPLATE_OPTIONS.find((entry) => entry.id === template)?.description}
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  gap: 10,
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: tokens.typography.sizes.bodySmall,
+                    color: tokens.colors.textMuted,
+                  }}
+                >
+                  {
+                    TEMPLATE_OPTIONS.find((entry) => entry.id === template)
+                      ?.description
+                  }
                 </div>
                 <button
                   type="submit"
@@ -678,11 +855,23 @@ export default function ConvictionScorecard() {
           )}
         </div>
 
-        <div style={{ ...S.card(withAlpha(tokens.colors.accent, 0.2)), marginBottom: 0 }}>
-          <div style={{ ...S.label, marginBottom: 10 }}>Active ({activePredictions.length})</div>
+        <div
+          style={{
+            ...S.card(withAlpha(tokens.colors.accent, 0.2)),
+            marginBottom: 0,
+          }}
+        >
+          <div style={{ ...S.label, marginBottom: 10 }}>
+            Active ({activePredictions.length})
+          </div>
           <div style={{ display: "grid", gap: 10 }}>
             {activePredictions.length === 0 && (
-              <div style={{ fontSize: tokens.typography.sizes.bodySmall, color: tokens.colors.textMuted }}>
+              <div
+                style={{
+                  fontSize: tokens.typography.sizes.bodySmall,
+                  color: tokens.colors.textMuted,
+                }}
+              >
                 No active predictions.
               </div>
             )}
@@ -699,11 +888,23 @@ export default function ConvictionScorecard() {
           </div>
         </div>
 
-        <div style={{ ...S.card(withAlpha(tokens.colors.textMuted, 0.22)), marginBottom: 0 }}>
-          <div style={{ ...S.label, marginBottom: 10 }}>Scored ({scoredPredictions.length})</div>
+        <div
+          style={{
+            ...S.card(withAlpha(tokens.colors.textMuted, 0.22)),
+            marginBottom: 0,
+          }}
+        >
+          <div style={{ ...S.label, marginBottom: 10 }}>
+            Scored ({scoredPredictions.length})
+          </div>
           <div style={{ display: "grid", gap: 10 }}>
             {scoredPredictions.length === 0 && (
-              <div style={{ fontSize: tokens.typography.sizes.bodySmall, color: tokens.colors.textMuted }}>
+              <div
+                style={{
+                  fontSize: tokens.typography.sizes.bodySmall,
+                  color: tokens.colors.textMuted,
+                }}
+              >
                 No scored predictions yet.
               </div>
             )}
