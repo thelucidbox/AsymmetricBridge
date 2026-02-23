@@ -1,0 +1,53 @@
+{
+  "cli_version": "0.4.4",
+  "checkpoint_id": "375b833f8730",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 4,
+  "files_touched": [
+    ".claude/skills/signal-update/SKILL.md",
+    ".env",
+    ".env.example",
+    ".gitignore",
+    "AGENTS.md",
+    "ARCHITECTURE.md",
+    "CLARITY-BRIEF.md",
+    "CLAUDE.md",
+    "DECOMPOSITION.md",
+    "DISPATCH.md",
+    "GEMINI.md",
+    "QUESTIONS.md",
+    "SPEC.md",
+    "docs/INDEX.md",
+    "docs/reference/decisions/TEMPLATE.md",
+    "docs/tutorials/getting-started.md",
+    "productivity/SESSION_LOG.md",
+    "productivity/TODO.md",
+    "src/components/CommandCenter.jsx",
+    "src/components/SignalUpdateForm.jsx",
+    "src/components/WorkflowInfo.jsx",
+    "src/hooks/useAutoThreshold.js",
+    "src/hooks/useSignalStatuses.js",
+    "src/lib/supabase.js",
+    "src/lib/threshold-engine.js",
+    "src/lib/threshold-rules.js",
+    "supabase/migrations/001_create_tables.sql",
+    "supabase/seed.sql"
+  ],
+  "sessions": [
+    {
+      "metadata": "/37/5b833f8730/0/metadata.json",
+      "transcript": "/37/5b833f8730/0/full.jsonl",
+      "context": "/37/5b833f8730/0/context.md",
+      "content_hash": "/37/5b833f8730/0/content_hash.txt",
+      "prompt": "/37/5b833f8730/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 118,
+    "cache_creation_tokens": 115691,
+    "cache_read_tokens": 10691990,
+    "output_tokens": 9011,
+    "api_call_count": 80
+  }
+}
