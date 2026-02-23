@@ -1,0 +1,1386 @@
+Open up the zipped file that's in my downloads folder. It's the latest downloads in there. It's named asymmetric bridge bundle open it up and I wanna go ahead and create this.
+
+---
+
+[Request interrupted by user for tool use]
+
+---
+
+I kind of wanna go with live data feeds though I want to do a mix of Liv data feeds and using Claude code
+
+---
+
+Base directory for this skill: /Users/fabianaguilar/Projects/ALOS/.claude/skills/scaffold-project
+
+# /scaffold-project — New Project with ALOS Integration
+
+Create a new project from scratch with the full ALOS toolchain wired up. This is Phase 0 — before even `/clarify`.
+
+## Usage
+
+```bash
+/scaffold-project                    # Start interview
+/scaffold-project [name] [type]      # Quick scaffold (skip interview)
+```
+
+## Pipeline Position
+
+```
+★ /scaffold-project ★ → /clarify → /spec → /design → /forge → ...
+```
+
+---
+
+## Phase 1: Interview (4 questions max)
+
+Keep it fast. This is project setup, not project planning.
+
+**Q1: Project name?**
+- Will become directory name and repo name
+- Suggest kebab-case: `my-cool-app`
+- Validate: no spaces, no special chars, not already taken in `~/Projects/`
+
+**Q2: What kind of project?**
+
+Present TWO categories. The choice determines the entire scaffold pipeline.
+
+**Coding Projects** (full pipeline: docs/ 4+1 Diataxis, playground, dev tooling):
+
+| Type | Stack Default |
+|------|--------------|
+| Web app | Next.js + TypeScript |
+| Mobile app | React Native / Expo |
+| CLI tool | Node (TypeScript) or Python |
+| API / Backend | Node (Express/Fastify) or Python (FastAPI) |
+| Library / Package | TypeScript or Python |
+
+**Non-Coding Projects** (lighter scaffold: docs/ 4 Diataxis categories, no playground, no dev pipeline steps):
+
+| Type | Stack Default |
+|------|--------------|
+| Static site / Landing page | HTML + Tailwind |
+| Content project | Obsidian / Markdown |
+| Writing project | Markdown |
+
+Internally track `project_category` as `coding` or `non-coding` — this gates Phase 4 and changes templates.
+
+**Q3: Tech stack preferences?**
+- "Use your judgment" → auto-select based on type
+- Or specify: "Use Svelte instead of React", "Python not Node", etc.
+
+**Q4: Playground type?** (Coding projects ONLY — skip for non-coding)
+
+Present a suggestion based on project type, then let the user choose:
+
+| Project Type | Suggested Playground |
+|-------------|---------------------|
+| Web app | Content/Config Editor |
+| Mobile app | Component Configurator |
+| CLI tool | Command Builder |
+| API / Backend | Endpoint Explorer |
+| Library / Package | API Playground |
+
+Options: accept suggestion, customize (describe what you want), or skip.
+
+---
+
+## Phase 2: Scaffold Directory Structure
+
+Create at `~/Projects/[project-name]/`.
+
+### Always Create (Every Project)
+
+```
+[project-name]/
+├── CLAUDE.md                  # Project instructions (lean template)
+├── .claude/
+│   └── context/               # On-demand context files
+├── QUESTIONS.md               # Architecture & design questions
+├── productivity/
+│   ├── TODO.md                # Task tracking (pipeline-aware)
+│   └── SESSION_LOG.md         # Session history
+├── docs/
+│   ├── INDEX.md               # Diataxis context router table
+│   └── tutorials/
+│       └── getting-started.md # Setup guide with real content
+└── .gitignore                 # Appropriate for tech stack
+```
+
+### For Coding Projects, Also Create
+
+```
+├── docs/
+│   └── reference/
+│       └── decisions/
+│           └── TEMPLATE.md    # ADR template
+```
+
+**NO empty folders.** `docs/how-to/` and `docs/explanation/` get created by later pipeline steps (`/wrap-up`, `/design`). Do not pre-create them.
+
+### For Multi-Agent Projects (Most Projects)
+
+```
+├── AGENTS.md                  # Codex context file
+└── GEMINI.md                  # Gemini context file
+```
+
+Ask: "Will you use Codex or Gemini for this project?" Default: yes → create both.
+
+### CLAUDE.md Template
+
+```markdown
+# [Project Name]
+
+## Identity
+**Type:** [web app / CLI / API / etc.]
+**Stack:** [tech stack]
+**Vision:** [one-liner — fill in after /clarify]
+
+## On-Demand Context
+@.claude/context/[context files as needed]
+@docs/INDEX.md
+
+## Constraints
+- [To be filled after /spec]
+
+## Conventions
+- [To be filled as patterns emerge]
+
+## Current Focus
+- [To be filled each session]
+
+## ALOS Integration
+- Pipeline: /pipeline status
+- Session: /start-session → work → /wrap-up
+- Quality: /self-review → /ship
+```
+
+### AGENTS.md Template
+
+```markdown
+# [Project Name] — Codex Context
+
+## What This Project Does
+[To be filled after /spec]
+
+## Tech Stack
+[From interview]
+
+## Key Files
+[To be filled as project develops]
+
+## Current Tasks
+[To be filled from TODO.md]
+
+## Conventions
+[To be filled as patterns emerge]
+```
+
+### GEMINI.md Template
+
+```markdown
+# [Project Name] — Gemini Context
+
+## What This Project Does
+[To be filled after /spec]
+
+## Tech Stack
+[From interview]
+
+## Research Needs
+[To be filled — areas where Gemini's multimodal/research capabilities are useful]
+
+## Key Files
+[To be filled as project develops]
+```
+
+### QUESTIONS.md Template
+
+```markdown
+# Questions — [Project Name]
+
+## Architecture
+- [Captured during /design]
+
+## Strategic
+- [Captured during planning]
+
+## Learning
+- [Captured during implementation]
+```
+
+### TODO.md Template (Category-Aware)
+
+**For coding projects:**
+
+```markdown
+# TODO — [Project Name]
+
+## Setup (Pipeline Phase 0-3)
+- [ ] Run /clarify for vision clarity
+- [ ] Run /spec to decompose features
+- [ ] Run /design for architecture decisions
+
+## Implementation
+[To be populated by /spec]
+```
+
+**For non-coding projects:**
+
+```markdown
+# TODO — [Project Name]
+
+## Setup
+- [ ] Run /clarify to define scope and goals
+- [ ] Define content structure
+
+## Content
+[To be populated as project develops]
+```
+
+### SESSION_LOG.md Template
+
+```markdown
+# Session Log — [Project Name]
+
+[Entries added by /wrap-up after each session]
+```
+
+---
+
+## Phase 3: Scaffold Docs (Diataxis Context Router)
+
+Generate the documentation files with REAL content — not empty stubs.
+
+### docs/INDEX.md — Context Router Table
+
+Generate this file using the project name, type, and category:
+
+```markdown
+# Documentation Index — [Project Name]
+
+> This is the documentation map. Each entry links to a specific doc and notes which pipeline step creates it.
+
+## Quick Navigation
+
+| I need to... | Go to | Created by |
+|-------------|-------|-----------|
+| Get the project running | [Getting Started](tutorials/getting-started.md) | `/scaffold-project` |
+| Understand architecture decisions | [ADR Log](reference/decisions/) | `/design` |
+| Learn why we chose this approach | [Design Rationale](explanation/design-rationale.md) | `/design` |
+| Configure or customize | [How-To Guides](how-to/) | `/wrap-up` (as patterns emerge) |
+| Try it interactively | [Playground](playgrounds/) | `/scaffold-project` |
+
+## Diataxis Categories
+
+| Category | Purpose | Status |
+|----------|---------|--------|
+| tutorials/ | Learning-oriented (step-by-step) | getting-started.md |
+| how-to/ | Task-oriented (solve a problem) | Created as patterns emerge |
+| reference/ | Information-oriented (accurate, complete) | decisions/TEMPLATE.md |
+| explanation/ | Understanding-oriented (the "why") | Created by /design |
+| playgrounds/ | Interaction-oriented (configure visually) | [Coding only] |
+```
+
+For non-coding projects, remove the `playgrounds/` row and the "Try it interactively" row from Quick Navigation. Also remove the `reference/decisions/` row from Quick Navigation if not a coding project.
+
+### docs/tutorials/getting-started.md — Real Content from Tech Stack
+
+Generate this with actual commands based on the chosen tech stack:
+
+```markdown
+# Getting Started with [Project Name]
+
+## Prerequisites
+- [Based on tech stack: Node 20+, Python 3.12+, etc.]
+- [Package manager: npm, uv, etc.]
+
+## Quick Start
+\`\`\`bash
+git clone [repo-url]
+cd [project-name]
+[install command based on stack]
+[run command based on stack]
+\`\`\`
+
+## Project Structure
+\`\`\`
+[Annotated directory tree from Phase 2]
+\`\`\`
+
+## Development Pipeline
+This project uses the ALOS development pipeline:
+\`\`\`
+/scaffold-project → /clarify → /spec → /design → /forge → /self-review → /ship
+\`\`\`
+Run `/pipeline status` to see where you are.
+
+## Next Steps
+- [ ] Run `/clarify` to sharpen the project vision
+- [ ] Run `/spec` to decompose into features and tasks
+```
+
+Use the ACTUAL tech stack to fill in prerequisites and commands. Examples:
+
+| Stack | Prerequisites | Install | Run |
+|-------|--------------|---------|-----|
+| Next.js + TS | Node 20+, npm | `npm install` | `npm run dev` |
+| React Native / Expo | Node 20+, Expo CLI | `npm install` | `npx expo start` |
+| Python + uv | Python 3.12+, uv | `uv sync` | `uv run main.py` |
+| FastAPI | Python 3.12+, uv | `uv sync` | `uv run uvicorn main:app --reload` |
+| HTML + Tailwind | Browser | N/A | Open `index.html` |
+| Markdown | Obsidian or text editor | N/A | Open in Obsidian |
+
+### docs/reference/decisions/TEMPLATE.md (Coding Projects Only)
+
+```markdown
+# ADR-[NNN]: [Decision Title]
+
+**Status:** [Proposed | Accepted | Deprecated | Superseded]
+**Date:** [YYYY-MM-DD]
+**Deciders:** [Names]
+
+## Context
+[What is the issue that we're seeing that is motivating this decision?]
+
+## Decision
+[What is the change that we're proposing and/or doing?]
+
+## Consequences
+### Positive
+- [What becomes easier?]
+
+### Negative
+- [What becomes harder?]
+
+### Neutral
+- [What other changes does this require?]
+```
+
+---
+
+## Phase 4: Scaffold Playground (Coding Projects Only)
+
+**Skip this phase entirely for non-coding projects or if user chose "skip" in Q4.**
+
+Based on the Q4 interview answer, generate a functional HTML playground:
+
+### Playground Requirements
+
+- **3-panel layout:** sidebar controls (340px) + preview (flex-1) + output area
+- **localStorage persistence:** All user inputs survive page reload
+- **Obsidian export:** Button to copy formatted markdown to clipboard for Kosha Prime
+- **Tooltips:** On all non-obvious controls and sections
+- **Dark theme:** Dark background, high-contrast text
+- **Copy-to-clipboard:** On all output sections
+- **Functional from day one:** Not a wireframe — buttons work, state persists, exports run
+
+### Playground Types by Project
+
+| Playground Type | What It Does |
+|----------------|--------------|
+| Content/Config Editor | Edit project config values, preview rendered output |
+| Component Configurator | Toggle props/variants, see live component preview |
+| Command Builder | Build CLI commands with flags, copy to clipboard |
+| Endpoint Explorer | Compose API requests, view mock responses |
+| API Playground | Call library functions with params, see return values |
+
+### File Location
+
+Place at `docs/playgrounds/[playground-name].html`
+
+The playground should be a STARTER — functional but minimal. It gives the project an interactive exploration tool from day one. Use the Task tool to spawn playground generation if needed for complexity.
+
+### Canonical Pattern Reference
+
+Follow the playground patterns from ALOS memory:
+- Single HTML file, self-contained (inline CSS + JS)
+- CSS custom properties for theming
+- Modular JS with clear init/render/export functions
+- localStorage keys namespaced to the project: `[project-name]-playground-*`
+
+---
+
+## Phase 5: Initialize Git + GitHub
+
+```bash
+cd ~/Projects/[project-name]
+git init
+git add .
+git commit -m "chore: scaffold project with ALOS integration"
+gh repo create [project-name] --private --source=. --push
+```
+
+**Always private** unless user explicitly says otherwise.
+
+If `gh` is not authenticated or fails, skip GitHub creation and note: "Run `gh auth login` to set up GitHub, then `gh repo create`."
+
+---
+
+## Phase 6: Register in Kosha Prime
+
+Create project brief at:
+`Kosha Prime/Projects/Current/[ProjectName]/brief.md`
+
+```markdown
+---
+created: [date]
+status: active
+type: [project type]
+category: [coding | non-coding]
+stack: [tech stack]
+---
+
+# [Project Name]
+
+## Vision
+[To be filled after /clarify]
+
+## Status
+Scaffolded. Next: /clarify or /spec
+
+## Links
+- Repo: github.com/[user]/[project-name]
+- Local: ~/Projects/[project-name]
+```
+
+---
+
+## Phase 7: Tech Stack Setup (Optional)
+
+If user chose a known stack, offer to scaffold:
+
+| Type | Command | What It Does |
+|------|---------|--------------|
+| Next.js | `npx create-next-app@latest . --typescript --tailwind --app --src-dir` | Full Next.js setup |
+| Expo | `npx create-expo-app .` | React Native with Expo |
+| Python | `uv init` | Python project with uv |
+| Node CLI | Manual `package.json` + `bin` + `tsconfig` | TypeScript CLI setup |
+
+Ask before running: "Want me to set up the [stack] boilerplate too, or just the ALOS structure?"
+
+If boilerplate is created, amend the initial commit to include it.
+
+---
+
+## Output
+
+```markdown
+## Project Scaffolded: [name]
+
+**Type:** [project type] ([coding/non-coding])
+**Stack:** [tech stack]
+**Location:** ~/Projects/[name]
+**GitHub:** github.com/[user]/[name]
+
+### Files Created
+- CLAUDE.md — project instructions (with docs/ import)
+- docs/INDEX.md — documentation context router
+- docs/tutorials/getting-started.md — setup guide
+- [if coding] docs/reference/decisions/TEMPLATE.md — ADR template
+- [if coding] docs/playgrounds/[name].html — interactive playground
+- AGENTS.md — Codex context
+- GEMINI.md — Gemini context
+- QUESTIONS.md — question capture
+- productivity/TODO.md — pipeline-aware task tracking
+- productivity/SESSION_LOG.md — session history
+- .gitignore
+
+### Registered
+- Kosha Prime brief: Projects/Current/[Name]/brief.md
+
+### Next Step
+[Coding] Run `/clarify` to sharpen your vision, then `/spec` to decompose into features.
+[Non-coding] Run `/clarify` to define scope, then start creating content.
+```
+
+---
+
+## Integration
+
+| From | Trigger | Action |
+|------|---------|--------|
+| `/pipeline new` | No project directory | Route to `/scaffold-project` |
+| `/clarify` | "This looks like a new project" | Suggest `/scaffold-project` first |
+| After scaffold | Project created | Suggest `/clarify` → `/spec` |
+| Phase 3 | Docs scaffolded | INDEX.md imported into CLAUDE.md via `@docs/INDEX.md` |
+| Phase 4 | Playground generated | Linked from INDEX.md, placed in docs/playgrounds/ |
+
+## Constraints
+
+- **Never overwrite** — if project directory exists, warn and ask before proceeding
+- **Private repos by default** — always `--private` unless explicitly told otherwise
+- **Lean CLAUDE.md** — use the universal template, not a massive file
+- **Register in Kosha Prime** — every project gets a brief, no exceptions
+- **Don't force tech stack** — offer boilerplate, don't assume
+- **No empty folders** — only create directories that contain at least one file
+- **Category gates matter** — non-coding projects skip Phase 4 and get simpler templates
+- **Playgrounds must work** — if generated, they must be functional (persistence, export, tooltips)
+
+---
+
+Base directory for this skill: /Users/fabianaguilar/.claude/skills/clarify
+
+# Clarify — Pre-Prompt Clarity Engineering
+
+Force the cognitive work that separates great outputs from slop. This skill runs the "invisible work" that should happen before any major creative prompt.
+
+## Philosophy
+
+From the article: "The gap between what you want and what you get has nothing to do with the model being limited... it's about you not knowing what you want with enough precision to communicate it."
+
+This skill forces precision BEFORE typing the actual prompt.
+
+## Recommended Output Style
+
+> 💡 Clarity engineering pairs well with **Strategist** mode: `/mode strat`
+
+## When to Use
+
+- Before writing any significant creative content
+- Before designing a new feature or system
+- Before generating anything that "could go either way"
+- When you have a vague idea that needs sharpening
+- When you've been getting generic outputs and can't figure out why
+
+## Usage
+
+```
+/clarify                    # Start clarity interview
+/clarify "product launch"   # Start with context
+```
+
+## The Clarity Interview
+
+Ask these questions ONE AT A TIME. Wait for each answer before proceeding.
+
+### Phase 1: What Are We Making?
+
+**Q1: The One-Liner**
+"In one sentence, what are we creating?"
+
+*Listen for: vagueness, "something like", "kind of"*
+*If vague, push back: "That's the problem. Let's get specific. What EXACTLY?"*
+
+### Phase 2: The Differentiation Questions
+
+**Q2: The Slop Test**
+"Picture the generic, boring, AI-slop version of this. What would make someone scroll past it? Now—what will make YOUR version different?"
+
+*This is the most important question. Push for specifics.*
+
+**Q3: The Emotion Map**
+"What emotion do you want to create? At what exact moment? Walk me through the journey."
+
+*For non-emotional outputs (code, analysis), rephrase: "What 'aha moment' should the reader have? Where in the output?"*
+
+**Q4: The Success Snapshot**
+"Imagine it's done perfectly. Describe what you're looking at. Be specific about format, length, style."
+
+### Phase 3: Reference Hunting
+
+**Q5: The Reference**
+"Is there an example that makes you say 'yes, exactly like this'? It doesn't have to be the same domain—just captures the vibe, structure, or quality level."
+
+*If they have one: Offer to analyze it together*
+*If not: Offer to search for references together using WebSearch*
+
+**Q6: The Anti-Reference**
+"What's an example of what you DON'T want? What would make this fail?"
+
+### Phase 4: Constraints & Scope
+
+**Q7: The Boundaries**
+"What's explicitly OUT of scope? What should we NOT include, even if it seems related?"
+
+**Q8: The Audience**
+"Who is this for? Not 'everyone'—who specifically? What do they already know? What are they skeptical about?"
+
+## Output: Clarity Document
+
+After the interview, generate a structured document:
+
+```markdown
+# Clarity Brief: {Project/Output Name}
+Generated: {date}
+
+## The Vision
+{One clear sentence from Q1, refined}
+
+## What Makes This Different
+{From Q2 - the anti-slop differentiation}
+
+## Emotional/Experience Journey
+{From Q3 - the feeling/aha moments mapped}
+
+## Success Looks Like
+{From Q4 - concrete description of the output}
+
+## Reference Anchor
+{From Q5 - the "exactly like this" example}
+- What to borrow: {specific elements}
+- What to avoid: {from Q6}
+
+## Boundaries
+**In Scope:** {list}
+**Out of Scope:** {list}
+
+## Audience Profile
+- Who: {specific person}
+- Already knows: {list}
+- Skeptical about: {list}
+
+## Ready-to-Use Context Block
+
+Use this at the start of prompts for this project:
+
+---
+I'm creating {one-liner}.
+
+What makes this different from generic output: {differentiation}.
+
+The key moment I'm engineering for: {emotion/aha moment}.
+
+Success looks like: {snapshot}.
+
+Reference style: {reference} — specifically borrowing {elements}.
+
+Avoid: {anti-reference elements}.
+
+Audience: {profile} who already knows {X} but is skeptical about {Y}.
+
+Not in scope: {boundaries}.
+---
+```
+
+## Persist the Brief
+
+After generating the clarity document, **always write it to disk**:
+
+**Output location:** `$PROJECT_ROOT/CLARITY-BRIEF.md` (if inside a project directory)
+**Fallback:** Write inline and offer `/save-prompt` to save to prompt library.
+
+This file is read by `/spec` and `/design` as upstream context. If it doesn't exist on disk, the clarity work is lost between sessions.
+
+## Integration with Other Skills
+
+### With /scaffold-project
+If clarifying for a new project, offer:
+"This looks like a new project. Want to run /scaffold-project with this clarity context?"
+
+### With /spec
+After clarity brief is saved, suggest:
+"Ready to decompose into features? Run `/spec` — it will read your CLARITY-BRIEF.md automatically."
+
+### With /save-prompt
+After generating clarity document, offer:
+"Save this clarity brief to your prompt library for reuse?"
+
+### With /prompt-library
+Can load existing clarity briefs as starting context.
+
+## Behavioral Notes
+
+- **Push back on vagueness.** If answers are generic, say "That's too vague. Give me something specific."
+- **Reference hunting is optional but powerful.** If they don't have one, help find one.
+- **The output is a tool, not a deliverable.** The clarity document is meant to be USED, not filed.
+- **This is uncomfortable by design.** The questions should force thinking that normally gets skipped.
+
+## Quick Mode
+
+If user says `/clarify quick`, compress to three questions:
+1. What exactly are we making?
+2. What makes this different from the generic version?
+3. What does success look like?
+
+Generate abbreviated clarity block.
+
+---
+
+#prompting #clarity #pre-work #cognitive-architecture
+
+
+ARGUMENTS: How live data maps to signal statuses (auto-threshold vs. manual assessment?)
+  - Refresh cadence strategy (real-time vs. daily vs. on-demand)
+  - Claude Code integration pattern (CLI commands? dedicated skill?)  Explain these options and give me more possible things to clarify that you may need
+
+---
+
+Base directory for this skill: /Users/fabianaguilar/Projects/ALOS/.claude/skills/spec
+
+# /spec — Product Spec → Tasks → Ship
+
+Capture what you're building, break it into tasks an AI agent can one-shot, and scale to parallel worktrees when the project is big.
+
+## Usage
+
+```bash
+/spec                     # Start spec interview for current project
+/spec from <file>         # Parse existing spec/PRD document
+/spec tasks               # Show current task decomposition
+/spec status              # Check implementation progress
+```
+
+## The Pipeline
+
+```
+SPEC → FEATURES → TASKS → (worktrees if big) → SHIP
+```
+
+---
+
+## Phase 0: Load Upstream Context
+
+Before starting the interview, check for existing artifacts:
+
+1. **`CLARITY-BRIEF.md`** — If it exists, read it. Pre-fill answers from the clarity brief instead of re-asking. Show the user what was imported: "I loaded your clarity brief. Here's what I already know: [summary]. Let me fill in the gaps."
+2. **`SPEC.md`** — If it exists, switch to update mode (see "Updating a Spec" below).
+
+---
+
+## Phase 1: Capture the Spec
+
+### Option A: Interview Mode (default)
+
+Ask these 5 questions. Keep answers tight — this is a 5-minute exercise, not a planning retreat.
+
+**1. What does it do?**
+> 2-3 sentences. If you can't explain it in 3 sentences, you don't know what you're building yet.
+
+**2. Who is it for?**
+> One user type + their use case. "Teachers who need to generate lesson plans from standards."
+
+**3. Core features?**
+> List 3-8 features. Each one line. If it's more than 8, you're building two products.
+
+**4. Constraints?**
+> Platform, cost ceiling, dependencies, timeline, tech stack. What CAN'T you do?
+
+**5. Done when?**
+> 3 concrete acceptance criteria. How do you know it's finished? "A user can X, Y, and Z."
+
+### Option B: Parse Existing Spec
+
+If the user provides a file (`/spec from SPEC.md` or `/spec from prd.txt`):
+
+1. Read the document
+2. Extract the 5 sections above from whatever format they wrote
+3. Present back for confirmation: "Here's what I extracted — correct?"
+4. If missing sections, ask only for what's missing
+
+### AI Project Check
+
+**If the project involves AI interactions** (LLM calls, model inference, AI-generated content):
+
+Surface the AI Interaction Atlas framework. Ask:
+- What AI tasks? (classify, generate, verify, etc.)
+- What human tasks? (review, approve, edit?)
+- What constraints? (latency, cost, safety, oversight level?)
+
+Reference: `Kosha Prime/Reference/AI-Interaction-Atlas.md`
+
+**If the project is React/RN with AI-generated UI for end users:**
+
+Surface json-render as a tool option.
+Reference: `Kosha Prime/Reference/JSON-Render-Generative-UI.md`
+
+---
+
+## Phase 2: Decompose into Features
+
+Take each core feature from the spec and define:
+
+```markdown
+### Feature: [Name]
+
+**What:** [One sentence]
+**Depends on:** [Other features, or "None"]
+**Files:** [Expected files/directories this touches]
+**Acceptance:** [How to verify it works]
+```
+
+Order features by dependency — what must exist before what?
+
+Output a dependency graph:
+
+```
+Feature A (no deps)
+Feature B (no deps)
+Feature C → depends on A
+Feature D → depends on A, B
+Feature E → depends on C, D
+```
+
+---
+
+## Phase 3: Decompose Features into Tasks
+
+For EACH feature, generate 3-7 atomic tasks. Each task must be:
+
+- **One-shottable** — Claude can complete it in a single session
+- **Testable** — You can verify it works
+- **Scoped** — Touches a clear set of files
+
+Format:
+
+```markdown
+## Feature: [Name]
+
+- [ ] [Task 1] — [what to build, which files]
+- [ ] [Task 2] — [what to build, which files]
+- [ ] [Task 3] — [what to build, which files]
+```
+
+### Task Quality Check
+
+Before outputting, verify each task against:
+
+| Check | Pass? |
+|-------|-------|
+| Can Claude one-shot this? | If no → break it down further |
+| Is the scope clear? | If no → specify files/functions |
+| Can you test it? | If no → add acceptance criteria |
+| Does it depend on another task? | If yes → mark the dependency |
+
+### Execution-Grade Task Blocks (Optional)
+
+When tasks will be dispatched to sub-agents (Sonnet teammates, Codex, Kimi) or need maximum specificity, upgrade task blocks to execution-grade. The bar: **a builder should never need to ask a clarifying question.**
+
+Use when:
+- Dispatching to external agents via `/dispatch-plan` or `/triad`
+- Using Claude Code agent teams (`TeamCreate`)
+- Tasks touch unfamiliar codebases or complex integrations
+
+Format for execution-grade tasks:
+
+```markdown
+## Task: [Name]
+
+**Files to create/modify:**
+- `src/path/to/file.ts` — [what to create or change]
+- `src/path/to/other.ts` — [what to create or change]
+
+**Interfaces/Types:**
+```ts
+// Key types the builder needs (from existing codebase or new)
+interface UserPayload {
+  id: string;
+  email: string;
+  role: 'admin' | 'user';
+}
+```
+
+**Skeleton:**
+```ts
+// Starting point — builder fills in implementation
+export function validateUser(payload: UserPayload): Result<User, ValidationError> {
+  // 1. Check email format
+  // 2. Verify role is valid
+  // 3. Return User or error
+}
+```
+
+**Test Cases:**
+| Test | Input | Expected Output |
+|------|-------|-----------------|
+| Valid user | `{ id: "1", email: "a@b.com", role: "user" }` | `Ok(User)` |
+| Invalid email | `{ id: "1", email: "bad", role: "user" }` | `Err(InvalidEmail)` |
+| Missing role | `{ id: "1", email: "a@b.com" }` | `Err(MissingField)` |
+
+**Acceptance Criteria:**
+- [ ] All test cases pass
+- [ ] No new dependencies added
+- [ ] Follows existing error handling pattern in `src/errors.ts`
+```
+
+**When NOT to use execution-grade:** Standard `/forge` runs where Claude has full context. Over-specifying wastes time when the builder can read the codebase.
+
+---
+
+## Phase 4: Scale Decision
+
+Count features and assess independence:
+
+| Project Size | Features | Independent? | Approach |
+|-------------|----------|--------------|----------|
+| **Small** | 1-3 | — | Sequential. Just work through tasks in order. |
+| **Medium** | 4-6 | Some | Sequential with suggested groupings. |
+| **Large** | 7+ | Yes | Parallel. Suggest `/parallel-forge` with worktree mapping. |
+
+### When to Suggest Worktrees
+
+Suggest `/parallel-forge` when ALL of these are true:
+- 5+ features
+- At least 3 features are independent (no shared dependencies)
+- Features touch different files (minimal conflict risk)
+
+Output a worktree mapping:
+
+```markdown
+## Parallel Implementation Plan
+
+### Worktree 1: [feature-a]
+Branch: `forge/project/feature-a`
+Tasks: [list]
+Files owned: [list]
+
+### Worktree 2: [feature-b]
+Branch: `forge/project/feature-b`
+Tasks: [list]
+Files owned: [list]
+
+### Sequential (after merge):
+- Feature C (depends on A)
+- Feature D (depends on A + B)
+
+### Merge Order: feature-a, feature-b → feature-c → feature-d
+```
+
+If the project is small, skip this entirely. Don't over-engineer a 3-feature project with worktrees.
+
+---
+
+## Phase 5: Write Files
+
+### Always Create:
+
+**`$PROJECT_ROOT/SPEC.md`** — The spec document
+
+```markdown
+---
+created: [date]
+status: active
+---
+
+# [Project Name] Spec
+
+## What it does
+[From interview]
+
+## Who it's for
+[From interview]
+
+## Core features
+1. [Feature]
+2. [Feature]
+...
+
+## Constraints
+[From interview]
+
+## Done when
+- [ ] [Criterion 1]
+- [ ] [Criterion 2]
+- [ ] [Criterion 3]
+```
+
+**`$PROJECT_ROOT/productivity/TODO.md`** — Tasks by feature
+
+```markdown
+# TODO
+
+## Feature: [Name] (no deps)
+- [ ] [Task 1]
+- [ ] [Task 2]
+- [ ] [Task 3]
+
+## Feature: [Name] (depends on: Feature A)
+- [ ] [Task 1]
+- [ ] [Task 2]
+
+## Implementation Order
+1. [Feature A] — start here
+2. [Feature B] — parallel with A
+3. [Feature C] — after A completes
+```
+
+### For Large Projects (worktree path), Also Create:
+
+**`$PROJECT_ROOT/DECOMPOSITION.md`** — Worktree plan (consumed by `/parallel-forge scaffold`)
+
+This follows the parallel-forge template format with units, dependencies, merge order, and file ownership.
+
+---
+
+## Output
+
+After all phases, output:
+
+```
+## Spec Complete: [Project Name]
+
+**Features:** [count]
+**Tasks:** [count]
+**Approach:** Sequential | Parallel ([N] worktrees)
+
+### Implementation Order
+1. [Feature] — [task count] tasks
+2. [Feature] — [task count] tasks (depends on #1)
+...
+
+### Files Created
+- SPEC.md — product spec
+- productivity/TODO.md — task breakdown
+[- DECOMPOSITION.md — worktree plan (if parallel)]
+
+### Next Step
+[If project has 3+ features OR external APIs OR multiple viable approaches]:
+  "Run `/design` to make architecture decisions before building."
+[If UI project]:
+  "Run `/design` for architecture, then `/design-explore` for visual direction."
+[If simple, sequential]:
+  "Start with Feature 1. Run: help me implement [first task]"
+[If parallel]:
+  "Run `/design` first, then `/parallel-forge scaffold [project] [units]` to create worktrees"
+```
+
+---
+
+## Updating a Spec
+
+If the project already has a SPEC.md:
+
+```bash
+/spec                    # Detects existing SPEC.md, asks what changed
+/spec add-feature        # Add a new feature + decompose
+/spec re-scope           # Revisit constraints or cut features
+```
+
+Read the existing spec, show it, ask what's changed. Update SPEC.md and regenerate affected tasks in TODO.md.
+
+---
+
+## Constraints
+
+- **5-minute exercise** — Don't let spec capture drag on. If answers aren't clear, that's a signal to `/clarify` first.
+- **No over-engineering** — 3-feature project gets a TODO, not a DECOMPOSITION.md with worktrees.
+- **Tasks must be one-shottable** — If Claude can't finish it in one session, it's too big.
+- **Spec is living** — Update it as you build. It's a reference, not a contract.
+- **Files stay in the project** — SPEC.md and TODO.md live in the repo, not in Kosha Prime.
+
+---
+
+## Integration with Other Skills
+
+| Trigger | Skill | Why |
+|---------|-------|-----|
+| AI project detected | Surface AI Interaction Atlas | Think through AI tasks, human tasks, constraints |
+| React + AI-generated UI | Surface json-render | Guardrailed generative UI framework |
+| 5+ independent features | Suggest `/parallel-forge` | Worktree-based parallel implementation |
+| Unclear vision | Suggest `/clarify` first | Sharpen thinking before speccing |
+| New project | Run after `/scaffold-project` | Scaffold structure, then spec features |
+| 3+ features or external APIs | Suggest `/design` next | Architecture decisions before building |
+| UI project | Suggest `/design` then `/design-explore` | Architecture + visual direction |
+| Complex feature | Suggest `/forge` | Single-feature autonomous implementation |
+
+---
+
+## Examples
+
+### Small Project (Sequential)
+
+```
+/spec
+
+## Spec Complete: price-alert-bot
+
+**Features:** 3
+**Tasks:** 9
+**Approach:** Sequential
+
+### Implementation Order
+1. Price fetcher — 3 tasks
+2. Alert rules engine — 3 tasks (depends on #1)
+3. Notification sender — 3 tasks (depends on #2)
+
+### Next Step
+Start with Feature 1. Run: "help me implement the price fetcher"
+```
+
+### Large Project (Parallel)
+
+```
+/spec
+
+## Spec Complete: Tutelage
+
+**Features:** 7
+**Tasks:** 28
+**Approach:** Parallel (4 worktrees)
+
+### Implementation Order
+Parallel: content-engine, quiz-system, progress-tracker, settings-ui
+Sequential (after merge): adaptive-engine (depends on quiz + progress), parent-dashboard (depends on progress), onboarding (depends on all)
+
+### Next Step
+Run `/parallel-forge scaffold tutelage content-engine,quiz-system,progress-tracker,settings-ui`
+```
+
+---
+
+Base directory for this skill: /Users/fabianaguilar/Projects/ALOS/.claude/skills/design
+
+# /design — First-Principles Design Document
+
+Produce a formal design document between spec and implementation. Every constraint gets evaluated, every approach gets justified. No implementation begins without an approved design.
+
+## Philosophy
+
+The gap between spec and code is where bad decisions hide. `/spec` captures *what* to build. `/design` captures *why this approach* and *what alternatives were rejected*. Without it, architectural decisions get made implicitly inside forge loops — unauditable, unrepeatable, and often wrong.
+
+## Usage
+
+```bash
+/design                        # Start design from existing SPEC.md
+/design from <file>            # Design from a specific spec or brief
+/design review                 # Review existing ARCHITECTURE.md for staleness
+```
+
+## Pipeline Position
+
+```
+/clarify → /spec → ★ /design ★ → /adversarial-review → /forge or /dispatch-plan
+```
+
+This skill is MANDATORY for:
+- Any project with 3+ features
+- Any project involving external APIs or third-party libraries
+- Any project where multiple architectural approaches are viable
+
+SKIP for: Single-file scripts, config changes, documentation-only work.
+
+---
+
+## Phase 1: Load Context
+
+1. Read `SPEC.md` (or provided file) — extract features, constraints, acceptance criteria
+2. Read project's existing codebase patterns (if any):
+   - `package.json` / `Cargo.toml` / `pyproject.toml` — tech stack
+   - Existing source structure — naming conventions, module patterns
+   - `CLAUDE.md` (project-level) — any project-specific rules
+3. Read relevant ALOS context:
+   - `.claude/context/code-standards.md` — quality requirements
+
+---
+
+## Phase 2: Constraint Classification
+
+For EVERY constraint from the spec, classify:
+
+| Constraint | Type | Classification | Justification |
+|-----------|------|----------------|---------------|
+| [constraint] | Hard / Soft | Immovable / Negotiable / Assumed | [why this classification] |
+
+**Hard constraints** = non-negotiable (platform, budget, security, regulatory)
+**Soft constraints** = preferences or assumptions that could be challenged
+
+**Flag any soft constraint being treated as hard.** This is the #1 source of over-engineering.
+
+Present constraint table to user. Ask:
+> "I've classified your constraints. Any of these wrong? Anything I'm treating as hard that's actually flexible?"
+
+---
+
+## Phase 3: Research Approaches
+
+For the core architectural decision(s), research:
+
+1. **Codebase patterns** — Grep/Glob for how similar problems are solved in this project or other ALOS projects
+2. **Library/framework options** — WebSearch for current best practices (include year in search)
+3. **Known pitfalls** — Search for common failure modes of each approach
+
+For each viable approach, document:
+
+```markdown
+### Approach [N]: [Name]
+
+**How it works:** [2-3 sentences]
+**Constraints satisfied:** [list which constraints this satisfies]
+**Constraints violated:** [list which constraints this breaks, if any]
+**Tradeoffs:**
+- Pro: [advantage]
+- Pro: [advantage]
+- Con: [disadvantage]
+- Con: [disadvantage]
+**Effort estimate:** [Low / Medium / High]
+**Confidence:** [HIGH / MEDIUM / LOW]
+```
+
+Research at least 2 approaches. 3 is ideal. More than 4 means the problem space isn't well-defined — go back to `/clarify`.
+
+---
+
+## Phase 4: Select and Justify
+
+Choose the recommended approach. Justify with:
+
+1. **Why this one** — direct connection to constraints and goals
+2. **Why not the others** — specific reasons each alternative was rejected
+3. **Risk mitigation** — what could go wrong and how to detect it early
+4. **Reversibility** — how hard is it to switch if this turns out wrong?
+
+---
+
+## Phase 5: Component Map
+
+Translate the chosen approach into a concrete file/component structure:
+
+```markdown
+## Component Map
+
+### New Files
+- `src/[path]/[file]` — [purpose, ~LOC estimate]
+- `src/[path]/[file]` — [purpose, ~LOC estimate]
+
+### Modified Files
+- `src/[path]/[file]` — [what changes and why]
+
+### Dependencies
+- [package@version] — [why needed]
+
+### Data Flow
+[How data moves through the system — can be text or ASCII diagram]
+```
+
+---
+
+## Phase 6: Write ARCHITECTURE.md
+
+Output location: `$PROJECT_ROOT/ARCHITECTURE.md`
+
+> **Note:** This file was previously named `DESIGN.md`. Renamed to `ARCHITECTURE.md` to avoid collision with `/design-extract`, which writes the visual design system to `DESIGN.md`. Architecture = how it works. Design = how it looks.
+
+```markdown
+---
+created: [date]
+spec: SPEC.md
+status: pending-review
+---
+
+# Architecture: [Project/Feature Name]
+
+## Summary
+[2-3 sentences: what we're building and the chosen approach]
+
+## Constraint Classification
+
+| Constraint | Type | Classification | Justification |
+|-----------|------|----------------|---------------|
+| ... | ... | ... | ... |
+
+## Approaches Considered
+
+### Approach 1: [Name] (SELECTED)
+[Full writeup from Phase 3]
+
+### Approach 2: [Name] (REJECTED)
+[Full writeup from Phase 3]
+**Rejection reason:** [specific reason]
+
+### Approach 3: [Name] (REJECTED)
+[Full writeup from Phase 3]
+**Rejection reason:** [specific reason]
+
+## Decision Rationale
+[From Phase 4 — why this approach, why not others, risks, reversibility]
+
+## Component Map
+[From Phase 5]
+
+## Open Questions
+[Anything unresolved that /adversarial-review should stress-test]
+
+## Next Step
+Run `/adversarial-review` on this document, or proceed to `/forge` if adversarial review is not warranted.
+```
+
+---
+
+## Phase 7: Approval Gate
+
+Present the design to the user:
+
+```markdown
+## Design Complete: [Name]
+
+**Approach:** [chosen approach name]
+**Alternatives rejected:** [count]
+**Constraints classified:** [count] ([hard count] hard, [soft count] soft)
+**Open questions:** [count]
+
+**Files created:** ARCHITECTURE.md
+
+### Next Steps
+1. `/adversarial-review` — stress-test this design (recommended for complex projects)
+2. `/forge` or `/dispatch-plan` — proceed to implementation
+3. Discuss — talk through concerns before committing
+```
+
+Use AskUserQuestion to get direction.
+
+---
+
+## Integration with Other Skills
+
+| Trigger | Skill | Why |
+|---------|-------|-----|
+| Fuzzy vision | `/clarify` first | Design needs clear intent |
+| After design approval | `/adversarial-review` | Stress-test before building |
+| After design approval (simple) | `/forge` | Direct to implementation |
+| Multi-agent project | `/dispatch-plan` | Classify tasks across agents |
+| Design involves UI | Include `/frontend-design` notes | Design pipeline alignment |
+
+---
+
+## Constraints
+
+- **Not a spec.** `/spec` captures what. `/design` captures how and why. Don't re-ask spec questions.
+- **Not a plan.** `/design` is architecture. `/spec` Phase 3 (or enhanced task blocks) is the execution plan.
+- **Research is mandatory.** Don't skip web search. The point is to ground decisions in current reality, not cached knowledge.
+- **2-3 approaches minimum.** If you can only think of one approach, you haven't thought hard enough.
+- **Flag soft-as-hard.** This is the single most impactful check in the entire skill.
+
+---
+
+#design #architecture #first-principles #quality-gate
+
+---
+
+[Request interrupted by user]
+
+---
+
+Let's go to the original recommendationMy recommendation: Use Claude Code + Codex. I handle the brain (schema, threshold engine, ALOS integration, orchestration). Codex handles the hands (UI port, data feeds, alert function). That's 3 features for
+   me, 5 for Codex, with me writing execution-grade briefs for each Codex task.
+
+---
+
+As far as Codex, should I just tell Codex to read the dispatch MD file in the asymmetric bridge project or can you give me the prompt right here so I can give it to Codex
+
+---
+
+OK, so I just gave it this part of the prompt because I'm using the Codex app that can work locally on my machine. And also should I create this on a separate tree or the main. Here is the prompt I gave Codex Codex:  Read these files first:                
+  - AGENTS.md (project context)
+  - DISPATCH.md (your task brief)
+  - src/source/command-center.jsx (original source to port)
+  - src/source/source-materials.jsx (original source to port)
+
+  Execute "Codex Brief 1: UI Foundation (Feature 2)" from DISPATCH.md.
+
+  Port the two source JSX files into the proper project structure:
+  1. Extract static data arrays into src/data/ modules
+  2. Extract shared styles into src/styles.js
+  3. Extract SignalCard and DominoSection into src/components/
+  4. Port CommandCenter and SourceMaterials into src/components/
+  5. Set up React Router in App.jsx with nav between both pages
+  6. Replace index.css with dark theme globals
+  7. Clean up Vite boilerplate (App.css, default assets)
+  8. Install @tanstack/react-query
+
+  The source files in src/source/ are the exact visual spec — preserve all styling, colors, data, and interactive behavior. Do NOT change any visual output.
+
+  After completing Brief 1, stop and report what you built. Do NOT proceed to Brief 2 or 3.
+
+---
+
+OK, give it to Codex and named it name the tree forge/ui-foundation. Now you go ahead and start working
