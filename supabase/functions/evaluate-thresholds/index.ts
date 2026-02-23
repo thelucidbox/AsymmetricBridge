@@ -23,6 +23,38 @@ type ThresholdDefinition = {
   red: number;
 };
 
+type PredictionOutcome = "hit" | "miss" | "partial";
+
+type PredictionCondition = {
+  operator?: string;
+  threshold?: number | string;
+  direction?: string;
+  baselineValue?: number | string | null;
+  startValue?: number | string | null;
+  valueAtCreation?: number | string | null;
+  min?: number | string;
+  max?: number | string;
+  dominoId?: number | string | null;
+  signalName?: string | null;
+};
+
+type PredictionRow = {
+  id: string;
+  signal_id: string | null;
+  type: string;
+  condition: PredictionCondition | null;
+  target_date: string;
+  created_at: string;
+  scored_at: string | null;
+  outcome: string | null;
+};
+
+type SignalStatusLookupRow = {
+  id: string;
+  domino_id: number;
+  signal_name: string;
+};
+
 const THRESHOLD_DEFINITIONS: Record<string, ThresholdDefinition> = {
   "1|Public SaaS Net Revenue Retention": {
     comparator: "lt",
@@ -109,6 +141,112 @@ const evaluateStatus = (
   return "green";
 };
 
+const toNumber = (value: unknown): number | null => {
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value : null;
+  }
+
+  if (typeof value === "string") {
+    const match = value.replaceAll(",", "").match(/-?\d+(\.\d+)?/);
+    if (!match) return null;
+    const parsed = Number(match[0]);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+
+  return null;
+};
+
+const normalizeOperator = (value: unknown): "gt" | "gte" | "lt" | "lte" => {
+  const raw = String(value ?? "gte").trim().toLowerCase();
+  if (raw === ">" || raw === "gt") return "gt";
+  if (raw === ">=" || raw === "gte") return "gte";
+  if (raw === "<" || raw === "lt") return "lt";
+  if (raw === "<=" || raw === "lte") return "lte";
+  return "gte";
+};
+
+const hasReachedTargetDate = (value: string): boolean => {
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return false;
+  return parsed.getTime() <= Date.now();
+};
+
+const evaluatePredictionOutcome = (
+  prediction: PredictionRow,
+  currentValue: number | null,
+): PredictionOutcome => {
+  const condition = prediction.condition ?? {};
+  const type = String(prediction.type || "").trim().toLowerCase();
+
+  if (type === "threshold") {
+    const threshold = toNumber(condition.threshold);
+    if (threshold === null || currentValue === null) return "partial";
+
+    const operator = normalizeOperator(condition.operator);
+    if (operator === "gt") return currentValue > threshold ? "hit" : "miss";
+    if (operator === "gte") return currentValue >= threshold ? "hit" : "miss";
+    if (operator === "lt") return currentValue < threshold ? "hit" : "miss";
+    return currentValue <= threshold ? "hit" : "miss";
+  }
+
+  if (type === "direction") {
+    const baseline = toNumber(
+      condition.baselineValue ?? condition.startValue ?? condition.valueAtCreation,
+    );
+    if (baseline === null || currentValue === null) return "partial";
+
+    const direction = String(condition.direction || "").trim().toLowerCase();
+    const delta = currentValue - baseline;
+    if (delta === 0) return "partial";
+    if (direction === "up") return delta > 0 ? "hit" : "miss";
+    if (direction === "down") return delta < 0 ? "hit" : "miss";
+    return "partial";
+  }
+
+  if (type === "range") {
+    const min = toNumber(condition.min);
+    const max = toNumber(condition.max);
+    if (min === null || max === null || currentValue === null) return "partial";
+    const low = Math.min(min, max);
+    const high = Math.max(min, max);
+    return currentValue >= low && currentValue <= high ? "hit" : "miss";
+  }
+
+  return "partial";
+};
+
+const resolvePredictionCurrentValue = (
+  prediction: PredictionRow,
+  statusLookupById: Map<string, SignalStatusLookupRow>,
+  latestDataPointBySignal: Map<string, SignalDataPointRow>,
+): number | null => {
+  if (prediction.signal_id) {
+    const mapped = statusLookupById.get(prediction.signal_id);
+    if (mapped) {
+      const latestPoint = latestDataPointBySignal.get(
+        signalKey(mapped.domino_id, mapped.signal_name),
+      );
+      if (latestPoint) {
+        return parseNumericValue(latestPoint.value);
+      }
+    }
+  }
+
+  const condition = prediction.condition ?? {};
+  const fallbackDominoId = Number(condition.dominoId);
+  const fallbackSignalName = String(condition.signalName ?? "").trim();
+
+  if (!Number.isFinite(fallbackDominoId) || !fallbackSignalName) {
+    return null;
+  }
+
+  const latestPoint = latestDataPointBySignal.get(
+    signalKey(fallbackDominoId, fallbackSignalName),
+  );
+  if (!latestPoint) return null;
+  return parseNumericValue(latestPoint.value);
+};
+
 Deno.serve(async (request) => {
   if (request.method === "OPTIONS") {
     return new Response("ok", { headers: CORS_HEADERS });
@@ -142,6 +280,8 @@ Deno.serve(async (request) => {
   const errors: string[] = [];
   let evaluated = 0;
   let changed = 0;
+  let predictionsEvaluated = 0;
+  let predictionsScored = 0;
 
   const [
     { data: signalDefinitions, error: definitionsError },
@@ -241,5 +381,84 @@ Deno.serve(async (request) => {
     changed += 1;
   }
 
-  return jsonResponse({ evaluated, changed, errors });
+  const nowIso = new Date().toISOString();
+  const { data: duePredictions, error: duePredictionsError } = await supabase
+    .from("predictions")
+    .select("id,signal_id,type,condition,target_date,created_at,scored_at,outcome")
+    .is("scored_at", null)
+    .is("outcome", null)
+    .lte("target_date", nowIso)
+    .order("target_date", { ascending: true });
+
+  if (duePredictionsError) {
+    errors.push(`Failed to fetch pending predictions: ${duePredictionsError.message}`);
+  }
+
+  const pendingPredictions = (duePredictions ?? []) as PredictionRow[];
+
+  if (pendingPredictions.length > 0) {
+    const predictionSignalIds = [
+      ...new Set(
+        pendingPredictions
+          .map((prediction) => prediction.signal_id)
+          .filter((value): value is string => Boolean(value)),
+      ),
+    ];
+
+    const statusLookupById = new Map<string, SignalStatusLookupRow>();
+    if (predictionSignalIds.length > 0) {
+      const { data: signalLookupRows, error: signalLookupError } = await supabase
+        .from("signal_statuses")
+        .select("id,domino_id,signal_name")
+        .in("id", predictionSignalIds);
+
+      if (signalLookupError) {
+        errors.push(
+          `Failed to fetch signal lookup for predictions: ${signalLookupError.message}`,
+        );
+      } else {
+        for (const row of (signalLookupRows ?? []) as SignalStatusLookupRow[]) {
+          statusLookupById.set(row.id, row);
+        }
+      }
+    }
+
+    for (const prediction of pendingPredictions) {
+      if (!hasReachedTargetDate(prediction.target_date)) {
+        continue;
+      }
+
+      const currentValue = resolvePredictionCurrentValue(
+        prediction,
+        statusLookupById,
+        latestDataPointBySignal,
+      );
+      const outcome = evaluatePredictionOutcome(prediction, currentValue);
+      predictionsEvaluated += 1;
+
+      const { error: scoreError } = await supabase
+        .from("predictions")
+        .update({
+          outcome,
+          scored_at: new Date().toISOString(),
+        })
+        .eq("id", prediction.id)
+        .is("scored_at", null);
+
+      if (scoreError) {
+        errors.push(`Failed to score prediction ${prediction.id}: ${scoreError.message}`);
+        continue;
+      }
+
+      predictionsScored += 1;
+    }
+  }
+
+  return jsonResponse({
+    evaluated,
+    changed,
+    predictionsEvaluated,
+    predictionsScored,
+    errors,
+  });
 });

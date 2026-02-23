@@ -1,10 +1,12 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import CommandCenter from "./components/CommandCenter";
+import DigestView from "./components/digests/DigestView";
 import ErrorBoundary from "./components/ErrorBoundary";
 import Navigation from "./components/Navigation";
 import OnboardingWizard from "./components/onboarding/OnboardingWizard";
 import PerformanceView from "./components/performance-lab/PerformanceView";
+import ConvictionScorecard from "./components/conviction/ConvictionScorecard";
 import { useTheme } from "./design-tokens";
 import { S } from "./styles";
 
@@ -135,7 +137,7 @@ function AppShell() {
           path="/conviction"
           element={
             <ErrorBoundary>
-              <PlaceholderView name="Conviction Ledger" />
+              <ConvictionScorecard />
             </ErrorBoundary>
           }
         />
@@ -143,7 +145,7 @@ function AppShell() {
           path="/digests"
           element={
             <ErrorBoundary>
-              <PlaceholderView name="Signal Digests" />
+              <DigestView />
             </ErrorBoundary>
           }
         />

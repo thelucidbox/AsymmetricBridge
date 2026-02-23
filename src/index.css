@@ -150,3 +150,24 @@ button {
     opacity: 0.7;
   }
 }
+
+@keyframes conviction-border-pulse {
+  0% {
+    border-color: var(--ab-active-border-low, rgba(255,255,255,0.2));
+    box-shadow: 0 0 0 1px var(--ab-active-border-low, rgba(255,255,255,0.2));
+  }
+
+  50% {
+    border-color: var(--ab-active-border-high, rgba(255,255,255,0.75));
+    box-shadow: 0 0 0 1px var(--ab-active-border-high, rgba(255,255,255,0.75));
+  }
+
+  100% {
+    border-color: var(--ab-active-border-low, rgba(255,255,255,0.2));
+    box-shadow: 0 0 0 1px var(--ab-active-border-low, rgba(255,255,255,0.2));
+  }
+}
+
+.ab-conviction-active {
+  animation: conviction-border-pulse 2s ease-in-out infinite;
+}
