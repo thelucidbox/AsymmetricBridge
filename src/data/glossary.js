@@ -30,8 +30,7 @@ export const GLOSSARY = {
   GDP: {
     definition:
       "Gross Domestic Product. The total value of goods and services produced in an economy.",
-    analogy:
-      "Like the economy's total monthly sales receipt.",
+    analogy: "Like the economy's total monthly sales receipt.",
     relatedTerms: ["Ghost GDP", "labor share", "unemployment rate"],
   },
   "unemployment rate": {
@@ -44,8 +43,7 @@ export const GLOSSARY = {
   VIX: {
     definition:
       "A market volatility index often called the fear gauge because it rises when investors expect bigger stock swings.",
-    analogy:
-      "Like a stress meter for Wall Street.",
+    analogy: "Like a stress meter for Wall Street.",
     relatedTerms: ["alert", "drawdown", "contagion"],
   },
   stablecoin: {
@@ -56,8 +54,7 @@ export const GLOSSARY = {
     relatedTerms: ["Friction Collapse", "liquidity", "intermediation"],
   },
   "basis point": {
-    definition:
-      "One-hundredth of a percent. 100 basis points equals 1.00%.",
+    definition: "One-hundredth of a percent. 100 basis points equals 1.00%.",
     analogy:
       "Like measuring interest rates in pennies instead of whole dollars for precision.",
     relatedTerms: ["yield curve", "credit spread", "threshold"],
@@ -72,50 +69,42 @@ export const GLOSSARY = {
   signal: {
     definition:
       "A measurable indicator used to track whether a specific domino is stable, warming up, or breaking down.",
-    analogy:
-      "Like a dashboard warning light in a car.",
+    analogy: "Like a dashboard warning light in a car.",
     relatedTerms: ["threshold", "baseline", "watch"],
   },
   threshold: {
     definition:
       "A predefined level where a signal changes meaning and usually moves to a higher risk status.",
-    analogy:
-      "Like a speed limit sign: crossing it changes the situation.",
+    analogy: "Like a speed limit sign: crossing it changes the situation.",
     relatedTerms: ["signal", "watch", "alert"],
   },
   baseline: {
-    definition:
-      "The normal range for a signal when conditions are stable.",
-    analogy:
-      "Like your resting heart rate before a workout.",
+    definition: "The normal range for a signal when conditions are stable.",
+    analogy: "Like your resting heart rate before a workout.",
     relatedTerms: ["watch", "threshold", "signal"],
   },
   watch: {
     definition:
       "A caution status showing early stress that is approaching, but has not yet crossed, a critical threshold.",
-    analogy:
-      "Like dark clouds forming before the storm starts.",
+    analogy: "Like dark clouds forming before the storm starts.",
     relatedTerms: ["baseline", "alert", "threshold"],
   },
   alert: {
     definition:
       "A high-risk status showing a threshold was breached and immediate attention is needed.",
-    analogy:
-      "Like a smoke alarm going off.",
+    analogy: "Like a smoke alarm going off.",
     relatedTerms: ["watch", "threshold", "contagion"],
   },
   inflation: {
     definition:
       "A broad rise in prices that reduces purchasing power over time.",
-    analogy:
-      "Like getting less value from the same paycheck.",
+    analogy: "Like getting less value from the same paycheck.",
     relatedTerms: ["CPI", "PCE", "Fed"],
   },
   recession: {
     definition:
       "A period of broad economic slowdown marked by weaker growth, hiring, and spending.",
-    analogy:
-      "Like the economy shifting into a lower gear.",
+    analogy: "Like the economy shifting into a lower gear.",
     relatedTerms: ["GDP", "unemployment rate", "yield curve"],
   },
   liquidity: {
@@ -128,13 +117,11 @@ export const GLOSSARY = {
   "default rate": {
     definition:
       "The percentage of borrowers failing to make required debt payments.",
-    analogy:
-      "Like the share of monthly bills that go unpaid.",
+    analogy: "Like the share of monthly bills that go unpaid.",
     relatedTerms: ["credit spread", "delinquency", "contagion"],
   },
   delinquency: {
-    definition:
-      "Late debt payments that have not yet become full defaults.",
+    definition: "Late debt payments that have not yet become full defaults.",
     analogy:
       "Like repeated overdue notices before an account goes to collections.",
     relatedTerms: ["default rate", "mortgage", "contagion"],
@@ -149,37 +136,85 @@ export const GLOSSARY = {
   "M2 velocity": {
     definition:
       "How quickly money is circulating through the economy, often shown as turnover of the M2 money supply.",
-    analogy:
-      "Like how fast cash changes hands in a neighborhood.",
+    analogy: "Like how fast cash changes hands in a neighborhood.",
     relatedTerms: ["Ghost GDP", "liquidity", "GDP"],
   },
   contagion: {
     definition:
       "Stress spreading from one market or sector into others through financial connections.",
-    analogy:
-      "Like a leak in one room damaging the rooms next to it.",
+    analogy: "Like a leak in one room damaging the rooms next to it.",
     relatedTerms: ["Financial Contagion", "credit spread", "alert"],
   },
   drawdown: {
-    definition:
-      "A decline from a recent peak in price or portfolio value.",
-    analogy:
-      "Like dropping from your personal best score before recovering.",
+    definition: "A decline from a recent peak in price or portfolio value.",
+    analogy: "Like dropping from your personal best score before recovering.",
     relatedTerms: ["VIX", "alert", "risk"],
   },
   intermediation: {
     definition:
       "The role of middle platforms or institutions that sit between buyers and sellers.",
-    analogy:
-      "Like a travel agent between you and an airline.",
+    analogy: "Like a travel agent between you and an airline.",
     relatedTerms: ["Friction Collapse", "stablecoin", "take rate"],
   },
   Fed: {
     definition:
       "The U.S. Federal Reserve, which sets monetary policy to influence inflation, employment, and financial conditions.",
-    analogy:
-      "Like the economy's thermostat operator.",
+    analogy: "Like the economy's thermostat operator.",
     relatedTerms: ["PCE", "inflation", "yield curve"],
+  },
+  "SaaS compression": {
+    definition:
+      "The squeeze on software-as-a-service companies as AI tools make it cheaper to build alternatives in-house, reducing their pricing power.",
+    analogy:
+      "Like taxi companies when ride-sharing apps appeared — suddenly the old pricing doesn't hold.",
+    relatedTerms: ["domino", "signal", "white-collar displacement"],
+  },
+  "white-collar displacement": {
+    definition:
+      "The reduction of knowledge-worker jobs — analysts, managers, consultants — as AI automates tasks that previously required human judgment.",
+    analogy:
+      "Like assembly line automation for the office. The work still gets done, just with fewer people.",
+    relatedTerms: ["SaaS compression", "unemployment rate", "labor share"],
+  },
+  "friction collapse": {
+    definition:
+      "The breakdown of middleman businesses and platforms as AI enables direct connections between buyers and sellers.",
+    analogy:
+      "Like the difference between booking through a travel agent versus booking directly. AI removes the agent from more industries.",
+    relatedTerms: ["intermediation", "stablecoin", "Ghost GDP"],
+  },
+  "Ghost GDP": {
+    definition:
+      "An economy where GDP numbers look healthy but the gains are concentrated — productivity rises while fewer people benefit.",
+    analogy:
+      "Like a company reporting record revenue while laying off half its staff.",
+    relatedTerms: ["GDP", "labor share", "M2 velocity"],
+  },
+  "financial contagion": {
+    definition:
+      "When financial stress in one sector spreads to others through connected markets — a bank problem becomes a housing problem becomes a credit problem.",
+    analogy: "Like one domino knocking over the next in a chain.",
+    relatedTerms: ["credit spread", "default rate", "contagion"],
+  },
+  "policy response": {
+    definition:
+      "Government and central bank reactions to economic disruption — rate changes, stimulus programs, new regulations, workforce retraining.",
+    analogy:
+      "Like a thermostat kicking in when the temperature gets too extreme in either direction.",
+    relatedTerms: ["Fed", "recession", "inflation"],
+  },
+  "take rate": {
+    definition:
+      "The percentage fee a platform charges on each transaction. As AI reduces friction, take rates face downward pressure.",
+    analogy:
+      "Like a broker's commission — when buyers can go direct, the commission gets squeezed.",
+    relatedTerms: ["friction collapse", "intermediation"],
+  },
+  JOLTS: {
+    definition:
+      "Job Openings and Labor Turnover Survey. A monthly report from the Bureau of Labor Statistics showing how many jobs are open and how many people are quitting or getting hired.",
+    analogy: "Like a help-wanted board for the entire economy.",
+    relatedTerms: ["unemployment rate", "white-collar displacement"],
   },
 };
 

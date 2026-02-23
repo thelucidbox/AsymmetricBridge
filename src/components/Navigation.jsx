@@ -1,7 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ThemeToggle, useTheme } from "../design-tokens";
-import { DISPLAY_MODES, setDisplayMode, useDisplayMode } from "../hooks/useDisplayMode";
+import {
+  DISPLAY_MODES,
+  setDisplayMode,
+  useDisplayMode,
+} from "../hooks/useDisplayMode";
+import { isOwnerMode, useThesis } from "../config/ThesisContext";
 import GuidedTour from "./GuidedTour";
 import { S } from "../styles";
 
@@ -13,8 +18,14 @@ const DEFAULT_SECTIONS = [
     path: "/performance",
     color: "#E9C46A",
   },
-  { id: "conviction", label: "Conviction", path: "/conviction", color: "#2A9D8F" },
+  {
+    id: "conviction",
+    label: "Conviction",
+    path: "/conviction",
+    color: "#2A9D8F",
+  },
   { id: "digests", label: "Digests", path: "/digests", color: "#6D6875" },
+  { id: "glossary", label: "Glossary", path: "/glossary", color: "#818CF8" },
 ];
 
 function isPathActive(pathname, path) {
@@ -22,20 +33,33 @@ function isPathActive(pathname, path) {
   return pathname.startsWith(path);
 }
 
-export default function Navigation({ sections, activeSection, onSectionChange }) {
+export default function Navigation({
+  sections,
+  activeSection,
+  onSectionChange,
+}) {
   const navigate = useNavigate();
   const location = useLocation();
   const { tokens } = useTheme();
   const displayMode = useDisplayMode();
+  const { enterTestMode } = useThesis();
   const [isMobile, setIsMobile] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const handleTestAsNewUser = () => {
+    enterTestMode();
+    navigate("/onboarding", { replace: true });
+  };
 
   const navSections = useMemo(() => {
     if (!sections?.length) return DEFAULT_SECTIONS;
     return sections.map((section, index) => ({
       ...section,
-      path: section.path || (section.id === "dashboard" ? "/" : `/${section.id}`),
-      color: section.color || DEFAULT_SECTIONS[index % DEFAULT_SECTIONS.length].color,
+      path:
+        section.path || (section.id === "dashboard" ? "/" : `/${section.id}`),
+      color:
+        section.color ||
+        DEFAULT_SECTIONS[index % DEFAULT_SECTIONS.length].color,
     }));
   }, [sections]);
 
@@ -47,14 +71,17 @@ export default function Navigation({ sections, activeSection, onSectionChange })
     if (media.addEventListener) media.addEventListener("change", onChange);
     else media.addListener(onChange);
     return () => {
-      if (media.removeEventListener) media.removeEventListener("change", onChange);
+      if (media.removeEventListener)
+        media.removeEventListener("change", onChange);
       else media.removeListener(onChange);
     };
   }, []);
 
   const resolvedActive = activeSection
     ? activeSection
-    : navSections.find((section) => isPathActive(location.pathname, section.path))?.id;
+    : navSections.find((section) =>
+        isPathActive(location.pathname, section.path),
+      )?.id;
   const simplifiedMode = displayMode === DISPLAY_MODES.simplified;
 
   const handleSelect = (section) => {
@@ -67,7 +94,9 @@ export default function Navigation({ sections, activeSection, onSectionChange })
   };
 
   const renderNavButton = (section, vertical = false) => {
-    const isActive = resolvedActive === section.id || isPathActive(location.pathname, section.path);
+    const isActive =
+      resolvedActive === section.id ||
+      isPathActive(location.pathname, section.path);
     return (
       <button
         key={section.id}
@@ -99,7 +128,9 @@ export default function Navigation({ sections, activeSection, onSectionChange })
           background: tokens.colors.navBg,
           borderBottom: `1px solid ${tokens.colors.border}`,
           backdropFilter: tokens.useGlass ? tokens.glass.blur : "blur(12px)",
-          WebkitBackdropFilter: tokens.useGlass ? tokens.glass.blur : "blur(12px)",
+          WebkitBackdropFilter: tokens.useGlass
+            ? tokens.glass.blur
+            : "blur(12px)",
         }}
       >
         <div
@@ -125,7 +156,14 @@ export default function Navigation({ sections, activeSection, onSectionChange })
           </div>
 
           {!isMobile && (
-            <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+            <div
+              style={{
+                display: "flex",
+                gap: 10,
+                alignItems: "center",
+                flexWrap: "wrap",
+              }}
+            >
               {navSections.map((section) => renderNavButton(section))}
               <div
                 style={{
@@ -172,6 +210,29 @@ export default function Navigation({ sections, activeSection, onSectionChange })
               >
                 <ThemeToggle />
               </div>
+
+              {isOwnerMode && (
+                <div
+                  style={{
+                    marginLeft: 2,
+                    paddingLeft: 8,
+                    borderLeft: `1px solid ${tokens.colors.border}`,
+                  }}
+                >
+                  <button
+                    onClick={handleTestAsNewUser}
+                    style={{
+                      ...S.tab(false, "#F4A261"),
+                      fontSize: tokens.typography.sizes.label,
+                      fontFamily: tokens.typography.fontMono,
+                      textTransform: "uppercase",
+                      letterSpacing: tokens.typography.letterSpacing.label,
+                    }}
+                  >
+                    Test as new user
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
@@ -222,7 +283,9 @@ export default function Navigation({ sections, activeSection, onSectionChange })
             gap: 8,
             transition: "left 0.2s ease",
             backdropFilter: tokens.useGlass ? tokens.glass.blur : "blur(16px)",
-            WebkitBackdropFilter: tokens.useGlass ? tokens.glass.blur : "blur(16px)",
+            WebkitBackdropFilter: tokens.useGlass
+              ? tokens.glass.blur
+              : "blur(16px)",
           }}
         >
           {navSections.map((section) => renderNavButton(section, true))}
@@ -267,6 +330,22 @@ export default function Navigation({ sections, activeSection, onSectionChange })
             <div style={{ marginTop: 4 }}>
               <ThemeToggle />
             </div>
+
+            {isOwnerMode && (
+              <button
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  handleTestAsNewUser();
+                }}
+                style={{
+                  ...S.tab(false, "#F4A261"),
+                  width: "100%",
+                  marginTop: 8,
+                }}
+              >
+                Test as new user
+              </button>
+            )}
           </div>
         </div>
       )}

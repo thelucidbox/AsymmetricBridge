@@ -1,5 +1,11 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router-dom";
 import CommandCenter from "./components/CommandCenter";
 import DigestView from "./components/digests/DigestView";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -7,24 +13,12 @@ import Navigation from "./components/Navigation";
 import OnboardingWizard from "./components/onboarding/OnboardingWizard";
 import PerformanceView from "./components/performance-lab/PerformanceView";
 import ConvictionScorecard from "./components/conviction/ConvictionScorecard";
+import GlossaryPage from "./components/GlossaryPage";
+import { useThesis } from "./config/ThesisContext";
 import { useTheme } from "./design-tokens";
 import { S } from "./styles";
 
 const queryClient = new QueryClient();
-const THESIS_STORAGE_KEY = "ab-thesis-config";
-
-function hasStoredThesisConfig() {
-  if (typeof window === "undefined") return true;
-  const stored = window.localStorage.getItem(THESIS_STORAGE_KEY);
-  if (!stored) return false;
-
-  try {
-    JSON.parse(stored);
-    return true;
-  } catch {
-    return false;
-  }
-}
 
 function PlaceholderView({ name }) {
   const { tokens } = useTheme();
@@ -40,7 +34,8 @@ function PlaceholderView({ name }) {
         <div
           style={{
             ...S.card("rgba(255,255,255,0.1)"),
-            padding: tokens.variant === "observatory" ? "22px 24px" : "18px 20px",
+            padding:
+              tokens.variant === "observatory" ? "22px 24px" : "18px 20px",
           }}
         >
           <div
@@ -57,7 +52,10 @@ function PlaceholderView({ name }) {
           </div>
           <div
             style={{
-              fontSize: tokens.variant === "observatory" ? tokens.typography.sizes.h1 : 24,
+              fontSize:
+                tokens.variant === "observatory"
+                  ? tokens.typography.sizes.h1
+                  : 24,
               fontWeight: tokens.typography.weights.bold,
               letterSpacing:
                 tokens.variant === "observatory"
@@ -68,7 +66,12 @@ function PlaceholderView({ name }) {
           >
             Coming Soon
           </div>
-          <div style={{ fontSize: tokens.typography.sizes.body, color: tokens.colors.textMuted }}>
+          <div
+            style={{
+              fontSize: tokens.typography.sizes.body,
+              color: tokens.colors.textMuted,
+            }}
+          >
             This view is scaffolded and ready for feature work.
           </div>
         </div>
@@ -90,10 +93,12 @@ export default function App() {
 function AppShell() {
   const location = useLocation();
   const { tokens } = useTheme();
+  const { hasThesis, isTestMode } = useThesis();
   const isOnboardingRoute = location.pathname === "/onboarding";
-  const hasStoredConfig = hasStoredThesisConfig();
 
-  if (!hasStoredConfig && !isOnboardingRoute) {
+  const needsOnboarding = !hasThesis || isTestMode;
+
+  if (needsOnboarding && !isOnboardingRoute) {
     return <Navigate to="/onboarding" replace />;
   }
 
@@ -146,6 +151,14 @@ function AppShell() {
           element={
             <ErrorBoundary>
               <DigestView />
+            </ErrorBoundary>
+          }
+        />
+        <Route
+          path="/glossary"
+          element={
+            <ErrorBoundary>
+              <GlossaryPage />
             </ErrorBoundary>
           }
         />

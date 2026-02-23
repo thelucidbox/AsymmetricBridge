@@ -9,6 +9,12 @@ import fabianThesis from "./fabian-thesis.js";
 import { validateThesis } from "./thesis-schema.js";
 
 const THESIS_STORAGE_KEY = "ab-thesis-config";
+const TEST_MODE_KEY = "ab-test-new-user";
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const isOwnerMode =
+  import.meta.env.VITE_OWNER_MODE === "true" ||
+  import.meta.env.VITE_OWNER_MODE === true;
 
 const ThesisContext = createContext(null);
 
@@ -31,23 +37,35 @@ function persistThesis(config) {
   window.localStorage.setItem(THESIS_STORAGE_KEY, JSON.stringify(config));
 }
 
+function isTestingAsNewUser() {
+  if (typeof window === "undefined") return false;
+  return window.localStorage.getItem(TEST_MODE_KEY) === "true";
+}
+
 function getInitialThesis() {
+  if (isOwnerMode && !isTestingAsNewUser()) {
+    const stored = loadStoredThesis();
+    if (stored) {
+      const validation = validateThesis(stored);
+      if (validation.valid) return stored;
+    }
+    persistThesis(fabianThesis);
+    return fabianThesis;
+  }
+
   const stored = loadStoredThesis();
-  if (!stored) return fabianThesis;
+  if (!stored) return isOwnerMode ? fabianThesis : null;
 
   const validation = validateThesis(stored);
   if (validation.valid) return stored;
 
-  console.warn(
-    "Stored thesis config failed validation, using default.",
-    validation.errors,
-  );
-  return fabianThesis;
+  console.warn("Stored thesis config failed validation.", validation.errors);
+  return null;
 }
 
 export function ThesisProvider({ children }) {
   const [thesis, setThesis] = useState(getInitialThesis);
-  const [isLoaded] = useState(true);
+  const [isTestMode, setIsTestMode] = useState(isTestingAsNewUser);
 
   const updateThesis = useCallback((nextThesis) => {
     setThesis((current) => {
@@ -56,7 +74,10 @@ export function ThesisProvider({ children }) {
       const validation = validateThesis(candidate);
 
       if (!validation.valid) {
-        console.error("Rejected invalid thesis config update.", validation.errors);
+        console.error(
+          "Rejected invalid thesis config update.",
+          validation.errors,
+        );
         return current;
       }
 
@@ -65,13 +86,36 @@ export function ThesisProvider({ children }) {
     });
   }, []);
 
+  const enterTestMode = useCallback(() => {
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(TEST_MODE_KEY, "true");
+      window.localStorage.removeItem(THESIS_STORAGE_KEY);
+    }
+    setIsTestMode(true);
+    setThesis(null);
+  }, []);
+
+  const exitTestMode = useCallback(() => {
+    if (typeof window !== "undefined") {
+      window.localStorage.removeItem(TEST_MODE_KEY);
+    }
+    setIsTestMode(false);
+    persistThesis(fabianThesis);
+    setThesis(fabianThesis);
+  }, []);
+
+  const hasThesis = thesis !== null;
+
   const value = useMemo(
     () => ({
-      thesis,
+      thesis: thesis || fabianThesis,
       updateThesis,
-      isLoaded,
+      hasThesis,
+      isTestMode,
+      enterTestMode,
+      exitTestMode,
     }),
-    [thesis, updateThesis, isLoaded],
+    [thesis, updateThesis, hasThesis, isTestMode, enterTestMode, exitTestMode],
   );
 
   return (

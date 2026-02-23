@@ -31,14 +31,38 @@ const JOB_TITLE_PATTERNS = [
 ];
 
 const INDUSTRY_PATTERNS = [
-  { label: "AI / Machine Learning", regex: /\b(ai|machine learning|ml|llm|genai|artificial intelligence)\b/i },
-  { label: "SaaS / Software", regex: /\b(saas|software|cloud|b2b software|enterprise software)\b/i },
-  { label: "Finance / Fintech", regex: /\b(finance|banking|fintech|capital markets|asset management)\b/i },
-  { label: "Healthcare", regex: /\b(healthcare|health care|medtech|biotech|hospital)\b/i },
-  { label: "Education", regex: /\b(education|edtech|curriculum|instructional|teaching)\b/i },
-  { label: "Consulting", regex: /\b(consulting|advisor|advisory|strategy practice)\b/i },
-  { label: "Marketing / Media", regex: /\b(marketing|media|advertising|growth)\b/i },
-  { label: "Ecommerce / Retail", regex: /\b(ecommerce|e-commerce|retail|marketplace)\b/i },
+  {
+    label: "AI / Machine Learning",
+    regex: /\b(ai|machine learning|ml|llm|genai|artificial intelligence)\b/i,
+  },
+  {
+    label: "SaaS / Software",
+    regex: /\b(saas|software|cloud|b2b software|enterprise software)\b/i,
+  },
+  {
+    label: "Finance / Fintech",
+    regex: /\b(finance|banking|fintech|capital markets|asset management)\b/i,
+  },
+  {
+    label: "Healthcare",
+    regex: /\b(healthcare|health care|medtech|biotech|hospital)\b/i,
+  },
+  {
+    label: "Education",
+    regex: /\b(education|edtech|curriculum|instructional|teaching)\b/i,
+  },
+  {
+    label: "Consulting",
+    regex: /\b(consulting|advisor|advisory|strategy practice)\b/i,
+  },
+  {
+    label: "Marketing / Media",
+    regex: /\b(marketing|media|advertising|growth)\b/i,
+  },
+  {
+    label: "Ecommerce / Retail",
+    regex: /\b(ecommerce|e-commerce|retail|marketplace)\b/i,
+  },
 ];
 
 const SKILL_KEYWORDS = [
@@ -91,7 +115,9 @@ function toExperienceBucket(years) {
 }
 
 function estimateYearsOfExperience(text) {
-  const explicit = text.match(/(\d{1,2})\+?\s*(?:years|yrs)\s*(?:of)?\s*experience/i);
+  const explicit = text.match(
+    /(\d{1,2})\+?\s*(?:years|yrs)\s*(?:of)?\s*experience/i,
+  );
   if (explicit) {
     return Number.parseInt(explicit[1], 10);
   }
@@ -116,16 +142,22 @@ function parseResumeText(text) {
 
   const jobTitles = unique(
     JOB_TITLE_PATTERNS.filter((title) => {
-      const regex = new RegExp(`\\b${escapeRegex(title.toLowerCase())}\\b`, "i");
+      const regex = new RegExp(
+        `\\b${escapeRegex(title.toLowerCase())}\\b`,
+        "i",
+      );
       return regex.test(lower);
     }),
   );
 
-  const industry = INDUSTRY_PATTERNS.find((entry) => entry.regex.test(cleaned))?.label || "";
+  const industry =
+    INDUSTRY_PATTERNS.find((entry) => entry.regex.test(cleaned))?.label || "";
 
-  const companiesFromAt = [...cleaned.matchAll(/\b(?:at|@)\s+([A-Z][A-Za-z0-9&'.-]*(?:\s+[A-Z][A-Za-z0-9&'.-]*){0,4})/g)].map(
-    (match) => match[1],
-  );
+  const companiesFromAt = [
+    ...cleaned.matchAll(
+      /\b(?:at|@)\s+([A-Z][A-Za-z0-9&'.-]*(?:\s+[A-Z][A-Za-z0-9&'.-]*){0,4})/g,
+    ),
+  ].map((match) => match[1]);
 
   const companiesWithSuffix = [
     ...cleaned.matchAll(
@@ -147,15 +179,21 @@ function parseResumeText(text) {
   ).slice(0, 10);
 
   const goalsFromObjective = [
-    ...cleaned.matchAll(/(?:seeking to|looking to|aim(?:ing)? to|goal is to|objective(?: is)? to)\s+([^\.\n]{8,120})/gi),
+    ...cleaned.matchAll(
+      /(?:seeking to|looking to|aim(?:ing)? to|goal is to|objective(?: is)? to)\s+([^\.\n]{8,120})/gi,
+    ),
   ]
     .map((match) => normalizeSentence(match[1]))
     .filter((goal) => goal.length > 8);
 
-  const generatedGoals = skills.slice(0, 3).map((skill) => `Apply ${skill} to higher-leverage work`);
+  const generatedGoals = skills
+    .slice(0, 3)
+    .map((skill) => `Apply ${skill} to higher-leverage work`);
   const goals = unique([...goalsFromObjective, ...generatedGoals]).slice(0, 4);
 
-  const targetRoleMatch = cleaned.match(/(?:target role|seeking|objective|career goal)\s*[:\-]\s*([^\n\.]{6,90})/i);
+  const targetRoleMatch = cleaned.match(
+    /(?:target role|seeking|objective|career goal)\s*[:\-]\s*([^\n\.]{6,90})/i,
+  );
 
   return {
     currentRole: jobTitles[0] || "",
@@ -192,7 +230,9 @@ export default function ResumeIngestion({ onApply }) {
       result.companyNames.length > 0;
 
     if (!hasFindings) {
-      setParseError("No clear patterns found. Add more detail from experience and skills sections.");
+      setParseError(
+        "No clear patterns found. Add more detail from experience and skills sections.",
+      );
       setParsed(null);
       return;
     }
@@ -208,9 +248,16 @@ export default function ResumeIngestion({ onApply }) {
 
   return (
     <div style={{ ...S.card("rgba(255,255,255,0.08)"), marginBottom: 14 }}>
-      <div style={S.label}>Resume Ingestion (Regex Heuristics)</div>
-      <div style={{ fontSize: 12, color: "rgba(255,255,255,0.6)", marginBottom: 10, lineHeight: 1.6 }}>
-        Paste resume text and extract job titles, companies, experience band, and skill keywords to prefill your profile.
+      <div style={S.label}>Quick-Fill from Resume</div>
+      <div
+        style={{
+          fontSize: 12,
+          color: "rgba(255,255,255,0.6)",
+          marginBottom: 10,
+          lineHeight: 1.6,
+        }}
+      >
+        Paste your resume text to auto-fill the fields below.
       </div>
 
       <textarea
@@ -228,14 +275,17 @@ export default function ResumeIngestion({ onApply }) {
           fontSize: 12,
           lineHeight: 1.5,
           fontFamily: "'IBM Plex Sans', sans-serif",
-          outline: "none",
           boxSizing: "border-box",
         }}
       />
 
       <div style={{ display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
-        <button type="button" onClick={handleParse} style={S.tab(false, "#E9C46A")}>
-          Parse Resume
+        <button
+          type="button"
+          onClick={handleParse}
+          style={S.tab(false, "#E9C46A")}
+        >
+          Auto-Fill
         </button>
         <button
           type="button"
@@ -252,19 +302,30 @@ export default function ResumeIngestion({ onApply }) {
       </div>
 
       {parseError && (
-        <div style={{ marginTop: 10, fontSize: 11, color: "#F4A261" }}>{parseError}</div>
+        <div style={{ marginTop: 10, fontSize: 11, color: "#F4A261" }}>
+          {parseError}
+        </div>
       )}
 
       {parsed && (
         <div style={{ marginTop: 12, display: "grid", gap: 8 }}>
           <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)" }}>
-            Parsed role: <span style={{ color: "#E8E4DF" }}>{parsed.currentRole || "Not found"}</span>
+            Parsed role:{" "}
+            <span style={{ color: "#E8E4DF" }}>
+              {parsed.currentRole || "Not found"}
+            </span>
           </div>
           <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)" }}>
-            Industry: <span style={{ color: "#E8E4DF" }}>{parsed.industry || "Not found"}</span>
+            Industry:{" "}
+            <span style={{ color: "#E8E4DF" }}>
+              {parsed.industry || "Not found"}
+            </span>
           </div>
           <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)" }}>
-            Experience estimate: <span style={{ color: "#E8E4DF" }}>{parsed.yearsExperience || 0} years</span>
+            Experience estimate:{" "}
+            <span style={{ color: "#E8E4DF" }}>
+              {parsed.yearsExperience || 0} years
+            </span>
           </div>
 
           {parsed.jobTitles.length > 0 && (

@@ -66,17 +66,28 @@ export default function APIKeySetup({ value, onChange }) {
       }
 
       if (!response.ok || payload?.error_code) {
-        const message = payload?.error_message || payload?.message || `HTTP ${response.status}`;
+        const message =
+          payload?.error_message ||
+          payload?.message ||
+          `HTTP ${response.status}`;
         updateTest("fred", "error", message);
         return;
       }
 
       if (!Array.isArray(payload?.seriess) || payload.seriess.length === 0) {
-        updateTest("fred", "error", "Key accepted but sample payload was empty.");
+        updateTest(
+          "fred",
+          "error",
+          "Key accepted but sample payload was empty.",
+        );
         return;
       }
 
-      updateTest("fred", "success", "Valid key. FRED sample call returned data.");
+      updateTest(
+        "fred",
+        "success",
+        "Valid key. FRED sample call returned data.",
+      );
     } catch (error) {
       updateTest(
         "fred",
@@ -105,17 +116,26 @@ export default function APIKeySetup({ value, onChange }) {
       }
 
       if (!response.ok || payload?.status === "error") {
-        const message = payload?.message || payload?.code || `HTTP ${response.status}`;
+        const message =
+          payload?.message || payload?.code || `HTTP ${response.status}`;
         updateTest("twelveData", "error", String(message));
         return;
       }
 
       if (payload?.price === undefined) {
-        updateTest("twelveData", "error", "Key accepted but sample payload was empty.");
+        updateTest(
+          "twelveData",
+          "error",
+          "Key accepted but sample payload was empty.",
+        );
         return;
       }
 
-      updateTest("twelveData", "success", `Valid key. AAPL sample price: ${payload.price}`);
+      updateTest(
+        "twelveData",
+        "success",
+        `Valid key. AAPL sample price: ${payload.price}`,
+      );
     } catch (error) {
       updateTest(
         "twelveData",
@@ -128,8 +148,34 @@ export default function APIKeySetup({ value, onChange }) {
   return (
     <div style={S.card("rgba(233,196,106,0.2)")}>
       <div style={S.label}>API Key Setup</div>
-      <div style={{ fontSize: 12, color: "rgba(255,255,255,0.62)", marginBottom: 12, lineHeight: 1.6 }}>
-        Keys are stored locally in this browser (`localStorage`) for OSS onboarding convenience.
+      <div
+        style={{
+          display: "grid",
+          gap: 8,
+          fontSize: 12,
+          color: "rgba(255,255,255,0.62)",
+          marginBottom: 14,
+          lineHeight: 1.6,
+        }}
+      >
+        <div>
+          Asymmetric Bridge pulls live economic data to keep your signals
+          current.
+        </div>
+        <div>
+          <strong style={{ color: "#E8E4DF" }}>FRED</strong> (Federal Reserve
+          Economic Data) — Employment figures, GDP growth, money velocity,
+          deficit tracking. Free key.
+        </div>
+        <div>
+          <strong style={{ color: "#E8E4DF" }}>Twelve Data</strong> — Stock and
+          market prices for portfolio tracking (NVIDIA, Salesforce, Blackstone,
+          etc.). Free key.
+        </div>
+        <div style={{ color: "rgba(255,255,255,0.45)" }}>
+          Without API keys, the dashboard uses sample data so you can still
+          explore everything.
+        </div>
       </div>
 
       <div style={{ display: "grid", gap: 14 }}>
@@ -141,22 +187,42 @@ export default function APIKeySetup({ value, onChange }) {
             <input
               id="fredKey"
               value={value.fredKey}
-              onChange={(event) => updateKey("fredKey", FRED_KEY_STORAGE, event.target.value)}
+              onChange={(event) =>
+                updateKey("fredKey", FRED_KEY_STORAGE, event.target.value)
+              }
               placeholder="Enter your FRED API key"
+              spellCheck={false}
+              autoComplete="off"
               style={{ ...inputStyle, flex: 1, minWidth: 250 }}
             />
-            <button type="button" onClick={testFredKey} style={S.tab(false, "#2A9D8F")}>
+            <button
+              type="button"
+              onClick={testFredKey}
+              style={S.tab(false, "#2A9D8F")}
+            >
               Test
             </button>
           </div>
-          <div style={{ fontSize: 11, marginTop: 8, color: statusColor(testResults.fred.status) }}>
-            {statusLabel(testResults.fred.status)}{testResults.fred.message ? ` · ${testResults.fred.message}` : ""}
+          <div
+            style={{
+              fontSize: 11,
+              marginTop: 8,
+              color: statusColor(testResults.fred.status),
+            }}
+          >
+            {statusLabel(testResults.fred.status)}
+            {testResults.fred.message ? ` · ${testResults.fred.message}` : ""}
           </div>
           <a
             href="https://fredaccount.stlouisfed.org/apikeys"
             target="_blank"
             rel="noreferrer"
-            style={{ fontSize: 11, color: "#E9C46A", display: "inline-block", marginTop: 8 }}
+            style={{
+              fontSize: 11,
+              color: "#E9C46A",
+              display: "inline-block",
+              marginTop: 8,
+            }}
           >
             Get a free FRED key
           </a>
@@ -170,22 +236,48 @@ export default function APIKeySetup({ value, onChange }) {
             <input
               id="twelveDataKey"
               value={value.twelveDataKey}
-              onChange={(event) => updateKey("twelveDataKey", TWELVE_DATA_KEY_STORAGE, event.target.value)}
+              onChange={(event) =>
+                updateKey(
+                  "twelveDataKey",
+                  TWELVE_DATA_KEY_STORAGE,
+                  event.target.value,
+                )
+              }
               placeholder="Enter your Twelve Data API key"
+              spellCheck={false}
+              autoComplete="off"
               style={{ ...inputStyle, flex: 1, minWidth: 250 }}
             />
-            <button type="button" onClick={testTwelveDataKey} style={S.tab(false, "#2A9D8F")}>
+            <button
+              type="button"
+              onClick={testTwelveDataKey}
+              style={S.tab(false, "#2A9D8F")}
+            >
               Test
             </button>
           </div>
-          <div style={{ fontSize: 11, marginTop: 8, color: statusColor(testResults.twelveData.status) }}>
-            {statusLabel(testResults.twelveData.status)}{testResults.twelveData.message ? ` · ${testResults.twelveData.message}` : ""}
+          <div
+            style={{
+              fontSize: 11,
+              marginTop: 8,
+              color: statusColor(testResults.twelveData.status),
+            }}
+          >
+            {statusLabel(testResults.twelveData.status)}
+            {testResults.twelveData.message
+              ? ` · ${testResults.twelveData.message}`
+              : ""}
           </div>
           <a
             href="https://twelvedata.com/apikey"
             target="_blank"
             rel="noreferrer"
-            style={{ fontSize: 11, color: "#E9C46A", display: "inline-block", marginTop: 8 }}
+            style={{
+              fontSize: 11,
+              color: "#E9C46A",
+              display: "inline-block",
+              marginTop: 8,
+            }}
           >
             Get a free Twelve Data key
           </a>
@@ -204,6 +296,5 @@ const inputStyle = {
   padding: "9px 10px",
   fontSize: 12,
   fontFamily: "'IBM Plex Sans', sans-serif",
-  outline: "none",
   boxSizing: "border-box",
 };

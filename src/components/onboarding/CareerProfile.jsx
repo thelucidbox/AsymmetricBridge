@@ -11,11 +11,11 @@ const EXPERIENCE_OPTIONS = [
 ];
 
 const GOAL_SUGGESTIONS = [
-  "Increase income leverage with AI-native services",
-  "Build repeatable consulting offers",
-  "Shift from execution to strategic operator role",
-  "Turn market intelligence into productized insights",
-  "Build a public proof-of-work portfolio",
+  "Transition to a higher-leverage role",
+  "Build AI-native skills and services",
+  "Develop a public portfolio of work",
+  "Move from execution to strategy",
+  "Create consulting or advisory offers",
 ];
 
 function dedupeGoals(goals) {
@@ -24,7 +24,11 @@ function dedupeGoals(goals) {
 
 function FieldError({ message }) {
   if (!message) return null;
-  return <div style={{ color: "#F4A261", fontSize: 11, marginTop: 4 }}>{message}</div>;
+  return (
+    <div style={{ color: "#F4A261", fontSize: 11, marginTop: 4 }}>
+      {message}
+    </div>
+  );
 }
 
 export default function CareerProfile({ value, onChange, errors }) {
@@ -43,17 +47,23 @@ export default function CareerProfile({ value, onChange, errors }) {
   };
 
   const removeGoal = (goal) => {
-    const nextGoals = (value.goals || []).filter((currentGoal) => currentGoal !== goal);
+    const nextGoals = (value.goals || []).filter(
+      (currentGoal) => currentGoal !== goal,
+    );
     onChange({ ...value, goals: nextGoals });
   };
 
   const applyResumeParse = (parsed) => {
-    const mergedGoals = dedupeGoals([...(value.goals || []), ...(parsed.goals || [])]);
+    const mergedGoals = dedupeGoals([
+      ...(value.goals || []),
+      ...(parsed.goals || []),
+    ]);
 
     onChange({
       ...value,
       currentRole: parsed.currentRole || value.currentRole,
-      targetRole: parsed.targetRole || value.targetRole || parsed.currentRole || "",
+      targetRole:
+        parsed.targetRole || value.targetRole || parsed.currentRole || "",
       industry: parsed.industry || value.industry,
       experience: parsed.experience || value.experience,
       goals: mergedGoals,
@@ -65,7 +75,17 @@ export default function CareerProfile({ value, onChange, errors }) {
       <ResumeIngestion onApply={applyResumeParse} />
 
       <div style={S.card("rgba(42,157,143,0.2)")}>
-        <div style={S.label}>Career Profile</div>
+        <div style={S.label}>About You</div>
+        <div
+          style={{
+            fontSize: 12,
+            color: "rgba(255,255,255,0.55)",
+            marginBottom: 10,
+            lineHeight: 1.6,
+          }}
+        >
+          This helps connect macro signals to your specific career context.
+        </div>
 
         <div style={{ display: "grid", gap: 12 }}>
           <div>
@@ -75,7 +95,9 @@ export default function CareerProfile({ value, onChange, errors }) {
             <input
               id="currentRole"
               value={value.currentRole}
-              onChange={(event) => updateField("currentRole", event.target.value)}
+              onChange={(event) =>
+                updateField("currentRole", event.target.value)
+              }
               placeholder="e.g. Enterprise Account Executive"
               style={inputStyle}
             />
@@ -89,7 +111,9 @@ export default function CareerProfile({ value, onChange, errors }) {
             <input
               id="targetRole"
               value={value.targetRole}
-              onChange={(event) => updateField("targetRole", event.target.value)}
+              onChange={(event) =>
+                updateField("targetRole", event.target.value)
+              }
               placeholder="e.g. AI Strategy Advisor"
               style={inputStyle}
             />
@@ -112,16 +136,21 @@ export default function CareerProfile({ value, onChange, errors }) {
 
           <div>
             <label htmlFor="experience" style={S.label}>
-              Experience Band
+              Years of Experience
             </label>
             <select
               id="experience"
               value={value.experience}
-              onChange={(event) => updateField("experience", event.target.value)}
+              onChange={(event) =>
+                updateField("experience", event.target.value)
+              }
               style={inputStyle}
             >
               {EXPERIENCE_OPTIONS.map((option) => (
-                <option key={option.value || "placeholder"} value={option.value}>
+                <option
+                  key={option.value || "placeholder"}
+                  value={option.value}
+                >
                   {option.label}
                 </option>
               ))}
@@ -130,7 +159,16 @@ export default function CareerProfile({ value, onChange, errors }) {
           </div>
 
           <div>
-            <div style={S.label}>Goals (tags)</div>
+            <div style={S.label}>Career Goals</div>
+            <div
+              style={{
+                fontSize: 11,
+                color: "rgba(255,255,255,0.45)",
+                marginBottom: 6,
+              }}
+            >
+              What are you working toward?
+            </div>
             <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
               <input
                 value={goalInput}
@@ -144,13 +182,24 @@ export default function CareerProfile({ value, onChange, errors }) {
                 placeholder="Add a goal and press Enter"
                 style={{ ...inputStyle, marginBottom: 0 }}
               />
-              <button type="button" onClick={() => addGoal(goalInput)} style={S.tab(false, "#E9C46A")}>
+              <button
+                type="button"
+                onClick={() => addGoal(goalInput)}
+                style={S.tab(false, "#E9C46A")}
+              >
                 Add
               </button>
             </div>
 
             {(value.goals || []).length > 0 && (
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
+              <div
+                style={{
+                  display: "flex",
+                  gap: 8,
+                  flexWrap: "wrap",
+                  marginBottom: 8,
+                }}
+              >
                 {value.goals.map((goal) => (
                   <button
                     type="button"
@@ -199,6 +248,5 @@ const inputStyle = {
   padding: "9px 10px",
   fontSize: 12,
   fontFamily: "'IBM Plex Sans', sans-serif",
-  outline: "none",
   boxSizing: "border-box",
 };

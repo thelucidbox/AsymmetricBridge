@@ -10,6 +10,7 @@ import { DOMINOS } from "../data/dominos";
 import { PRODUCTS } from "../data/products";
 import { REVENUE_SCENARIOS } from "../data/revenue";
 import { TWITTER_PILLARS } from "../data/twitter";
+import { isOwnerMode } from "../config/ThesisContext";
 import { useTheme } from "../design-tokens";
 import { useCryptoData } from "../hooks/useCryptoData";
 import { useFredData } from "../hooks/useFredData";
@@ -18,6 +19,7 @@ import { useStockData } from "../hooks/useStockData";
 import { useAutoThreshold } from "../hooks/useAutoThreshold";
 import { FRED_API_KEY } from "../lib/fred";
 import { TWELVE_DATA_API_KEY } from "../lib/stocks";
+import { S } from "../styles";
 
 const PRODUCT_STATUS_LABELS = {
   launch_now: "LAUNCH NOW",
@@ -76,10 +78,63 @@ function latestTimestamp(values) {
   return valid[0].toISOString();
 }
 
+function EmptyStateCard({ title, description, color }) {
+  return (
+    <div
+      style={{
+        ...S.card(`${color}22`),
+        textAlign: "center",
+        padding: "32px 20px",
+      }}
+    >
+      <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 8 }}>
+        {title}
+      </div>
+      <div
+        style={{
+          fontSize: 12,
+          color: "rgba(255,255,255,0.5)",
+          lineHeight: 1.6,
+        }}
+      >
+        {description}
+      </div>
+    </div>
+  );
+}
+
+function SampleDataBanner() {
+  const hasApiKeys = FRED_API_KEY || TWELVE_DATA_API_KEY;
+  if (hasApiKeys) return null;
+
+  return (
+    <div
+      style={{
+        ...S.card("rgba(233,196,106,0.15)"),
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+        padding: "10px 14px",
+      }}
+    >
+      <div
+        style={{
+          fontSize: 12,
+          color: "rgba(255,255,255,0.55)",
+          lineHeight: 1.5,
+        }}
+      >
+        Showing sample data — add your FRED and Twelve Data API keys in Settings
+        for live updates.
+      </div>
+    </div>
+  );
+}
+
 export default function CommandCenter() {
   const { tokens } = useTheme();
-  const [section, setSection] = useState("lucidbox");
-  const [subTab, setSubTab] = useState("products");
+  const [section, setSection] = useState(isOwnerMode ? "lucidbox" : "signals");
+  const [subTab, setSubTab] = useState(isOwnerMode ? "products" : "dominos");
   const [activeDominos, setActiveDominos] = useState(new Set([1]));
   const [expandedProduct, setExpandedProduct] = useState(3);
   const [signalSubTab, setSignalSubTab] = useState("tracker");
@@ -110,19 +165,24 @@ export default function CommandCenter() {
     error: cryptoQueryError,
     dataUpdatedAt: cryptoDataUpdatedAt,
   } = cryptoQuery;
-  const {
-    data: signalStatuses,
-    isLoading: signalStatusesLoading,
-  } = signalStatusesQuery;
+  const { data: signalStatuses, isLoading: signalStatusesLoading } =
+    signalStatusesQuery;
 
-  const thresholdResult = useAutoThreshold({ fredData, stockData, cryptoData, signalStatuses });
+  const thresholdResult = useAutoThreshold({
+    fredData,
+    stockData,
+    cryptoData,
+    signalStatuses,
+  });
 
   const liveDominos = useMemo(() => {
     return DOMINOS.map((domino) => ({
       ...domino,
       signals: domino.signals.map((signal) => {
         const live = signalStatuses?.find(
-          (status) => status.domino_id === domino.id && status.signal_name === signal.name,
+          (status) =>
+            status.domino_id === domino.id &&
+            status.signal_name === signal.name,
         );
         const baseSignal = {
           ...signal,
@@ -152,17 +212,34 @@ export default function CommandCenter() {
     });
   };
 
-  const totalSig = liveDominos.reduce((sum, domino) => sum + domino.signals.length, 0);
+  const totalSig = liveDominos.reduce(
+    (sum, domino) => sum + domino.signals.length,
+    0,
+  );
   const amberCt = liveDominos.reduce(
-    (sum, domino) => sum + domino.signals.filter((signal) => signal.currentStatus === "amber").length,
+    (sum, domino) =>
+      sum +
+      domino.signals.filter((signal) => signal.currentStatus === "amber")
+        .length,
     0,
   );
   const redCt = liveDominos.reduce(
-    (sum, domino) => sum + domino.signals.filter((signal) => signal.currentStatus === "red").length,
+    (sum, domino) =>
+      sum +
+      domino.signals.filter((signal) => signal.currentStatus === "red").length,
     0,
   );
   const greenCt = totalSig - amberCt - redCt;
-  const threat = redCt >= 6 ? "CRISIS" : redCt >= 3 ? "CRITICAL" : amberCt >= 12 ? "ELEVATED" : amberCt >= 6 ? "WATCH" : "BASELINE";
+  const threat =
+    redCt >= 6
+      ? "CRISIS"
+      : redCt >= 3
+        ? "CRITICAL"
+        : amberCt >= 12
+          ? "ELEVATED"
+          : amberCt >= 6
+            ? "WATCH"
+            : "BASELINE";
   const threatClr =
     threat === "CRISIS" || threat === "CRITICAL"
       ? "#E63946"
@@ -186,8 +263,8 @@ export default function CommandCenter() {
     );
   }, [fredData]);
 
-  const fredSuccessfulSeries = fredSeries.filter(
-    (entry) => Array.isArray(entry.observations),
+  const fredSuccessfulSeries = fredSeries.filter((entry) =>
+    Array.isArray(entry.observations),
   );
   const fredNestedErrors = fredSeries
     .map((entry) => normalizeFeedError(entry.error, "fred"))
@@ -206,10 +283,10 @@ export default function CommandCenter() {
 
   const stockConnected = Boolean(
     stockData &&
-      typeof stockData === "object" &&
-      !Array.isArray(stockData) &&
-      !("error" in stockData) &&
-      Object.keys(stockData).length > 0,
+    typeof stockData === "object" &&
+    !Array.isArray(stockData) &&
+    !("error" in stockData) &&
+    Object.keys(stockData).length > 0,
   );
   const stockError =
     normalizeFeedError(stockData?.error, "twelve_data") ||
@@ -221,18 +298,17 @@ export default function CommandCenter() {
 
   const cryptoConnected = Boolean(
     cryptoData &&
-      typeof cryptoData === "object" &&
-      !Array.isArray(cryptoData) &&
-      Array.isArray(cryptoData.coins),
+    typeof cryptoData === "object" &&
+    !Array.isArray(cryptoData) &&
+    Array.isArray(cryptoData.coins),
   );
   const cryptoError =
     normalizeFeedError(cryptoData?.error, "coingecko") ||
     normalizeFeedError(cryptoQueryError, "coingecko");
-  const cryptoLastSuccess =
-    cryptoConnected
-      ? cryptoData.fetchedAt ||
-        (cryptoDataUpdatedAt ? new Date(cryptoDataUpdatedAt).toISOString() : null)
-      : null;
+  const cryptoLastSuccess = cryptoConnected
+    ? cryptoData.fetchedAt ||
+      (cryptoDataUpdatedAt ? new Date(cryptoDataUpdatedAt).toISOString() : null)
+    : null;
 
   const feeds = [
     {
@@ -281,9 +357,17 @@ export default function CommandCenter() {
       }}
     >
       <div className="ab-content-shell">
-        <LucidBoxHeader section={section} onSwitchSection={switchSection} threat={threat} threatClr={threatClr} />
+        <LucidBoxHeader
+          section={section}
+          onSwitchSection={switchSection}
+          threat={threat}
+          threatClr={threatClr}
+          isOwnerMode={isOwnerMode}
+        />
 
-        {section === "lucidbox" && (
+        {!isOwnerMode && <SampleDataBanner />}
+
+        {section === "lucidbox" && isOwnerMode && (
           <ErrorBoundary>
             <LucidBoxPortfolio
               subTab={subTab}
@@ -298,6 +382,14 @@ export default function CommandCenter() {
               statusColors={PRODUCT_STATUS_COLORS}
             />
           </ErrorBoundary>
+        )}
+
+        {section === "lucidbox" && !isOwnerMode && (
+          <EmptyStateCard
+            title="Your Portfolio"
+            description="Upload your portfolio CSV in the Performance Lab to see thesis alignment and track your positioning."
+            color="#E63946"
+          />
         )}
 
         {section === "signals" && (
@@ -344,7 +436,8 @@ export default function CommandCenter() {
             borderTop: "1px solid rgba(255,255,255,0.04)",
           }}
         >
-          Asymmetric Bridge Command Center v3.0 · Lucid Box + Signal Tracker · Feb 22, 2026 · Not financial advice
+          Asymmetric Bridge v3.1 · Signal Tracker + Thesis Dashboard · Not
+          financial advice
         </div>
       </div>
     </div>

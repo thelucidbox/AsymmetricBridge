@@ -5,6 +5,7 @@ export default function LucidBoxHeader({
   onSwitchSection,
   threat,
   threatClr,
+  isOwnerMode,
 }) {
   return (
     <>
@@ -25,7 +26,9 @@ export default function LucidBoxHeader({
               borderRadius: 2,
             }}
           />
-          <h1 style={{ fontSize: 20, fontWeight: 700, letterSpacing: "-0.8px" }}>
+          <h1
+            style={{ fontSize: 20, fontWeight: 700, letterSpacing: "-0.8px" }}
+          >
             Asymmetric Bridge
           </h1>
           <span
@@ -39,7 +42,7 @@ export default function LucidBoxHeader({
               marginLeft: 6,
             }}
           >
-            COMMAND CENTER
+            {isOwnerMode ? "PERSONAL EDITION" : "COMMAND CENTER"}
           </span>
         </div>
         <p
@@ -50,7 +53,9 @@ export default function LucidBoxHeader({
             fontFamily: "'IBM Plex Mono'",
           }}
         >
-          Lucid Box · Signal Tracker · Thesis & Portfolio · AI Jobs
+          {isOwnerMode
+            ? "Lucid Box · Signal Tracker · Thesis & Portfolio · AI Jobs"
+            : "Signal Tracker · Thesis & Portfolio · AI Jobs"}
         </p>
       </div>
 
@@ -62,12 +67,22 @@ export default function LucidBoxHeader({
           flexWrap: "wrap",
         }}
       >
-        <button
-          onClick={() => onSwitchSection("lucidbox")}
-          style={S.sectionTab(section === "lucidbox", "#E63946")}
-        >
-          Lucid Box
-        </button>
+        {isOwnerMode && (
+          <button
+            onClick={() => onSwitchSection("lucidbox")}
+            style={S.sectionTab(section === "lucidbox", "#E63946")}
+          >
+            Lucid Box
+          </button>
+        )}
+        {!isOwnerMode && (
+          <button
+            onClick={() => onSwitchSection("lucidbox")}
+            style={S.sectionTab(section === "lucidbox", "#E63946")}
+          >
+            My Dashboard
+          </button>
+        )}
         <button
           onClick={() => onSwitchSection("signals")}
           data-tour="section-signals"
