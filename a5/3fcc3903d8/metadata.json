@@ -3,9 +3,8 @@
   "checkpoint_id": "a53fcc3903d8",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 5,
+  "checkpoints_count": 4,
   "files_touched": [
-    ".env",
     ".env.example",
     "ARCHITECTURE.md",
     "CLAUDE.md",
@@ -33,7 +32,6 @@
     "src/components/GlossaryTooltip.jsx",
     "src/components/GuidedTour.jsx",
     "src/components/Navigation.jsx",
-    "src/components/SignalUpdateForm.jsx",
     "src/components/conviction/ConvictionScorecard.jsx",
     "src/components/digests/DigestView.jsx",
     "src/components/lucid-box/LucidBoxHeader.jsx",
@@ -45,13 +43,12 @@
     "src/config/thesis-schema.js",
     "src/design-tokens/observatory.js",
     "src/design-tokens/terminal.js",
-    "src/hooks/useDigests.js",
     "src/hooks/useFredData.js",
     "src/hooks/usePortfolioData.js",
     "src/hooks/usePredictions.js",
     "src/hooks/useStockData.js",
     "src/index.css",
-    "src/lib/ai-digest.js",
+    "src/lib/csv-parser.js",
     "src/lib/export-utils.js",
     "src/lib/fred.js",
     "src/lib/stocks.js",
@@ -107,10 +104,10 @@
     }
   ],
   "token_usage": {
-    "input_tokens": 1706,
-    "cache_creation_tokens": 451201,
-    "cache_read_tokens": 17717188,
-    "output_tokens": 28142,
-    "api_call_count": 145
+    "input_tokens": 1675,
+    "cache_creation_tokens": 395473,
+    "cache_read_tokens": 14221786,
+    "output_tokens": 20150,
+    "api_call_count": 120
   }
 }

@@ -1149,3 +1149,15 @@ Summary:
 
 If you need specific details from before compaction (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/fabianaguilar/.REDACTED.jsonl
 Please continue the conversation from where we left off without asking the user any further questions. Continue with the last task that you were asked to work on.
+
+---
+
+When I try to upload a CSV, it does not work
+
+---
+
+[Image: source: /Users/fabianaguilar/Desktop/Screenshot 2026-02-24 at 9.55.25 AM.png]
+
+---
+
+commit and push
