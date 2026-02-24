@@ -227,3 +227,27 @@ A couple things about the repository. I want to replace a screenshot with the la
 
 [Image: source: /Users/fabianaguilar/Desktop/Screenshot 2026-02-24 at 12.02.06 PM.png]
 
+### Prompt 43
+
+what should Do about this?
+
+### Prompt 44
+
+[Image: source: /Users/fabianaguilar/Desktop/Screenshot 2026-02-24 at 12.14.24 PM.png]
+
+[Image: source: /Users/fabianaguilar/Desktop/Screenshot 2026-02-24 at 12.14.24 PM.png]
+
+[Image: source: /Users/fabianaguilar/Desktop/Screenshot 2026-02-24 at 12.15.16 PM.png]
+
+### Prompt 45
+
+can you make the repo public please
+
+### Prompt 46
+
+Do we need these descriptions?
+
+### Prompt 47
+
+[Image: source: /Users/fabianaguilar/Desktop/Screenshot 2026-02-24 at 12.17.53 PM.png]
+

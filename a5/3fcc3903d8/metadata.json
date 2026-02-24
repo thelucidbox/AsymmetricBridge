@@ -6,6 +6,7 @@
   "checkpoints_count": 4,
   "files_touched": [
     ".env.example",
+    ".gitignore",
     "ARCHITECTURE.md",
     "CLAUDE.md",
     "CODEX-REVIEW-PROMPT.md",
@@ -103,10 +104,10 @@
     }
   ],
   "token_usage": {
-    "input_tokens": 1697,
-    "cache_creation_tokens": 397491,
-    "cache_read_tokens": 17529277,
-    "output_tokens": 25975,
-    "api_call_count": 142
+    "input_tokens": 1696,
+    "cache_creation_tokens": 385049,
+    "cache_read_tokens": 17806047,
+    "output_tokens": 20918,
+    "api_call_count": 139
   }
 }
