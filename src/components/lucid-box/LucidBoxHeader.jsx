@@ -1,4 +1,5 @@
 import { S } from "../../styles";
+import { useTheme } from "../../design-tokens";
 
 export default function LucidBoxHeader({
   section,
@@ -7,6 +8,8 @@ export default function LucidBoxHeader({
   threatClr,
   isOwnerMode,
 }) {
+  const { tokens } = useTheme();
+
   return (
     <>
       <div style={{ marginBottom: 20 }}>
@@ -22,20 +25,24 @@ export default function LucidBoxHeader({
             style={{
               width: 3,
               height: 24,
-              background: "linear-gradient(180deg, #E9C46A, #E63946)",
+              background: tokens.colors.headerGradient,
               borderRadius: 2,
             }}
           />
           <h1
-            style={{ fontSize: 20, fontWeight: 700, letterSpacing: "-0.8px" }}
+            style={{
+              fontSize: 20,
+              fontWeight: 700,
+              letterSpacing: tokens.typography.letterSpacing.heading,
+            }}
           >
             Asymmetric Bridge
           </h1>
           <span
             style={{
               fontSize: 9,
-              color: "#E9C46A",
-              background: "#E9C46A15",
+              color: tokens.colors.accent,
+              background: tokens.colors.accentSubtle,
               padding: "2px 8px",
               borderRadius: 4,
               fontWeight: 600,
@@ -48,9 +55,9 @@ export default function LucidBoxHeader({
         <p
           style={{
             fontSize: 10,
-            color: "rgba(255,255,255,0.2)",
+            color: tokens.colors.textSubtle,
             marginLeft: 11,
-            fontFamily: "'IBM Plex Mono'",
+            fontFamily: tokens.typography.fontMono,
           }}
         >
           {isOwnerMode
@@ -70,7 +77,7 @@ export default function LucidBoxHeader({
         {isOwnerMode && (
           <button
             onClick={() => onSwitchSection("lucidbox")}
-            style={S.sectionTab(section === "lucidbox", "#E63946")}
+            style={S.sectionTab(section === "lucidbox", tokens.colors.alert)}
           >
             Lucid Box
           </button>
@@ -78,7 +85,7 @@ export default function LucidBoxHeader({
         {!isOwnerMode && (
           <button
             onClick={() => onSwitchSection("lucidbox")}
-            style={S.sectionTab(section === "lucidbox", "#E63946")}
+            style={S.sectionTab(section === "lucidbox", tokens.colors.alert)}
           >
             My Dashboard
           </button>
@@ -86,7 +93,7 @@ export default function LucidBoxHeader({
         <button
           onClick={() => onSwitchSection("signals")}
           data-tour="section-signals"
-          style={S.sectionTab(section === "signals", "#E9C46A")}
+          style={S.sectionTab(section === "signals", tokens.colors.accent)}
         >
           Signals
           <span
@@ -103,13 +110,13 @@ export default function LucidBoxHeader({
         <button
           onClick={() => onSwitchSection("thesis")}
           data-tour="section-portfolio-tab"
-          style={S.sectionTab(section === "thesis", "#6D6875")}
+          style={S.sectionTab(section === "thesis", tokens.colors.dominoPolicy)}
         >
           Thesis & Portfolio
         </button>
         <button
           onClick={() => onSwitchSection("jobs")}
-          style={S.sectionTab(section === "jobs", "#2A9D8F")}
+          style={S.sectionTab(section === "jobs", tokens.colors.baseline)}
         >
           AI Jobs
         </button>

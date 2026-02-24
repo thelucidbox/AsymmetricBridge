@@ -68,9 +68,9 @@ src/
 ## Adding Signals to a Thesis
 
 Edit `src/config/fabian-thesis.js` (or create your own thesis file). Each signal needs:
-- `name`, `key`, `source`, `metric`
-- `threshold` with `value`, `direction`, `operator`
-- `whyItMatters` and `transmissionTo` (for the educational layer)
+- `name`, `source`, `frequency`, `currentStatus`
+- `baseline`, `threshold`, `notes`
+- `dataPoints` (array of historical measurements)
 
 ## Reporting Issues
 

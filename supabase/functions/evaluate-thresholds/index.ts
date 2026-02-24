@@ -55,7 +55,10 @@ type SignalStatusLookupRow = {
   signal_name: string;
 };
 
-const THRESHOLD_DEFINITIONS: Record<string, ThresholdDefinition> = {
+// Threshold definitions are loaded from the threshold_config table at runtime.
+// This eliminates duplication between client and server-side evaluation.
+// Fallback hardcoded definitions are kept only as a safety net if the DB read fails.
+const FALLBACK_THRESHOLDS: Record<string, ThresholdDefinition> = {
   "1|Public SaaS Net Revenue Retention": {
     comparator: "lt",
     amber: 120,
@@ -76,21 +79,13 @@ const THRESHOLD_DEFINITIONS: Record<string, ThresholdDefinition> = {
     amber: 1000,
     red: 2000,
   },
-  "4|M2 Velocity of Money": {
-    comparator: "lt",
-    amber: 1.15,
-    red: 1.0,
-  },
+  "4|M2 Velocity of Money": { comparator: "lt", amber: 1.15, red: 1.0 },
   "4|Consumer Confidence vs. CEO Confidence": {
     comparator: "lt",
     amber: 98,
     red: 95,
   },
-  "4|Labor Share of GDP": {
-    comparator: "lt",
-    amber: 55,
-    red: 52,
-  },
+  "4|Labor Share of GDP": { comparator: "lt", amber: 55, red: 52 },
   "5|Alt Manager Stock Prices (BX, APO, KKR)": {
     comparator: "lt",
     amber: -15,
@@ -98,10 +93,50 @@ const THRESHOLD_DEFINITIONS: Record<string, ThresholdDefinition> = {
   },
 };
 
+type ThresholdConfigRow = {
+  domino_id: number;
+  signal_name: string;
+  comparator: string;
+  amber_value: number | null;
+  red_value: number | null;
+  enabled: boolean;
+};
+
+async function loadThresholdDefinitions(
+  supabase: ReturnType<typeof createClient>,
+): Promise<Record<string, ThresholdDefinition>> {
+  const { data, error } = await supabase
+    .from("threshold_config")
+    .select(
+      "domino_id, signal_name, comparator, amber_value, red_value, enabled",
+    )
+    .eq("enabled", true);
+
+  if (error || !data || data.length === 0) {
+    return FALLBACK_THRESHOLDS;
+  }
+
+  const definitions: Record<string, ThresholdDefinition> = {};
+  for (const row of data as ThresholdConfigRow[]) {
+    if (row.amber_value === null || row.red_value === null) continue;
+    const key = `${row.domino_id}|${row.signal_name}`;
+    definitions[key] = {
+      comparator: row.comparator as Comparator,
+      amber: row.amber_value,
+      red: row.red_value,
+    };
+  }
+
+  return Object.keys(definitions).length > 0
+    ? definitions
+    : FALLBACK_THRESHOLDS;
+}
+
 const CORS_HEADERS = {
   "Content-Type": "application/json",
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
 };
 
 const jsonResponse = (payload: unknown, status = 200): Response =>
@@ -157,7 +192,9 @@ const toNumber = (value: unknown): number | null => {
 };
 
 const normalizeOperator = (value: unknown): "gt" | "gte" | "lt" | "lte" => {
-  const raw = String(value ?? "gte").trim().toLowerCase();
+  const raw = String(value ?? "gte")
+    .trim()
+    .toLowerCase();
   if (raw === ">" || raw === "gt") return "gt";
   if (raw === ">=" || raw === "gte") return "gte";
   if (raw === "<" || raw === "lt") return "lt";
@@ -176,7 +213,9 @@ const evaluatePredictionOutcome = (
   currentValue: number | null,
 ): PredictionOutcome => {
   const condition = prediction.condition ?? {};
-  const type = String(prediction.type || "").trim().toLowerCase();
+  const type = String(prediction.type || "")
+    .trim()
+    .toLowerCase();
 
   if (type === "threshold") {
     const threshold = toNumber(condition.threshold);
@@ -191,11 +230,15 @@ const evaluatePredictionOutcome = (
 
   if (type === "direction") {
     const baseline = toNumber(
-      condition.baselineValue ?? condition.startValue ?? condition.valueAtCreation,
+      condition.baselineValue ??
+        condition.startValue ??
+        condition.valueAtCreation,
     );
     if (baseline === null || currentValue === null) return "partial";
 
-    const direction = String(condition.direction || "").trim().toLowerCase();
+    const direction = String(condition.direction || "")
+      .trim()
+      .toLowerCase();
     const delta = currentValue - baseline;
     if (delta === 0) return "partial";
     if (direction === "up") return delta > 0 ? "hit" : "miss";
@@ -256,8 +299,8 @@ Deno.serve(async (request) => {
     return jsonResponse({ error: "Method not allowed" }, 405);
   }
 
-  const supabaseUrl = Deno.env.get("SUPABASE_URL") ??
-    Deno.env.get("VITE_SUPABASE_URL");
+  const supabaseUrl =
+    Deno.env.get("SUPABASE_URL") ?? Deno.env.get("VITE_SUPABASE_URL");
   const supabaseServiceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
   if (!supabaseUrl || !supabaseServiceRoleKey) {
@@ -283,6 +326,9 @@ Deno.serve(async (request) => {
   let predictionsEvaluated = 0;
   let predictionsScored = 0;
 
+  // Load threshold definitions from DB (single source of truth)
+  const THRESHOLD_DEFINITIONS = await loadThresholdDefinitions(supabase);
+
   const [
     { data: signalDefinitions, error: definitionsError },
     { data: dataPoints, error: dataPointsError },
@@ -298,11 +344,15 @@ Deno.serve(async (request) => {
   ]);
 
   if (definitionsError) {
-    errors.push(`Failed to fetch signal definitions: ${definitionsError.message}`);
+    errors.push(
+      `Failed to fetch signal definitions: ${definitionsError.message}`,
+    );
   }
 
   if (dataPointsError) {
-    errors.push(`Failed to fetch latest data points: ${dataPointsError.message}`);
+    errors.push(
+      `Failed to fetch latest data points: ${dataPointsError.message}`,
+    );
   }
 
   const definitions = (signalDefinitions ?? []) as SignalDefinitionRow[];
@@ -336,7 +386,9 @@ Deno.serve(async (request) => {
 
     const parsedValue = parseNumericValue(latestPoint.value);
     if (parsedValue === null) {
-      errors.push(`Could not parse numeric value for ${key}: "${latestPoint.value}"`);
+      errors.push(
+        `Could not parse numeric value for ${key}: "${latestPoint.value}"`,
+      );
       continue;
     }
 
@@ -375,7 +427,9 @@ Deno.serve(async (request) => {
       });
 
     if (historyError) {
-      errors.push(`Updated ${key}, but history insert failed: ${historyError.message}`);
+      errors.push(
+        `Updated ${key}, but history insert failed: ${historyError.message}`,
+      );
     }
 
     changed += 1;
@@ -384,14 +438,18 @@ Deno.serve(async (request) => {
   const nowIso = new Date().toISOString();
   const { data: duePredictions, error: duePredictionsError } = await supabase
     .from("predictions")
-    .select("id,signal_id,type,condition,target_date,created_at,scored_at,outcome")
+    .select(
+      "id,signal_id,type,condition,target_date,created_at,scored_at,outcome",
+    )
     .is("scored_at", null)
     .is("outcome", null)
     .lte("target_date", nowIso)
     .order("target_date", { ascending: true });
 
   if (duePredictionsError) {
-    errors.push(`Failed to fetch pending predictions: ${duePredictionsError.message}`);
+    errors.push(
+      `Failed to fetch pending predictions: ${duePredictionsError.message}`,
+    );
   }
 
   const pendingPredictions = (duePredictions ?? []) as PredictionRow[];
@@ -407,10 +465,11 @@ Deno.serve(async (request) => {
 
     const statusLookupById = new Map<string, SignalStatusLookupRow>();
     if (predictionSignalIds.length > 0) {
-      const { data: signalLookupRows, error: signalLookupError } = await supabase
-        .from("signal_statuses")
-        .select("id,domino_id,signal_name")
-        .in("id", predictionSignalIds);
+      const { data: signalLookupRows, error: signalLookupError } =
+        await supabase
+          .from("signal_statuses")
+          .select("id,domino_id,signal_name")
+          .in("id", predictionSignalIds);
 
       if (signalLookupError) {
         errors.push(
@@ -446,7 +505,9 @@ Deno.serve(async (request) => {
         .is("scored_at", null);
 
       if (scoreError) {
-        errors.push(`Failed to score prediction ${prediction.id}: ${scoreError.message}`);
+        errors.push(
+          `Failed to score prediction ${prediction.id}: ${scoreError.message}`,
+        );
         continue;
       }
 

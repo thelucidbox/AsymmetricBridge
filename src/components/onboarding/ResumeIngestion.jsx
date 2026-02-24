@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTheme } from "../../design-tokens";
 import { S } from "../../styles";
 
 const JOB_TITLE_PATTERNS = [
@@ -209,6 +210,7 @@ function parseResumeText(text) {
 }
 
 export default function ResumeIngestion({ onApply }) {
+  const { tokens } = useTheme();
   const [resumeText, setResumeText] = useState("");
   const [parseError, setParseError] = useState("");
   const [parsed, setParsed] = useState(null);
@@ -252,7 +254,7 @@ export default function ResumeIngestion({ onApply }) {
       <div
         style={{
           fontSize: 12,
-          color: "rgba(255,255,255,0.6)",
+          color: tokens.colors.textSecondary,
           marginBottom: 10,
           lineHeight: 1.6,
         }}
@@ -268,13 +270,13 @@ export default function ResumeIngestion({ onApply }) {
         style={{
           width: "100%",
           borderRadius: 8,
-          background: "rgba(255,255,255,0.03)",
-          border: "1px solid rgba(255,255,255,0.12)",
-          color: "#E8E4DF",
+          background: tokens.colors.surfaceRaised,
+          border: `1px solid ${tokens.colors.borderStrong}`,
+          color: tokens.colors.text,
           padding: "10px 12px",
           fontSize: 12,
           lineHeight: 1.5,
-          fontFamily: "'IBM Plex Sans', sans-serif",
+          fontFamily: tokens.typography.fontSans,
           boxSizing: "border-box",
         }}
       />
@@ -302,44 +304,46 @@ export default function ResumeIngestion({ onApply }) {
       </div>
 
       {parseError && (
-        <div style={{ marginTop: 10, fontSize: 11, color: "#F4A261" }}>
+        <div
+          style={{ marginTop: 10, fontSize: 11, color: tokens.colors.watch }}
+        >
           {parseError}
         </div>
       )}
 
       {parsed && (
         <div style={{ marginTop: 12, display: "grid", gap: 8 }}>
-          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)" }}>
+          <div style={{ fontSize: 11, color: tokens.colors.textMuted }}>
             Parsed role:{" "}
-            <span style={{ color: "#E8E4DF" }}>
+            <span style={{ color: tokens.colors.text }}>
               {parsed.currentRole || "Not found"}
             </span>
           </div>
-          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)" }}>
+          <div style={{ fontSize: 11, color: tokens.colors.textMuted }}>
             Industry:{" "}
-            <span style={{ color: "#E8E4DF" }}>
+            <span style={{ color: tokens.colors.text }}>
               {parsed.industry || "Not found"}
             </span>
           </div>
-          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)" }}>
+          <div style={{ fontSize: 11, color: tokens.colors.textMuted }}>
             Experience estimate:{" "}
-            <span style={{ color: "#E8E4DF" }}>
+            <span style={{ color: tokens.colors.text }}>
               {parsed.yearsExperience || 0} years
             </span>
           </div>
 
           {parsed.jobTitles.length > 0 && (
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.55)" }}>
+            <div style={{ fontSize: 11, color: tokens.colors.textMuted }}>
               Titles: {parsed.jobTitles.join(" · ")}
             </div>
           )}
           {parsed.companyNames.length > 0 && (
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.55)" }}>
+            <div style={{ fontSize: 11, color: tokens.colors.textMuted }}>
               Companies: {parsed.companyNames.join(" · ")}
             </div>
           )}
           {parsed.skills.length > 0 && (
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.55)" }}>
+            <div style={{ fontSize: 11, color: tokens.colors.textMuted }}>
               Skills: {parsed.skills.join(" · ")}
             </div>
           )}

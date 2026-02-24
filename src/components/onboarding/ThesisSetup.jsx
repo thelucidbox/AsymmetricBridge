@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from "react";
+import { useTheme } from "../../design-tokens";
 import { S } from "../../styles";
 
 function buildThresholdMap(signals, existingThresholds) {
@@ -16,6 +17,7 @@ export default function ThesisSetup({
   onUpdateThesis,
   errors,
 }) {
+  const { tokens } = useTheme();
   const [expandedDominoId, setExpandedDominoId] = useState(null);
   const [showThresholds, setShowThresholds] = useState(false);
   const originalThesisRef = useRef(thesis);
@@ -79,7 +81,7 @@ export default function ThesisSetup({
         <div
           style={{
             fontSize: 12,
-            color: "rgba(255,255,255,0.6)",
+            color: tokens.colors.textSecondary,
             lineHeight: 1.7,
           }}
         >
@@ -121,7 +123,7 @@ export default function ThesisSetup({
         <div style={S.label}>Live Domino Cascade Preview</div>
 
         {activeDominos.length === 0 ? (
-          <div style={{ color: "#F4A261", fontSize: 12 }}>
+          <div style={{ color: tokens.colors.watch, fontSize: 12 }}>
             Enable at least one domino to build your cascade.
           </div>
         ) : (
@@ -150,7 +152,7 @@ export default function ThesisSetup({
                     style={{
                       fontSize: 10,
                       color: domino.color,
-                      fontFamily: "'IBM Plex Mono', monospace",
+                      fontFamily: tokens.typography.fontMono,
                     }}
                   >
                     D{domino.id}
@@ -160,9 +162,7 @@ export default function ThesisSetup({
                   </div>
                 </div>
                 {index < activeDominos.length - 1 && (
-                  <div
-                    style={{ fontSize: 14, color: "rgba(255,255,255,0.35)" }}
-                  >
+                  <div style={{ fontSize: 14, color: tokens.colors.textSoft }}>
                     →
                   </div>
                 )}
@@ -172,7 +172,9 @@ export default function ThesisSetup({
         )}
 
         {errors.thesis && (
-          <div style={{ marginTop: 10, color: "#F4A261", fontSize: 11 }}>
+          <div
+            style={{ marginTop: 10, color: tokens.colors.watch, fontSize: 11 }}
+          >
             {errors.thesis}
           </div>
         )}
@@ -252,7 +254,7 @@ export default function ThesisSetup({
                   <div
                     style={{
                       fontSize: 11,
-                      color: "rgba(255,255,255,0.45)",
+                      color: tokens.colors.textMuted,
                       lineHeight: 1.5,
                     }}
                   >
@@ -318,7 +320,7 @@ export default function ThesisSetup({
                                 <div
                                   style={{
                                     fontSize: 10,
-                                    color: "rgba(255,255,255,0.35)",
+                                    color: tokens.colors.textSoft,
                                     marginBottom: 6,
                                   }}
                                 >

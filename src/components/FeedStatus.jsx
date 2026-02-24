@@ -1,3 +1,4 @@
+import { useTheme } from "../design-tokens";
 import { S } from "../styles";
 
 function toDate(value) {
@@ -17,11 +18,11 @@ function formatTimestamp(value) {
   });
 }
 
-function getConnectionColor(feed) {
-  if (!feed.active) return "rgba(255,255,255,0.22)";
-  if (feed.loading) return "#E9C46A";
-  if (feed.connected) return "#2A9D8F";
-  return "#E63946";
+function getConnectionColor(feed, tokens) {
+  if (!feed.active) return tokens.colors.textSubtle;
+  if (feed.loading) return tokens.colors.accent;
+  if (feed.connected) return tokens.colors.baseline;
+  return tokens.colors.alert;
 }
 
 function getConnectionLabel(feed) {
@@ -30,19 +31,20 @@ function getConnectionLabel(feed) {
   return feed.connected ? "Connected" : "Disconnected";
 }
 
-function getRateLimitState(feed) {
+function getRateLimitState(feed, tokens) {
   if (!feed.active) {
-    return { label: "N/A", color: "rgba(255,255,255,0.28)" };
+    return { label: "N/A", color: tokens.colors.textSubtle };
   }
 
   if (feed.error?.code === "RATE_LIMITED") {
-    return { label: "Rate limited", color: "#E63946" };
+    return { label: "Rate limited", color: tokens.colors.alert };
   }
 
-  return { label: "Within limits", color: "#2A9D8F" };
+  return { label: "Within limits", color: tokens.colors.baseline };
 }
 
 export default function FeedStatus({ feeds = [] }) {
+  const { tokens } = useTheme();
   if (!feeds.length) return null;
 
   return (
@@ -50,9 +52,9 @@ export default function FeedStatus({ feeds = [] }) {
       style={{
         marginBottom: 12,
         padding: "12px",
-        background: "rgba(255,255,255,0.02)",
-        border: "1px solid rgba(255,255,255,0.08)",
-        borderRadius: 10,
+        background: tokens.colors.surfaceSoft,
+        border: `1px solid ${tokens.colors.border}`,
+        borderRadius: tokens.shape.cardRadius,
       }}
     >
       <div style={{ ...S.label, marginBottom: 10 }}>Feed Health</div>
@@ -64,18 +66,18 @@ export default function FeedStatus({ feeds = [] }) {
         }}
       >
         {feeds.map((feed) => {
-          const indicatorColor = getConnectionColor(feed);
+          const indicatorColor = getConnectionColor(feed, tokens);
           const connectionLabel = getConnectionLabel(feed);
-          const rateLimit = getRateLimitState(feed);
+          const rateLimit = getRateLimitState(feed, tokens);
           const errorMessage = feed.error?.message || "";
           return (
             <div
               key={feed.name}
               style={{
-                border: "1px solid rgba(255,255,255,0.08)",
-                borderRadius: 8,
+                border: `1px solid ${tokens.colors.border}`,
+                borderRadius: tokens.shape.tabRadius,
                 padding: "10px",
-                background: "rgba(255,255,255,0.015)",
+                background: tokens.colors.surfaceSoft,
               }}
             >
               <div
@@ -97,14 +99,16 @@ export default function FeedStatus({ feeds = [] }) {
                       boxShadow: `0 0 6px ${indicatorColor}66`,
                     }}
                   />
-                  <span style={{ fontSize: 12, fontWeight: 600 }}>{feed.name}</span>
+                  <span style={{ fontSize: 12, fontWeight: 600 }}>
+                    {feed.name}
+                  </span>
                 </div>
                 <span
                   style={{
                     fontSize: 10,
                     color: indicatorColor,
                     letterSpacing: "0.6px",
-                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontFamily: tokens.typography.fontMono,
                     textTransform: "uppercase",
                   }}
                 >
@@ -112,9 +116,9 @@ export default function FeedStatus({ feeds = [] }) {
                 </span>
               </div>
 
-              <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>
+              <div style={{ fontSize: 10, color: tokens.colors.textSoft }}>
                 Last success:{" "}
-                <span style={{ color: "rgba(255,255,255,0.7)" }}>
+                <span style={{ color: tokens.colors.textSecondary }}>
                   {formatTimestamp(feed.lastSuccessfulFetch)}
                 </span>
               </div>
@@ -130,7 +134,7 @@ export default function FeedStatus({ feeds = [] }) {
                   gap: 5,
                 }}
               >
-                <span style={{ fontFamily: "'IBM Plex Mono', monospace" }}>
+                <span style={{ fontFamily: tokens.typography.fontMono }}>
                   Rate limit:
                 </span>
                 <span>{rateLimit.label}</span>

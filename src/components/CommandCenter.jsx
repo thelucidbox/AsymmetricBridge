@@ -79,6 +79,7 @@ function latestTimestamp(values) {
 }
 
 function EmptyStateCard({ title, description, color }) {
+  const { tokens } = useTheme();
   return (
     <div
       style={{
@@ -93,7 +94,7 @@ function EmptyStateCard({ title, description, color }) {
       <div
         style={{
           fontSize: 12,
-          color: "rgba(255,255,255,0.5)",
+          color: tokens.colors.textMuted,
           lineHeight: 1.6,
         }}
       >
@@ -104,6 +105,7 @@ function EmptyStateCard({ title, description, color }) {
 }
 
 function SampleDataBanner() {
+  const { tokens } = useTheme();
   const hasApiKeys = getFredApiKey() || getTwelveDataApiKey();
   if (hasApiKeys) return null;
 
@@ -120,7 +122,7 @@ function SampleDataBanner() {
       <div
         style={{
           fontSize: 12,
-          color: "rgba(255,255,255,0.55)",
+          color: tokens.colors.textMuted,
           lineHeight: 1.5,
         }}
       >
@@ -242,12 +244,12 @@ export default function CommandCenter() {
             : "BASELINE";
   const threatClr =
     threat === "CRISIS" || threat === "CRITICAL"
-      ? "#E63946"
+      ? tokens.colors.alert
       : threat === "ELEVATED"
-        ? "#F4A261"
+        ? tokens.colors.watch
         : threat === "WATCH"
-          ? "#E9C46A"
-          : "#2A9D8F";
+          ? tokens.colors.accent
+          : tokens.colors.baseline;
 
   const fredSeries = useMemo(() => {
     if (
@@ -369,8 +371,8 @@ export default function CommandCenter() {
           aria-live="polite"
           style={{
             fontSize: 10,
-            color: "rgba(255,255,255,0.45)",
-            fontFamily: "'IBM Plex Mono', monospace",
+            color: tokens.colors.textMuted,
+            fontFamily: tokens.typography.fontMono,
             letterSpacing: "0.3px",
             marginBottom: 4,
           }}
@@ -461,8 +463,8 @@ export default function CommandCenter() {
             padding: "10px",
             textAlign: "center",
             fontSize: 9,
-            color: "rgba(255,255,255,0.12)",
-            borderTop: "1px solid rgba(255,255,255,0.04)",
+            color: tokens.colors.borderStrong,
+            borderTop: `1px solid ${tokens.colors.borderSubtle}`,
           }}
         >
           Asymmetric Bridge v3.2 · Signal Tracker + Thesis Dashboard · Not

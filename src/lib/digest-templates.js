@@ -26,7 +26,8 @@ function formatStatus(status) {
 function formatPeriodLabel(period) {
   if (!period) return "Unknown period";
   if (period.label) return period.label;
-  if (period.startDate && period.endDate) return `${period.startDate} to ${period.endDate}`;
+  if (period.startDate && period.endDate)
+    return `${period.startDate} to ${period.endDate}`;
   return "Unknown period";
 }
 
@@ -51,7 +52,7 @@ function formatInlineMarkdown(text) {
     .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
     .replace(
       /`([^`]+)`/g,
-      "<code style=\"font-size:0.92em;padding:0.1rem 0.28rem;border-radius:4px;border:1px solid currentColor;opacity:0.9;\">$1</code>",
+      '<code style="font-size:0.92em;padding:0.1rem 0.28rem;border-radius:4px;border:1px solid currentColor;opacity:0.9;">$1</code>',
     );
 }
 
@@ -69,34 +70,37 @@ function buildExecutiveSummary(data) {
   const staleSignals = data?.staleSignals || [];
 
   const movedDominos = new Set(
-    [...escalations, ...deescalations].map((change) => change.dominoName).filter(Boolean),
+    [...escalations, ...deescalations]
+      .map((change) => change.dominoName)
+      .filter(Boolean),
   );
 
-  const sentenceOne = `Overall threat posture is **${data?.overallThreatLevel || "UNKNOWN"}** with ${redCount} red, ${amberCount} amber, and ${greenCount} green signals.`;
+  const sentenceOne = `The overall picture is **${data?.overallThreatLevel || "UNKNOWN"}** with ${redCount} alert${redCount !== 1 ? "s" : ""}, ${amberCount} on watch, and ${greenCount} at baseline.`;
   const sentenceTwo =
     escalations.length || deescalations.length
-      ? `${escalations.length} ${pluralize(escalations.length, "escalation", "escalations")} and ${deescalations.length} ${pluralize(deescalations.length, "de-escalation", "de-escalations")} were recorded across ${movedDominos.size} ${pluralize(movedDominos.size, "domino", "dominos")}.`
-      : "No status transitions were recorded in this period.";
+      ? `${escalations.length} ${pluralize(escalations.length, "signal got worse", "signals got worse")} and ${deescalations.length} ${pluralize(deescalations.length, "improved", "improved")} across ${movedDominos.size} ${pluralize(movedDominos.size, "domino", "dominos")}.`
+      : "No signals changed status in this period — everything held steady.";
   const sentenceThree = staleSignals.length
-    ? `${staleSignals.length} ${pluralize(staleSignals.length, "signal is", "signals are")} stale (>30 days without updates) and should be refreshed before the next decision cycle.`
-    : "No stale signals were detected, so coverage is current across all dominos.";
+    ? `${staleSignals.length} ${pluralize(staleSignals.length, "signal hasn't", "signals haven't")} been updated in over 30 days — worth checking if the data is still current.`
+    : "All signals have recent data — nothing looks outdated.";
 
   return [sentenceOne, sentenceTwo, sentenceThree];
 }
 
 function recommendedAction(change) {
   if (change.toStatus === "red") {
-    return "Run an immediate thesis review and set a mitigation decision within 24 hours.";
+    return "This needs attention now — review whether your positioning still makes sense and decide on next steps within 24 hours.";
   }
   if (change.toStatus === "amber") {
-    return "Validate the data source and prepare escalation triggers if the trend persists.";
+    return "Double-check the data source and watch whether this trend continues. Prepare to act if it does.";
   }
-  return "Monitor for follow-through before changing portfolio posture.";
+  return "Keep an eye on this but no action needed yet — wait for more data before making changes.";
 }
 
 function sortEscalationsForAttention(escalations) {
   return [...escalations].sort((a, b) => {
-    const severityDelta = (STATUS_WEIGHT[b.toStatus] || 0) - (STATUS_WEIGHT[a.toStatus] || 0);
+    const severityDelta =
+      (STATUS_WEIGHT[b.toStatus] || 0) - (STATUS_WEIGHT[a.toStatus] || 0);
     if (severityDelta !== 0) return severityDelta;
     const aTime = new Date(a.changedAt || 0).getTime();
     const bTime = new Date(b.changedAt || 0).getTime();
@@ -149,7 +153,9 @@ export function renderDigest(aggregatedData) {
   }
 
   lines.push("## Attention Items");
-  const sortedEscalations = sortEscalationsForAttention(aggregatedData.escalations || []);
+  const sortedEscalations = sortEscalationsForAttention(
+    aggregatedData.escalations || [],
+  );
   if (!sortedEscalations.length) {
     lines.push("- No newly escalated signals in this period.");
   } else {
@@ -167,10 +173,13 @@ export function renderDigest(aggregatedData) {
     lines.push("- No stale signals (>30 days without updates).");
   } else {
     for (const stale of staleSignals) {
-      const freshness = stale.daysSinceUpdate === null
-        ? "has never been updated in tracked history"
-        : `last updated ${stale.lastUpdatedLabel} (${stale.daysSinceUpdate} days ago)`;
-      lines.push(`- D${stale.dominoId} ${stale.dominoName} - **${stale.signalName}** ${freshness}.`);
+      const freshness =
+        stale.daysSinceUpdate === null
+          ? "has never been updated in tracked history"
+          : `last updated ${stale.lastUpdatedLabel} (${stale.daysSinceUpdate} days ago)`;
+      lines.push(
+        `- D${stale.dominoId} ${stale.dominoName} - **${stale.signalName}** ${freshness}.`,
+      );
     }
   }
   lines.push("");
@@ -225,7 +234,9 @@ export function markdownToHtml(markdown) {
     if (trimmed === "---") {
       flushParagraph();
       flushList();
-      html.push('<hr style="border:0;border-top:1px solid currentColor;opacity:0.22;margin:1rem 0;" />');
+      html.push(
+        '<hr style="border:0;border-top:1px solid currentColor;opacity:0.22;margin:1rem 0;" />',
+      );
       continue;
     }
 
@@ -236,11 +247,17 @@ export function markdownToHtml(markdown) {
       const depth = headerMatch[1].length;
       const text = formatInlineMarkdown(headerMatch[2]);
       if (depth === 1) {
-        html.push(`<h1 style="margin:0 0 0.9rem 0;font-size:1.38rem;line-height:1.25;">${text}</h1>`);
+        html.push(
+          `<h1 style="margin:0 0 0.9rem 0;font-size:1.38rem;line-height:1.25;">${text}</h1>`,
+        );
       } else if (depth === 2) {
-        html.push(`<h2 style="margin:1.1rem 0 0.65rem 0;font-size:1.08rem;line-height:1.3;">${text}</h2>`);
+        html.push(
+          `<h2 style="margin:1.1rem 0 0.65rem 0;font-size:1.08rem;line-height:1.3;">${text}</h2>`,
+        );
       } else {
-        html.push(`<h3 style="margin:0.92rem 0 0.58rem 0;font-size:0.98rem;line-height:1.35;">${text}</h3>`);
+        html.push(
+          `<h3 style="margin:0.92rem 0 0.58rem 0;font-size:0.98rem;line-height:1.35;">${text}</h3>`,
+        );
       }
       continue;
     }

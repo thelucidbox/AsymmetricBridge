@@ -1,3 +1,5 @@
+import { useTheme } from "../../design-tokens";
+
 export default function LucidBoxMarket({
   feeds,
   thresholdResult,
@@ -9,6 +11,8 @@ export default function LucidBoxMarket({
   redCt,
   totalSig,
 }) {
+  const { tokens } = useTheme();
+
   return (
     <>
       <div
@@ -18,18 +22,18 @@ export default function LucidBoxMarket({
           gap: 12,
           marginBottom: 12,
           padding: "8px 12px",
-          background: "rgba(255,255,255,0.02)",
-          border: "1px solid rgba(255,255,255,0.06)",
+          background: tokens.colors.surfaceSoft,
+          border: `1px solid ${tokens.colors.border}`,
           borderRadius: 8,
         }}
       >
         <span
           style={{
             fontSize: 9,
-            color: "rgba(255,255,255,0.35)",
+            color: tokens.colors.textSoft,
             textTransform: "uppercase",
             letterSpacing: "1px",
-            fontFamily: "'IBM Plex Mono'",
+            fontFamily: tokens.typography.fontMono,
           }}
         >
           Feeds
@@ -45,21 +49,23 @@ export default function LucidBoxMarket({
                 height: 6,
                 borderRadius: "50%",
                 background: f.loading
-                  ? "#E9C46A"
+                  ? tokens.colors.accent
                   : f.data
-                    ? "#2A9D8F"
+                    ? tokens.colors.baseline
                     : f.active
-                      ? "#F4A261"
-                      : "rgba(255,255,255,0.15)",
-                boxShadow: f.data ? "0 0 4px #2A9D8F66" : "none",
+                      ? tokens.colors.watch
+                      : tokens.colors.borderStrong,
+                boxShadow: f.data
+                  ? `0 0 4px ${tokens.colors.baseline}66`
+                  : "none",
               }}
             />
             <span
               style={{
                 fontSize: 10,
                 color: f.data
-                  ? "rgba(255,255,255,0.5)"
-                  : "rgba(255,255,255,0.25)",
+                  ? tokens.colors.textMuted
+                  : tokens.colors.textSubtle,
               }}
             >
               {f.name}
@@ -71,14 +77,14 @@ export default function LucidBoxMarket({
             style={{
               marginLeft: "auto",
               fontSize: 9,
-              color: "rgba(255,255,255,0.25)",
-              fontFamily: "'IBM Plex Mono'",
+              color: tokens.colors.textSubtle,
+              fontFamily: tokens.typography.fontMono,
             }}
           >
             Auto: {thresholdResult.evaluated} eval ·{" "}
             {thresholdResult.manualOnly} manual
             {thresholdResult.applied > 0 && (
-              <span style={{ color: "#E9C46A" }}>
+              <span style={{ color: tokens.colors.accent }}>
                 {" "}
                 · {thresholdResult.applied} updated
               </span>
@@ -90,8 +96,8 @@ export default function LucidBoxMarket({
             style={{
               marginLeft: "auto",
               fontSize: 9,
-              color: "rgba(255,255,255,0.2)",
-              fontFamily: "'IBM Plex Mono'",
+              color: tokens.colors.textSubtle,
+              fontFamily: tokens.typography.fontMono,
             }}
           >
             {signalStatuses.length ? "Supabase connected" : "Static mode"}
@@ -120,11 +126,11 @@ export default function LucidBoxMarket({
           <div
             style={{
               fontSize: 9,
-              color: "rgba(255,255,255,0.35)",
+              color: tokens.colors.textSoft,
               textTransform: "uppercase",
-              letterSpacing: "1.2px",
+              letterSpacing: tokens.typography.letterSpacing.label,
               marginBottom: 6,
-              fontFamily: "'IBM Plex Mono'",
+              fontFamily: tokens.typography.fontMono,
             }}
           >
             Threat Level
@@ -141,15 +147,15 @@ export default function LucidBoxMarket({
           </div>
         </div>
         {[
-          { l: "Baseline", c: greenCt, clr: "#2A9D8F" },
-          { l: "Watch", c: amberCt, clr: "#F4A261" },
-          { l: "Alert", c: redCt, clr: "#E63946" },
+          { l: "Baseline", c: greenCt, clr: tokens.colors.baseline },
+          { l: "Watch", c: amberCt, clr: tokens.colors.watch },
+          { l: "Alert", c: redCt, clr: tokens.colors.alert },
         ].map((x) => (
           <div
             key={x.l}
             style={{
-              background: "rgba(255,255,255,0.02)",
-              border: "1px solid rgba(255,255,255,0.06)",
+              background: tokens.colors.surfaceSoft,
+              border: `1px solid ${tokens.colors.border}`,
               borderRadius: 10,
               padding: "14px 12px",
               textAlign: "center",
@@ -158,11 +164,11 @@ export default function LucidBoxMarket({
             <div
               style={{
                 fontSize: 9,
-                color: "rgba(255,255,255,0.35)",
+                color: tokens.colors.textSoft,
                 textTransform: "uppercase",
-                letterSpacing: "1.2px",
+                letterSpacing: tokens.typography.letterSpacing.label,
                 marginBottom: 6,
-                fontFamily: "'IBM Plex Mono'",
+                fontFamily: tokens.typography.fontMono,
               }}
             >
               {x.l}
@@ -175,7 +181,7 @@ export default function LucidBoxMarket({
             </div>
             <div
               className="ab-tabular-nums"
-              style={{ fontSize: 10, color: "rgba(255,255,255,0.25)" }}
+              style={{ fontSize: 10, color: tokens.colors.textSubtle }}
             >
               of {totalSig}
             </div>

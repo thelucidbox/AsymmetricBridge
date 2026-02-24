@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { DISPLAY_MODES, useDisplayMode } from "../hooks/useDisplayMode";
+import { useTheme } from "../design-tokens";
 import SignalTimeline from "./SignalTimeline";
 import { STATUS_CFG, S } from "../styles";
 
@@ -31,16 +32,16 @@ function parseDataPointDate(value) {
   return null;
 }
 
-function getFreshness(signal) {
+function getFreshness(signal, tokens) {
   const dataPoints = Array.isArray(signal?.dataPoints) ? signal.dataPoints : [];
 
   if (!dataPoints.length) {
     return {
       label: "No datapoint",
       detail: null,
-      bg: "rgba(255,255,255,0.04)",
-      border: "rgba(255,255,255,0.12)",
-      color: "rgba(255,255,255,0.45)",
+      bg: tokens.colors.borderSubtle,
+      border: tokens.colors.borderStrong,
+      color: tokens.colors.textMuted,
     };
   }
 
@@ -56,9 +57,9 @@ function getFreshness(signal) {
     return {
       label: "Date unknown",
       detail: null,
-      bg: "rgba(255,255,255,0.04)",
-      border: "rgba(255,255,255,0.12)",
-      color: "rgba(255,255,255,0.45)",
+      bg: tokens.colors.borderSubtle,
+      border: tokens.colors.borderStrong,
+      color: tokens.colors.textMuted,
     };
   }
 
@@ -90,22 +91,25 @@ function getFreshness(signal) {
 
 export default function SignalCard({ signal, dominoColor }) {
   const [exp, setExp] = useState(false);
+  const { tokens } = useTheme();
   const displayMode = useDisplayMode();
   const simplifiedMode = displayMode === DISPLAY_MODES.simplified;
   const st = STATUS_CFG[signal.currentStatus] || STATUS_CFG.green;
-  const freshness = useMemo(() => getFreshness(signal), [signal]);
+  const freshness = useMemo(
+    () => getFreshness(signal, tokens),
+    [signal, tokens],
+  );
   const dataPoints = Array.isArray(signal?.dataPoints) ? signal.dataPoints : [];
 
   return (
     <div
       data-tour="signal-card"
       style={{
-        background: "rgba(255,255,255,0.03)",
-        border: `1px solid ${exp && !simplifiedMode ? `${dominoColor}44` : "rgba(255,255,255,0.06)"}`,
-        borderRadius: 8,
+        background: tokens.colors.surfaceRaised,
+        border: `1px solid ${exp && !simplifiedMode ? `${dominoColor}44` : tokens.colors.border}`,
+        borderRadius: tokens.shape.tabRadius,
         padding: "12px 14px",
-        transition:
-          "color 0.2s, background 0.2s, border-color 0.2s, opacity 0.2s, box-shadow 0.2s",
+        transition: tokens.motion.default,
         marginBottom: 6,
       }}
     >
@@ -161,7 +165,7 @@ export default function SignalCard({ signal, dominoColor }) {
               borderRadius: 4,
               fontWeight: 600,
               letterSpacing: "0.4px",
-              fontFamily: "'IBM Plex Mono', monospace",
+              fontFamily: tokens.typography.fontMono,
             }}
           >
             {freshness.label}
@@ -184,7 +188,7 @@ export default function SignalCard({ signal, dominoColor }) {
           {!simplifiedMode && (
             <span
               style={{
-                color: "rgba(255,255,255,0.25)",
+                color: tokens.colors.textSubtle,
                 fontSize: 11,
                 transform: exp ? "rotate(180deg)" : "rotate(0)",
                 transition: "transform 0.2s",
@@ -201,7 +205,7 @@ export default function SignalCard({ signal, dominoColor }) {
           style={{
             marginTop: 10,
             fontSize: 12,
-            color: "rgba(255,255,255,0.62)",
+            color: tokens.colors.textSecondary,
             lineHeight: 1.55,
             borderLeft: `2px solid ${dominoColor}33`,
             paddingLeft: 10,
@@ -225,7 +229,7 @@ export default function SignalCard({ signal, dominoColor }) {
               style={{
                 marginTop: 12,
                 paddingTop: 12,
-                borderTop: "1px solid rgba(255,255,255,0.06)",
+                borderTop: `1px solid ${tokens.colors.border}`,
                 opacity: exp ? 1 : 0,
                 transition: "opacity 220ms ease",
               }}
@@ -241,7 +245,7 @@ export default function SignalCard({ signal, dominoColor }) {
                 <div>
                   <div style={S.label}>Source</div>
                   <div
-                    style={{ fontSize: 12, color: "rgba(255,255,255,0.65)" }}
+                    style={{ fontSize: 12, color: tokens.colors.textSecondary }}
                   >
                     {signal.source}
                   </div>
@@ -249,7 +253,7 @@ export default function SignalCard({ signal, dominoColor }) {
                 <div>
                   <div style={S.label}>Frequency</div>
                   <div
-                    style={{ fontSize: 12, color: "rgba(255,255,255,0.65)" }}
+                    style={{ fontSize: 12, color: tokens.colors.textSecondary }}
                   >
                     {signal.frequency}
                   </div>
@@ -258,7 +262,9 @@ export default function SignalCard({ signal, dominoColor }) {
 
               <div style={{ marginBottom: 8 }}>
                 <div style={S.label}>Baseline</div>
-                <div style={{ fontSize: 12, color: "rgba(255,255,255,0.65)" }}>
+                <div
+                  style={{ fontSize: 12, color: tokens.colors.textSecondary }}
+                >
                   {signal.baseline}
                 </div>
               </div>
@@ -270,7 +276,11 @@ export default function SignalCard({ signal, dominoColor }) {
                   Trigger Threshold
                 </div>
                 <div
-                  style={{ fontSize: 12, color: "#E8E4DF", fontWeight: 500 }}
+                  style={{
+                    fontSize: 12,
+                    color: tokens.colors.text,
+                    fontWeight: 500,
+                  }}
                 >
                   {signal.threshold}
                 </div>
@@ -282,7 +292,7 @@ export default function SignalCard({ signal, dominoColor }) {
                   <div
                     style={{
                       fontSize: 12,
-                      color: "rgba(255,255,255,0.72)",
+                      color: tokens.colors.textSecondary,
                       lineHeight: 1.55,
                     }}
                   >
@@ -297,7 +307,7 @@ export default function SignalCard({ signal, dominoColor }) {
                   <div
                     style={{
                       fontSize: 12,
-                      color: "rgba(255,255,255,0.55)",
+                      color: tokens.colors.textMuted,
                       lineHeight: 1.55,
                     }}
                   >
@@ -309,9 +319,9 @@ export default function SignalCard({ signal, dominoColor }) {
               <div
                 style={{
                   fontSize: 11,
-                  color: "rgba(255,255,255,0.45)",
+                  color: tokens.colors.textMuted,
                   fontStyle: "italic",
-                  background: "rgba(255,255,255,0.02)",
+                  background: tokens.colors.surfaceSoft,
                   padding: "7px 10px",
                   borderRadius: 5,
                   borderLeft: `2px solid ${dominoColor}33`,
@@ -327,7 +337,7 @@ export default function SignalCard({ signal, dominoColor }) {
                 {dataPoints.length > 0 ? (
                   <div
                     style={{
-                      border: "1px solid rgba(255,255,255,0.08)",
+                      border: `1px solid ${tokens.colors.border}`,
                       borderRadius: 6,
                       overflow: "hidden",
                     }}
@@ -338,13 +348,13 @@ export default function SignalCard({ signal, dominoColor }) {
                         gridTemplateColumns: "120px 1fr 86px",
                         gap: 8,
                         padding: "6px 10px",
-                        borderBottom: "1px solid rgba(255,255,255,0.08)",
-                        background: "rgba(255,255,255,0.02)",
+                        borderBottom: `1px solid ${tokens.colors.border}`,
+                        background: tokens.colors.surfaceSoft,
                         fontSize: 10,
-                        color: "rgba(255,255,255,0.38)",
+                        color: tokens.colors.textSoft,
                         textTransform: "uppercase",
                         letterSpacing: "0.7px",
-                        fontFamily: "'IBM Plex Mono', monospace",
+                        fontFamily: tokens.typography.fontMono,
                       }}
                     >
                       <span>Date</span>
@@ -365,16 +375,16 @@ export default function SignalCard({ signal, dominoColor }) {
                             fontSize: 11,
                             borderBottom:
                               index < dataPoints.length - 1
-                                ? "1px solid rgba(255,255,255,0.04)"
+                                ? `1px solid ${tokens.colors.borderSubtle}`
                                 : "none",
                           }}
                         >
-                          <span style={{ color: "rgba(255,255,255,0.45)" }}>
+                          <span style={{ color: tokens.colors.textMuted }}>
                             {point.date}
                           </span>
                           <span
                             className="ab-tabular-nums"
-                            style={{ color: "rgba(255,255,255,0.72)" }}
+                            style={{ color: tokens.colors.textSecondary }}
                           >
                             {point.value}
                           </span>
@@ -391,11 +401,11 @@ export default function SignalCard({ signal, dominoColor }) {
                   <div
                     style={{
                       fontSize: 11,
-                      color: "rgba(255,255,255,0.42)",
+                      color: tokens.colors.textSoft,
                       padding: "8px 10px",
-                      border: "1px dashed rgba(255,255,255,0.16)",
+                      border: `1px dashed ${tokens.colors.borderStrong}`,
                       borderRadius: 6,
-                      background: "rgba(255,255,255,0.02)",
+                      background: tokens.colors.surfaceSoft,
                     }}
                   >
                     No data points available

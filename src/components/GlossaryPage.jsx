@@ -58,8 +58,8 @@ export default function GlossaryPage() {
             style={{
               width: "100%",
               borderRadius: 8,
-              background: "rgba(255,255,255,0.03)",
-              border: "1px solid rgba(255,255,255,0.12)",
+              background: tokens.colors.surfaceRaised,
+              border: `1px solid ${tokens.colors.borderStrong}`,
               color: tokens.colors.text,
               padding: "9px 10px",
               fontSize: 12,
@@ -97,7 +97,7 @@ export default function GlossaryPage() {
                 <div
                   style={{
                     fontSize: 12,
-                    color: "rgba(255,255,255,0.7)",
+                    color: tokens.colors.textSecondary,
                     lineHeight: 1.6,
                     marginBottom: 8,
                   }}
@@ -130,7 +130,7 @@ export default function GlossaryPage() {
                           fontSize: 10,
                           padding: "2px 6px",
                           borderRadius: 4,
-                          background: "rgba(255,255,255,0.06)",
+                          background: tokens.colors.border,
                           color: tokens.colors.textMuted,
                         }}
                       >

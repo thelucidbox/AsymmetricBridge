@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from "react";
 import { parsePortfolioCsv } from "../../lib/csv-parser";
+import { useTheme } from "../../design-tokens";
 import { S } from "../../styles";
 
 function formatCurrency(value) {
@@ -17,6 +18,7 @@ function formatNumber(value) {
 }
 
 export default function CSVUpload({ onConfirm, isProcessing }) {
+  const { tokens } = useTheme();
   const inputRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isParsing, setIsParsing] = useState(false);
@@ -115,7 +117,7 @@ export default function CSVUpload({ onConfirm, isProcessing }) {
       <div
         style={{
           fontSize: 13,
-          color: "rgba(255,255,255,0.7)",
+          color: tokens.colors.textSecondary,
           marginBottom: 12,
         }}
       >
@@ -152,23 +154,22 @@ export default function CSVUpload({ onConfirm, isProcessing }) {
         }}
         onDrop={handleDrop}
         style={{
-          border: `1px dashed ${isDragging ? "rgba(233,196,106,0.7)" : "rgba(255,255,255,0.25)"}`,
+          border: `1px dashed ${isDragging ? "rgba(233,196,106,0.7)" : tokens.colors.textSubtle}`,
           background: isDragging
             ? "rgba(233,196,106,0.08)"
-            : "rgba(255,255,255,0.015)",
+            : tokens.colors.surfaceSoft,
           borderRadius: 10,
           padding: "22px 14px",
           textAlign: "center",
           cursor: "pointer",
           marginBottom: 12,
-          transition:
-            "color 0.2s, background 0.2s, border-color 0.2s, opacity 0.2s, box-shadow 0.2s",
+          transition: tokens.motion.default,
         }}
       >
         <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 4 }}>
           Drop CSV here or click to choose a file
         </div>
-        <div style={{ fontSize: 10, color: "rgba(255,255,255,0.45)" }}>
+        <div style={{ fontSize: 10, color: tokens.colors.textMuted }}>
           Client-side parse only. No server upload.
         </div>
       </div>
@@ -183,12 +184,12 @@ export default function CSVUpload({ onConfirm, isProcessing }) {
             width: "100%",
             minHeight: 100,
             borderRadius: 8,
-            border: "1px solid rgba(255,255,255,0.12)",
+            border: `1px solid ${tokens.colors.borderStrong}`,
             background: "rgba(0,0,0,0.2)",
-            color: "#E8E4DF",
+            color: tokens.colors.text,
             fontSize: 11,
             lineHeight: 1.4,
-            fontFamily: "'IBM Plex Mono', monospace",
+            fontFamily: tokens.typography.fontMono,
             padding: "10px 11px",
             resize: "vertical",
           }}
@@ -215,7 +216,7 @@ export default function CSVUpload({ onConfirm, isProcessing }) {
               display: "flex",
               justifyContent: "space-between",
               fontSize: 10,
-              color: "rgba(255,255,255,0.5)",
+              color: tokens.colors.textMuted,
               marginBottom: 4,
             }}
           >
@@ -226,7 +227,7 @@ export default function CSVUpload({ onConfirm, isProcessing }) {
             style={{
               height: 6,
               borderRadius: 999,
-              background: "rgba(255,255,255,0.08)",
+              background: tokens.colors.border,
               overflow: "hidden",
             }}
           >
@@ -274,30 +275,30 @@ export default function CSVUpload({ onConfirm, isProcessing }) {
                 fontSize: 10,
                 fontWeight: 700,
                 letterSpacing: "0.5px",
-                color: "#2A9D8F",
-                background: "rgba(42,157,143,0.16)",
-                border: "1px solid rgba(42,157,143,0.3)",
+                color: tokens.colors.baseline,
+                background: tokens.colors.baselineBg,
+                border: `1px solid ${tokens.colors.baselineBorder}`,
                 padding: "3px 7px",
                 borderRadius: 5,
-                fontFamily: "'IBM Plex Mono', monospace",
+                fontFamily: tokens.typography.fontMono,
               }}
             >
               {parsedPayload.format} detected
             </span>
-            <span style={{ fontSize: 10, color: "rgba(255,255,255,0.45)" }}>
+            <span style={{ fontSize: 10, color: tokens.colors.textMuted }}>
               Source: {sourceLabel}
             </span>
-            <span style={{ fontSize: 10, color: "rgba(255,255,255,0.45)" }}>
+            <span style={{ fontSize: 10, color: tokens.colors.textMuted }}>
               {parsedPayload.positions.length} positions
             </span>
-            <span style={{ fontSize: 10, color: "rgba(255,255,255,0.45)" }}>
+            <span style={{ fontSize: 10, color: tokens.colors.textMuted }}>
               {parsedPayload.skippedRows} skipped rows
             </span>
           </div>
 
           <div
             style={{
-              border: "1px solid rgba(255,255,255,0.1)",
+              border: `1px solid ${tokens.colors.borderStrong}`,
               borderRadius: 8,
               overflow: "hidden",
             }}
@@ -309,9 +310,9 @@ export default function CSVUpload({ onConfirm, isProcessing }) {
                 gap: 8,
                 padding: "8px 10px",
                 fontSize: 10,
-                fontFamily: "'IBM Plex Mono', monospace",
-                color: "rgba(255,255,255,0.45)",
-                background: "rgba(255,255,255,0.03)",
+                fontFamily: tokens.typography.fontMono,
+                color: tokens.colors.textMuted,
+                background: tokens.colors.surfaceRaised,
               }}
             >
               <span>Symbol</span>
@@ -328,19 +329,19 @@ export default function CSVUpload({ onConfirm, isProcessing }) {
                   gap: 8,
                   padding: "8px 10px",
                   fontSize: 11,
-                  borderTop: "1px solid rgba(255,255,255,0.05)",
+                  borderTop: `1px solid ${tokens.colors.borderSubtle}`,
                 }}
               >
-                <span style={{ fontWeight: 700, color: "#E8E4DF" }}>
+                <span style={{ fontWeight: 700, color: tokens.colors.text }}>
                   {row.symbol}
                 </span>
-                <span style={{ color: "rgba(255,255,255,0.7)" }}>
+                <span style={{ color: tokens.colors.textSecondary }}>
                   {formatNumber(row.quantity)}
                 </span>
-                <span style={{ color: "rgba(255,255,255,0.7)" }}>
+                <span style={{ color: tokens.colors.textSecondary }}>
                   {formatCurrency(row.marketValue)}
                 </span>
-                <span style={{ color: "rgba(255,255,255,0.55)" }}>
+                <span style={{ color: tokens.colors.textMuted }}>
                   {row.costBasis !== undefined
                     ? formatCurrency(row.costBasis)
                     : "—"}
@@ -352,7 +353,7 @@ export default function CSVUpload({ onConfirm, isProcessing }) {
             style={{
               marginTop: 6,
               fontSize: 10,
-              color: "rgba(255,255,255,0.45)",
+              color: tokens.colors.textMuted,
             }}
           >
             Preview shows first {previewRows.length} parsed rows.

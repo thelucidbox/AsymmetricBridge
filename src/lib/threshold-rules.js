@@ -33,13 +33,15 @@ export const THRESHOLD_RULES = [
         operator: "<",
         value: -20,
         status: "red",
-        reason: "SaaS stocks down >20% — compression accelerating",
+        reason:
+          "Major software companies down over 20% — pricing pressure is accelerating",
       },
       {
         operator: "<",
         value: -10,
         status: "amber",
-        reason: "SaaS stocks down >10% — pressure building",
+        reason:
+          "Software stocks falling — early sign of subscription pricing pressure",
       },
     ],
   },
@@ -79,13 +81,15 @@ export const THRESHOLD_RULES = [
         operator: "<",
         value: 1.5,
         status: "red",
-        reason: "Below 1.5M = structural shift confirmed",
+        reason:
+          "Professional job openings below 1.5 million — lasting shift in hiring, not just a dip",
       },
       {
         operator: "<",
         value: 1.8,
         status: "amber",
-        reason: "Approaching structural shift threshold",
+        reason:
+          "Fewer professional job openings — hiring is cooling in office-type roles",
       },
     ],
   },
@@ -114,13 +118,15 @@ export const THRESHOLD_RULES = [
         operator: "custom",
         test: (extracted) => extracted?.declining && extracted?.value < 2.8,
         status: "red",
-        reason: "3 consecutive months decline below 2.8M",
+        reason:
+          "Tech employment falling for 3 straight months and below 2.8 million — significant job losses",
       },
       {
         operator: "custom",
         test: (extracted) => extracted?.declining,
         status: "amber",
-        reason: "3 consecutive months of decline",
+        reason:
+          "Tech employment declining 3 months in a row — watch for sustained trend",
       },
     ],
   },
@@ -146,13 +152,15 @@ export const THRESHOLD_RULES = [
         operator: ">",
         value: 350,
         status: "red",
-        reason: "Above 350K — crisis territory",
+        reason:
+          "Over 350K weekly unemployment claims — approaching crisis levels",
       },
       {
         operator: ">",
         value: 280,
         status: "amber",
-        reason: "Elevated claims, watch composition",
+        reason:
+          "Unemployment claims rising above normal — more people losing jobs each week",
       },
     ],
   },
@@ -189,13 +197,15 @@ export const THRESHOLD_RULES = [
         operator: ">",
         value: 2000,
         status: "red",
-        reason: "Above $2T/month — mainstream agent adoption",
+        reason:
+          "Over $2 trillion/month in stablecoin transactions — AI-driven payments going mainstream",
       },
       {
         operator: ">",
         value: 1000,
         status: "amber",
-        reason: "Above $1T/month — significant growth",
+        reason:
+          "Stablecoin volume surpassing $1 trillion/month — digital payment rails growing fast",
       },
     ],
   },
@@ -244,13 +254,15 @@ export const THRESHOLD_RULES = [
         operator: "<",
         value: 1.0,
         status: "red",
-        reason: "Below 1.0 — money not circulating",
+        reason:
+          "Money velocity below 1.0 — cash barely changing hands, economy sluggish despite looking okay on paper",
       },
       {
         operator: "<",
         value: 1.15,
         status: "amber",
-        reason: "Near historic lows, approaching critical",
+        reason:
+          "Money circulating slower than normal — spending and business activity weakening",
       },
     ],
   },
@@ -272,13 +284,14 @@ export const THRESHOLD_RULES = [
         operator: "<",
         value: 95,
         status: "red",
-        reason: "Consumer confidence deeply negative",
+        reason: "Consumers are deeply pessimistic — spending cuts likely ahead",
       },
       {
         operator: "<",
         value: 98,
         status: "amber",
-        reason: "Consumer confidence weakening",
+        reason:
+          "Consumer confidence dropping — people starting to feel uneasy about their finances",
       },
     ],
   },
@@ -299,13 +312,15 @@ export const THRESHOLD_RULES = [
         operator: "<",
         value: 52,
         status: "red",
-        reason: "Below 52% — acceleration of capital capture",
+        reason:
+          "Workers getting less than 52% of economic output — wealth concentrating away from paychecks",
       },
       {
         operator: "<",
         value: 55,
         status: "amber",
-        reason: "Declining labor share, approaching threshold",
+        reason:
+          "Workers' share of the economy shrinking — more income going to companies and investors",
       },
     ],
   },
@@ -347,13 +362,15 @@ export const THRESHOLD_RULES = [
         operator: "<",
         value: -25,
         status: "red",
-        reason: ">25% drawdown — market pricing contagion",
+        reason:
+          "Major investment firms down over 25% from highs — markets pricing in serious financial stress",
       },
       {
         operator: "<",
         value: -15,
         status: "amber",
-        reason: ">15% drawdown — stress emerging",
+        reason:
+          "Large investment firms falling — early sign of broader financial strain",
       },
     ],
   },

@@ -1,13 +1,22 @@
 import { useState } from "react";
+import { useTheme } from "../../design-tokens";
 import { S } from "../../styles";
+import {
+  getAvailableProviders,
+  setProvider,
+  setApiKey,
+  getApiKey,
+  getConfiguredProvider,
+  testApiKey,
+} from "../../lib/ai-provider";
 
 const FRED_KEY_STORAGE = "ab-fred-api-key";
 const TWELVE_DATA_KEY_STORAGE = "ab-twelve-data-api-key";
 
-function statusColor(status) {
-  if (status === "success") return "#2A9D8F";
-  if (status === "error") return "#E63946";
-  return "rgba(255,255,255,0.45)";
+function statusColor(status, tokens) {
+  if (status === "success") return tokens.colors.baseline;
+  if (status === "error") return tokens.colors.alert;
+  return tokens.colors.textMuted;
 }
 
 function statusLabel(status) {
@@ -18,9 +27,16 @@ function statusLabel(status) {
 }
 
 export default function APIKeySetup({ value, onChange }) {
+  const { tokens } = useTheme();
   const [testResults, setTestResults] = useState({
     fred: { status: "idle", message: "" },
     twelveData: { status: "idle", message: "" },
+    ai: { status: "idle", message: "" },
+  });
+  const [selectedAI, setSelectedAI] = useState(getConfiguredProvider() || "");
+  const [aiKey, setAiKey] = useState(() => {
+    const p = getConfiguredProvider();
+    return p ? getApiKey(p) || "" : "";
   });
 
   const saveKey = (storageKey, keyValue) => {
@@ -153,7 +169,7 @@ export default function APIKeySetup({ value, onChange }) {
           display: "grid",
           gap: 8,
           fontSize: 12,
-          color: "rgba(255,255,255,0.62)",
+          color: tokens.colors.textSecondary,
           marginBottom: 14,
           lineHeight: 1.6,
         }}
@@ -163,16 +179,16 @@ export default function APIKeySetup({ value, onChange }) {
           current.
         </div>
         <div>
-          <strong style={{ color: "#E8E4DF" }}>FRED</strong> (Federal Reserve
-          Economic Data) — Employment figures, GDP growth, money velocity,
-          deficit tracking. Free key.
+          <strong style={{ color: tokens.colors.text }}>FRED</strong> (Federal
+          Reserve Economic Data) — Employment figures, GDP growth, money
+          velocity, deficit tracking. Free key.
         </div>
         <div>
-          <strong style={{ color: "#E8E4DF" }}>Twelve Data</strong> — Stock and
-          market prices for portfolio tracking (NVIDIA, Salesforce, Blackstone,
-          etc.). Free key.
+          <strong style={{ color: tokens.colors.text }}>Twelve Data</strong> —
+          Stock and market prices for portfolio tracking (NVIDIA, Salesforce,
+          Blackstone, etc.). Free key.
         </div>
-        <div style={{ color: "rgba(255,255,255,0.45)" }}>
+        <div style={{ color: tokens.colors.textMuted }}>
           Without API keys, the dashboard uses sample data so you can still
           explore everything.
         </div>
@@ -207,7 +223,7 @@ export default function APIKeySetup({ value, onChange }) {
             style={{
               fontSize: 11,
               marginTop: 8,
-              color: statusColor(testResults.fred.status),
+              color: statusColor(testResults.fred.status, tokens),
             }}
           >
             {statusLabel(testResults.fred.status)}
@@ -219,7 +235,7 @@ export default function APIKeySetup({ value, onChange }) {
             rel="noreferrer"
             style={{
               fontSize: 11,
-              color: "#E9C46A",
+              color: tokens.colors.accent,
               display: "inline-block",
               marginTop: 8,
             }}
@@ -260,7 +276,7 @@ export default function APIKeySetup({ value, onChange }) {
             style={{
               fontSize: 11,
               marginTop: 8,
-              color: statusColor(testResults.twelveData.status),
+              color: statusColor(testResults.twelveData.status, tokens),
             }}
           >
             {statusLabel(testResults.twelveData.status)}
@@ -274,13 +290,122 @@ export default function APIKeySetup({ value, onChange }) {
             rel="noreferrer"
             style={{
               fontSize: 11,
-              color: "#E9C46A",
+              color: tokens.colors.accent,
               display: "inline-block",
               marginTop: 8,
             }}
           >
             Get a free Twelve Data key
           </a>
+        </div>
+
+        <div style={S.card("rgba(155,93,229,0.15)")}>
+          <div style={S.label}>AI Provider (Optional)</div>
+          <div
+            style={{
+              fontSize: 12,
+              color: tokens.colors.textSecondary,
+              marginBottom: 12,
+              lineHeight: 1.6,
+            }}
+          >
+            Add an AI provider to get intelligent analysis in your signal
+            digests. Your key stays in your browser — it is never sent to our
+            servers. Pick whichever provider you already have an account with.
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              gap: 8,
+              marginBottom: 10,
+              flexWrap: "wrap",
+            }}
+          >
+            {getAvailableProviders().map((p) => (
+              <button
+                key={p.id}
+                type="button"
+                onClick={() => {
+                  setSelectedAI(p.id);
+                  setProvider(p.id);
+                  setAiKey(getApiKey(p.id) || "");
+                  updateTest("ai", "idle", "");
+                }}
+                style={{
+                  ...S.tab(selectedAI === p.id, "#9B5DE5"),
+                  fontSize: 11,
+                }}
+              >
+                {p.name}
+              </button>
+            ))}
+          </div>
+
+          {selectedAI && (
+            <>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <input
+                  value={aiKey}
+                  onChange={(e) => {
+                    setAiKey(e.target.value);
+                    if (e.target.value.trim()) {
+                      setApiKey(selectedAI, e.target.value.trim());
+                    }
+                  }}
+                  placeholder={`Enter your ${getAvailableProviders().find((p) => p.id === selectedAI)?.name || "AI"} API key`}
+                  spellCheck={false}
+                  autoComplete="off"
+                  type="password"
+                  style={{ ...inputStyle, flex: 1, minWidth: 250 }}
+                />
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (!aiKey.trim()) {
+                      updateTest("ai", "error", "Enter an API key first.");
+                      return;
+                    }
+                    updateTest("ai", "loading", "");
+                    const result = await testApiKey(selectedAI, aiKey.trim());
+                    updateTest(
+                      "ai",
+                      result.valid ? "success" : "error",
+                      result.valid
+                        ? "Valid key — AI digests enabled."
+                        : result.error || "Key validation failed.",
+                    );
+                  }}
+                  style={S.tab(false, "#9B5DE5")}
+                >
+                  Test
+                </button>
+              </div>
+              <div
+                style={{
+                  fontSize: 11,
+                  marginTop: 8,
+                  color: statusColor(testResults.ai.status, tokens),
+                }}
+              >
+                {statusLabel(testResults.ai.status)}
+                {testResults.ai.message ? ` · ${testResults.ai.message}` : ""}
+              </div>
+            </>
+          )}
+
+          {!selectedAI && (
+            <div
+              style={{
+                fontSize: 11,
+                color: tokens.colors.textSoft,
+                fontStyle: "italic",
+              }}
+            >
+              No AI provider selected — digests will use template-based
+              summaries (still useful, just less narrative).
+            </div>
+          )}
         </div>
       </div>
     </div>

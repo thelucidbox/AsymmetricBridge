@@ -1,3 +1,4 @@
+import { useTheme } from "../design-tokens";
 import { STATUS_CFG } from "../styles";
 import SignalCard from "./SignalCard";
 
@@ -14,6 +15,7 @@ export default function DominoSection({
   showConnector = false,
   nextDominoColor,
 }) {
+  const { tokens } = useTheme();
   const sc = { green: 0, amber: 0, red: 0 };
   domino.signals.forEach((signal) => {
     const status = signal.currentStatus;
@@ -45,12 +47,13 @@ export default function DominoSection({
           padding: "14px 16px",
           background: isActive
             ? `linear-gradient(135deg, ${domino.color}11, ${domino.color}08)`
-            : "rgba(255,255,255,0.02)",
-          border: `1px solid ${isActive ? `${domino.color}44` : "rgba(255,255,255,0.06)"}`,
-          borderRadius: isActive ? "10px 10px 0 0" : 10,
+            : tokens.colors.surfaceSoft,
+          border: `1px solid ${isActive ? `${domino.color}44` : tokens.colors.border}`,
+          borderRadius: isActive
+            ? `${tokens.shape.cardRadius}px ${tokens.shape.cardRadius}px 0 0`
+            : tokens.shape.cardRadius,
           cursor: "pointer",
-          transition:
-            "color 0.2s, background 0.2s, border-color 0.2s, opacity 0.2s, box-shadow 0.2s",
+          transition: tokens.motion.default,
           color: "inherit",
           font: "inherit",
         }}
@@ -84,8 +87,8 @@ export default function DominoSection({
               <span
                 style={{
                   fontSize: 10,
-                  color: "rgba(255,255,255,0.45)",
-                  fontFamily: "'IBM Plex Mono', monospace",
+                  color: tokens.colors.textMuted,
+                  fontFamily: tokens.typography.fontMono,
                   letterSpacing: "0.3px",
                 }}
               >
@@ -95,7 +98,7 @@ export default function DominoSection({
             <div
               style={{
                 fontSize: 11,
-                color: "rgba(255,255,255,0.35)",
+                color: tokens.colors.textSoft,
                 marginTop: 2,
               }}
             >
@@ -119,7 +122,7 @@ export default function DominoSection({
                     border: `1px solid ${cfg.border}`,
                     padding: "2px 6px",
                     borderRadius: 4,
-                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontFamily: tokens.typography.fontMono,
                   }}
                 >
                   {count}
@@ -156,7 +159,7 @@ export default function DominoSection({
             background: "rgba(0,0,0,0.15)",
             border: `1px solid ${domino.color}22`,
             borderTop: "none",
-            borderRadius: "0 0 10px 10px",
+            borderRadius: `0 0 ${tokens.shape.cardRadius}px ${tokens.shape.cardRadius}px`,
           }}
         >
           {domino.signals.map((signal) => (

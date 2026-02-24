@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTheme } from "../design-tokens";
 import { S, STATUS_CFG } from "../styles";
 import { DOMINOS } from "../data/dominos";
 import {
@@ -9,6 +10,7 @@ import {
 const STATUS_OPTIONS = ["green", "amber", "red"];
 
 export default function SignalUpdateForm() {
+  const { tokens } = useTheme();
   const [selectedDomino, setSelectedDomino] = useState("");
   const [selectedSignal, setSelectedSignal] = useState("");
   const [newStatus, setNewStatus] = useState("");
@@ -56,10 +58,10 @@ export default function SignalUpdateForm() {
     width: "100%",
     padding: "10px 12px",
     fontSize: 13,
-    background: "rgba(255,255,255,0.04)",
-    border: "1px solid rgba(255,255,255,0.1)",
+    background: tokens.colors.borderSubtle,
+    border: `1px solid ${tokens.colors.borderStrong}`,
     borderRadius: 8,
-    color: "#E8E4DF",
+    color: tokens.colors.text,
     appearance: "none",
     cursor: "pointer",
   };
@@ -72,7 +74,7 @@ export default function SignalUpdateForm() {
           style={{
             fontSize: 13,
             fontWeight: 600,
-            color: "#E9C46A",
+            color: tokens.colors.accent,
             marginBottom: 12,
           }}
         >
@@ -129,8 +131,8 @@ export default function SignalUpdateForm() {
         {signal && (
           <div
             style={{
-              background: "rgba(255,255,255,0.03)",
-              border: "1px solid rgba(255,255,255,0.06)",
+              background: tokens.colors.surfaceRaised,
+              border: `1px solid ${tokens.colors.border}`,
               borderRadius: 8,
               padding: "10px 12px",
               marginBottom: 12,
@@ -150,14 +152,17 @@ export default function SignalUpdateForm() {
                   height: 8,
                   borderRadius: "50%",
                   background:
-                    STATUS_CFG[signal.currentStatus]?.dot || "#2A9D8F",
+                    STATUS_CFG[signal.currentStatus]?.dot ||
+                    tokens.colors.baseline,
                 }}
               />
               <span
                 style={{
                   fontSize: 12,
                   fontWeight: 600,
-                  color: STATUS_CFG[signal.currentStatus]?.text || "#2A9D8F",
+                  color:
+                    STATUS_CFG[signal.currentStatus]?.text ||
+                    tokens.colors.baseline,
                 }}
               >
                 Currently:{" "}
@@ -168,7 +173,7 @@ export default function SignalUpdateForm() {
               <div
                 style={{
                   fontSize: 11,
-                  color: "rgba(255,255,255,0.4)",
+                  color: tokens.colors.textSoft,
                   marginBottom: 2,
                 }}
               >
@@ -176,7 +181,7 @@ export default function SignalUpdateForm() {
               </div>
             )}
             {signal.threshold && (
-              <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)" }}>
+              <div style={{ fontSize: 11, color: tokens.colors.textSoft }}>
                 Threshold: {signal.threshold}
               </div>
             )}
@@ -233,7 +238,7 @@ export default function SignalUpdateForm() {
               style={{
                 ...selectStyle,
                 resize: "vertical",
-                fontFamily: "'IBM Plex Sans', sans-serif",
+                fontFamily: tokens.typography.fontSans,
                 lineHeight: 1.5,
               }}
             />
@@ -250,15 +255,14 @@ export default function SignalUpdateForm() {
               padding: "12px",
               fontSize: 13,
               fontWeight: 700,
-              color: reason.trim() ? "#0D0D0F" : "rgba(255,255,255,0.25)",
+              color: reason.trim() ? "#0D0D0F" : tokens.colors.textSubtle,
               background: reason.trim()
                 ? STATUS_CFG[newStatus].dot
-                : "rgba(255,255,255,0.06)",
+                : tokens.colors.border,
               border: "none",
               borderRadius: 8,
               cursor: reason.trim() ? "pointer" : "not-allowed",
-              transition:
-                "color 0.2s, background 0.2s, border-color 0.2s, opacity 0.2s, box-shadow 0.2s",
+              transition: tokens.motion.default,
             }}
           >
             {mutation.isPending
@@ -284,10 +288,10 @@ export default function SignalUpdateForm() {
                     : "rgba(233,196,106,0.15)",
               color:
                 feedback.type === "success"
-                  ? "#2A9D8F"
+                  ? tokens.colors.baseline
                   : feedback.type === "error"
-                    ? "#E63946"
-                    : "#E9C46A",
+                    ? tokens.colors.alert
+                    : tokens.colors.accent,
               border: `1px solid ${
                 feedback.type === "success"
                   ? "rgba(42,157,143,0.3)"
@@ -309,7 +313,7 @@ export default function SignalUpdateForm() {
           <div
             style={{
               fontSize: 12,
-              color: "rgba(255,255,255,0.25)",
+              color: tokens.colors.textSubtle,
               textAlign: "center",
               padding: "16px 0",
             }}
@@ -339,18 +343,20 @@ export default function SignalUpdateForm() {
                   padding: "8px 0",
                   borderBottom:
                     i < recentHistory.length - 1
-                      ? "1px solid rgba(255,255,255,0.04)"
+                      ? `1px solid ${tokens.colors.borderSubtle}`
                       : "none",
                 }}
               >
                 <div>
-                  <div style={{ fontSize: 12, color: "rgba(255,255,255,0.7)" }}>
+                  <div
+                    style={{ fontSize: 12, color: tokens.colors.textSecondary }}
+                  >
                     {entry.signal_name}
                   </div>
                   <div
                     style={{
                       fontSize: 10,
-                      color: "rgba(255,255,255,0.3)",
+                      color: tokens.colors.textSubtle,
                       marginTop: 2,
                     }}
                   >
@@ -372,8 +378,8 @@ export default function SignalUpdateForm() {
                 <div
                   style={{
                     fontSize: 9,
-                    color: "rgba(255,255,255,0.2)",
-                    fontFamily: "'IBM Plex Mono'",
+                    color: tokens.colors.textSubtle,
+                    fontFamily: tokens.typography.fontMono,
                     whiteSpace: "nowrap",
                   }}
                 >

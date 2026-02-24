@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTheme } from "../design-tokens";
 import { S, STATUS_CFG, Badge } from "../styles";
 import { DOMINOS } from "../data/dominos";
 import { SOURCES } from "../data/sources";
@@ -91,6 +92,7 @@ const SIGNAL_CONNECTIONS = [
 });
 
 export default function ThesisPortfolio() {
+  const { tokens } = useTheme();
   const [expandedSource, setExpandedSource] = useState(-1);
   const [showComparison, setShowComparison] = useState(false);
 
@@ -109,10 +111,10 @@ export default function ThesisPortfolio() {
           style={{
             fontSize: 10,
             fontWeight: 700,
-            color: "#E9C46A",
+            color: tokens.colors.accent,
             letterSpacing: "1px",
             marginBottom: 8,
-            fontFamily: "'IBM Plex Mono'",
+            fontFamily: tokens.typography.fontMono,
             textTransform: "uppercase",
           }}
         >
@@ -121,7 +123,7 @@ export default function ThesisPortfolio() {
         <div
           style={{
             fontSize: 12,
-            color: "rgba(255,255,255,0.7)",
+            color: tokens.colors.textSecondary,
             lineHeight: 1.7,
           }}
         >
@@ -150,7 +152,7 @@ export default function ThesisPortfolio() {
               <div
                 style={{
                   fontSize: 11,
-                  color: "rgba(255,255,255,0.5)",
+                  color: tokens.colors.textMuted,
                   marginTop: 2,
                   lineHeight: 1.5,
                 }}
@@ -179,7 +181,7 @@ export default function ThesisPortfolio() {
                     border: `1px solid ${p.color}33`,
                     padding: "3px 8px",
                     borderRadius: 4,
-                    fontFamily: "'IBM Plex Mono'",
+                    fontFamily: tokens.typography.fontMono,
                     letterSpacing: "0.5px",
                   }}
                 >
@@ -191,7 +193,7 @@ export default function ThesisPortfolio() {
           <div
             style={{
               fontSize: 10,
-              color: "rgba(255,255,255,0.35)",
+              color: tokens.colors.textSoft,
               fontStyle: "italic",
               lineHeight: 1.5,
             }}
@@ -215,7 +217,8 @@ export default function ThesisPortfolio() {
               gap: 8,
               alignItems: "center",
               padding: "8px 0",
-              borderBottom: i < 5 ? "1px solid rgba(255,255,255,0.04)" : "none",
+              borderBottom:
+                i < 5 ? `1px solid ${tokens.colors.borderSubtle}` : "none",
             }}
           >
             <span
@@ -223,12 +226,12 @@ export default function ThesisPortfolio() {
                 fontSize: 9,
                 fontWeight: 700,
                 color: row.color,
-                fontFamily: "'IBM Plex Mono'",
+                fontFamily: tokens.typography.fontMono,
               }}
             >
               {row.domino}
             </span>
-            <span style={{ fontSize: 11, color: "rgba(255,255,255,0.6)" }}>
+            <span style={{ fontSize: 11, color: tokens.colors.textSecondary }}>
               {row.signal}
             </span>
             <span style={{ fontSize: 11, color: row.color, fontWeight: 500 }}>
@@ -246,14 +249,15 @@ export default function ThesisPortfolio() {
           key={i}
           style={{
             ...S.card(
-              expandedSource === i ? `${s.color}22` : "rgba(255,255,255,0.04)",
+              expandedSource === i
+                ? `${s.color}22`
+                : tokens.colors.borderSubtle,
             ),
             appearance: "none",
             textAlign: "left",
             width: "100%",
             cursor: "pointer",
-            transition:
-              "color 0.2s, background 0.2s, border-color 0.2s, opacity 0.2s, box-shadow 0.2s",
+            transition: tokens.motion.default,
             color: "inherit",
             font: "inherit",
           }}
@@ -280,15 +284,15 @@ export default function ThesisPortfolio() {
                 <span
                   style={{
                     fontSize: 10,
-                    color: "rgba(255,255,255,0.25)",
-                    fontFamily: "'IBM Plex Mono'",
+                    color: tokens.colors.textSubtle,
+                    fontFamily: tokens.typography.fontMono,
                   }}
                 >
                   {s.date}
                 </span>
               </div>
               <div style={{ fontSize: 13, fontWeight: 600 }}>{s.title}</div>
-              <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)" }}>
+              <div style={{ fontSize: 11, color: tokens.colors.textSoft }}>
                 {s.author}
               </div>
               {s.tldr && (
@@ -296,7 +300,7 @@ export default function ThesisPortfolio() {
                   style={{
                     marginTop: 5,
                     fontSize: 11,
-                    color: "rgba(255,255,255,0.58)",
+                    color: tokens.colors.textMuted,
                     lineHeight: 1.5,
                   }}
                 >
@@ -306,7 +310,7 @@ export default function ThesisPortfolio() {
             </div>
             <span
               style={{
-                color: "rgba(255,255,255,0.2)",
+                color: tokens.colors.textSubtle,
                 transform:
                   expandedSource === i ? "rotate(180deg)" : "rotate(0)",
                 transition: "transform 0.2s",
@@ -321,14 +325,14 @@ export default function ThesisPortfolio() {
               style={{
                 marginTop: 12,
                 paddingTop: 12,
-                borderTop: "1px solid rgba(255,255,255,0.06)",
+                borderTop: `1px solid ${tokens.colors.border}`,
               }}
               onClick={(e) => e.stopPropagation()}
             >
               <div
                 style={{
                   fontSize: 12,
-                  color: "rgba(255,255,255,0.7)",
+                  color: tokens.colors.textSecondary,
                   lineHeight: 1.7,
                   padding: "10px 12px",
                   background: `${s.color}06`,
@@ -350,7 +354,7 @@ export default function ThesisPortfolio() {
                     padding: "5px 0",
                     borderBottom:
                       ci < s.chapters.length - 1
-                        ? "1px solid rgba(255,255,255,0.03)"
+                        ? `1px solid ${tokens.colors.surfaceRaised}`
                         : "none",
                   }}
                 >
@@ -359,7 +363,7 @@ export default function ThesisPortfolio() {
                       fontSize: 10,
                       color: s.color,
                       fontWeight: 700,
-                      fontFamily: "'IBM Plex Mono'",
+                      fontFamily: tokens.typography.fontMono,
                       flexShrink: 0,
                       width: 16,
                     }}
@@ -369,7 +373,7 @@ export default function ThesisPortfolio() {
                   <span
                     style={{
                       fontSize: 11,
-                      color: "rgba(255,255,255,0.55)",
+                      color: tokens.colors.textMuted,
                       lineHeight: 1.5,
                     }}
                   >
@@ -382,14 +386,14 @@ export default function ThesisPortfolio() {
                 style={{
                   marginTop: 10,
                   padding: "10px 12px",
-                  background: "rgba(255,255,255,0.03)",
+                  background: tokens.colors.surfaceRaised,
                   borderRadius: 6,
                 }}
               >
                 <div
                   style={{
                     fontSize: 10,
-                    color: "#E9C46A",
+                    color: tokens.colors.accent,
                     fontWeight: 600,
                     letterSpacing: "0.8px",
                     marginBottom: 4,
@@ -400,7 +404,7 @@ export default function ThesisPortfolio() {
                 <div
                   style={{
                     fontSize: 12,
-                    color: "rgba(255,255,255,0.6)",
+                    color: tokens.colors.textSecondary,
                     lineHeight: 1.6,
                   }}
                 >
@@ -437,9 +441,7 @@ export default function ThesisPortfolio() {
         type="button"
         style={{
           ...S.card(
-            showComparison
-              ? "rgba(255,255,255,0.08)"
-              : "rgba(255,255,255,0.04)",
+            showComparison ? tokens.colors.border : tokens.colors.borderSubtle,
           ),
           appearance: "none",
           textAlign: "left",
@@ -464,7 +466,7 @@ export default function ThesisPortfolio() {
           </span>
           <span
             style={{
-              color: "rgba(255,255,255,0.2)",
+              color: tokens.colors.textSubtle,
               transform: showComparison ? "rotate(180deg)" : "rotate(0)",
               transition: "transform 0.2s",
             }}
@@ -478,7 +480,7 @@ export default function ThesisPortfolio() {
             style={{
               marginTop: 12,
               paddingTop: 12,
-              borderTop: "1px solid rgba(255,255,255,0.06)",
+              borderTop: `1px solid ${tokens.colors.border}`,
             }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -488,9 +490,9 @@ export default function ThesisPortfolio() {
                 key={i}
                 style={{
                   fontSize: 11,
-                  color: "rgba(255,255,255,0.55)",
+                  color: tokens.colors.textMuted,
                   padding: "4px 0 4px 12px",
-                  borderLeft: "2px solid rgba(255,255,255,0.06)",
+                  borderLeft: `2px solid ${tokens.colors.border}`,
                 }}
               >
                 {o}
@@ -506,14 +508,16 @@ export default function ThesisPortfolio() {
                 gridTemplateColumns: "70px 1fr 1fr",
                 gap: 0,
                 fontSize: 9,
-                color: "rgba(255,255,255,0.25)",
-                fontFamily: "'IBM Plex Mono'",
+                color: tokens.colors.textSubtle,
+                fontFamily: tokens.typography.fontMono,
                 marginBottom: 4,
               }}
             >
               <div>Topic</div>
-              <div style={{ color: "#E63946" }}>Citrini (Bear)</div>
-              <div style={{ color: "#E9C46A" }}>Leopold (Capability)</div>
+              <div style={{ color: tokens.colors.alert }}>Citrini (Bear)</div>
+              <div style={{ color: tokens.colors.accent }}>
+                Leopold (Capability)
+              </div>
             </div>
             {COMPARISON.divergence.map((d, i) => (
               <div
@@ -523,22 +527,22 @@ export default function ThesisPortfolio() {
                   gridTemplateColumns: "70px 1fr 1fr",
                   gap: 8,
                   padding: "6px 0",
-                  borderBottom: "1px solid rgba(255,255,255,0.03)",
+                  borderBottom: `1px solid ${tokens.colors.surfaceRaised}`,
                 }}
               >
                 <span
                   style={{
                     fontSize: 10,
                     fontWeight: 600,
-                    color: "rgba(255,255,255,0.5)",
+                    color: tokens.colors.textMuted,
                   }}
                 >
                   {d.topic}
                 </span>
-                <span style={{ fontSize: 10, color: "rgba(255,255,255,0.45)" }}>
+                <span style={{ fontSize: 10, color: tokens.colors.textMuted }}>
                   {d.citrini}
                 </span>
-                <span style={{ fontSize: 10, color: "rgba(255,255,255,0.45)" }}>
+                <span style={{ fontSize: 10, color: tokens.colors.textMuted }}>
                   {d.leopold}
                 </span>
               </div>
@@ -556,7 +560,7 @@ export default function ThesisPortfolio() {
           border: "1px solid rgba(230,57,70,0.15)",
           borderRadius: 8,
           fontSize: 10,
-          color: "rgba(255,255,255,0.3)",
+          color: tokens.colors.textSubtle,
           lineHeight: 1.5,
         }}
       >

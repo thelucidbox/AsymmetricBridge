@@ -5,6 +5,7 @@ import {
   downloadFile,
   performanceToMarkdown,
 } from "../../lib/export-utils";
+import { useTheme } from "../../design-tokens";
 import { usePortfolioData } from "../../hooks/usePortfolioData";
 import { S } from "../../styles";
 import CSVUpload from "./CSVUpload";
@@ -23,6 +24,7 @@ function formatPercent(value, digits = 1) {
 }
 
 function ScoreRing({ score }) {
+  const { tokens } = useTheme();
   const radius = 54;
   const circumference = 2 * Math.PI * radius;
   const dash = (Math.max(0, Math.min(score, 100)) / 100) * circumference;
@@ -34,7 +36,7 @@ function ScoreRing({ score }) {
           cx="70"
           cy="70"
           r={radius}
-          stroke="rgba(255,255,255,0.12)"
+          stroke={tokens.colors.borderStrong}
           strokeWidth="10"
           fill="transparent"
         />
@@ -42,7 +44,7 @@ function ScoreRing({ score }) {
           cx="70"
           cy="70"
           r={radius}
-          stroke="#2A9D8F"
+          stroke={tokens.colors.baseline}
           strokeWidth="10"
           strokeLinecap="round"
           fill="transparent"
@@ -70,10 +72,10 @@ function ScoreRing({ score }) {
         <div
           style={{
             fontSize: 10,
-            color: "rgba(255,255,255,0.45)",
+            color: tokens.colors.textMuted,
             textTransform: "uppercase",
             letterSpacing: "1px",
-            fontFamily: "'IBM Plex Mono', monospace",
+            fontFamily: tokens.typography.fontMono,
           }}
         >
           alignment
@@ -84,6 +86,7 @@ function ScoreRing({ score }) {
 }
 
 export default function PerformanceView() {
+  const { tokens } = useTheme();
   const {
     positions,
     legBreakdown,
@@ -159,7 +162,7 @@ export default function PerformanceView() {
                 <div
                   style={{
                     fontSize: 12,
-                    color: "rgba(255,255,255,0.65)",
+                    color: tokens.colors.textSecondary,
                     lineHeight: 1.6,
                     marginBottom: 10,
                   }}
@@ -174,9 +177,9 @@ export default function PerformanceView() {
                     className="ab-tabular-nums"
                     style={{
                       fontSize: 10,
-                      fontFamily: "'IBM Plex Mono', monospace",
-                      color: "rgba(255,255,255,0.5)",
-                      border: "1px solid rgba(255,255,255,0.14)",
+                      fontFamily: tokens.typography.fontMono,
+                      color: tokens.colors.textMuted,
+                      border: `1px solid ${tokens.colors.borderStrong}`,
                       borderRadius: 5,
                       padding: "4px 7px",
                     }}
@@ -186,9 +189,9 @@ export default function PerformanceView() {
                   <span
                     style={{
                       fontSize: 10,
-                      fontFamily: "'IBM Plex Mono', monospace",
-                      color: "rgba(255,255,255,0.5)",
-                      border: "1px solid rgba(255,255,255,0.14)",
+                      fontFamily: tokens.typography.fontMono,
+                      color: tokens.colors.textMuted,
+                      border: `1px solid ${tokens.colors.borderStrong}`,
                       borderRadius: 5,
                       padding: "4px 7px",
                     }}
@@ -199,9 +202,9 @@ export default function PerformanceView() {
                     <span
                       style={{
                         fontSize: 10,
-                        fontFamily: "'IBM Plex Mono', monospace",
-                        color: "rgba(255,255,255,0.5)",
-                        border: "1px solid rgba(255,255,255,0.14)",
+                        fontFamily: tokens.typography.fontMono,
+                        color: tokens.colors.textMuted,
+                        border: `1px solid ${tokens.colors.borderStrong}`,
                         borderRadius: 5,
                         padding: "4px 7px",
                       }}
@@ -224,9 +227,9 @@ export default function PerformanceView() {
                     }}
                     style={{
                       fontSize: 10,
-                      fontFamily: "'IBM Plex Mono', monospace",
-                      color: "rgba(255,255,255,0.5)",
-                      border: "1px solid rgba(255,255,255,0.14)",
+                      fontFamily: tokens.typography.fontMono,
+                      color: tokens.colors.textMuted,
+                      border: `1px solid ${tokens.colors.borderStrong}`,
                       borderRadius: 5,
                       padding: "4px 7px",
                       background: "transparent",
@@ -249,9 +252,9 @@ export default function PerformanceView() {
                     }}
                     style={{
                       fontSize: 10,
-                      fontFamily: "'IBM Plex Mono', monospace",
-                      color: "rgba(255,255,255,0.5)",
-                      border: "1px solid rgba(255,255,255,0.14)",
+                      fontFamily: tokens.typography.fontMono,
+                      color: tokens.colors.textMuted,
+                      border: `1px solid ${tokens.colors.borderStrong}`,
                       borderRadius: 5,
                       padding: "4px 7px",
                       background: "transparent",
@@ -278,23 +281,23 @@ export default function PerformanceView() {
                 const hasTarget = row.targetPercent !== null;
                 const deltaColor =
                   row.delta === null
-                    ? "rgba(255,255,255,0.45)"
+                    ? tokens.colors.textMuted
                     : row.delta > 4
-                      ? "#E63946"
+                      ? tokens.colors.alert
                       : row.delta < -4
-                        ? "#F4A261"
-                        : "#2A9D8F";
+                        ? tokens.colors.watch
+                        : tokens.colors.baseline;
 
                 return (
                   <div
                     key={row.leg}
-                    style={S.card(`${row.color || "#2A9D8F"}33`)}
+                    style={S.card(`${row.color || tokens.colors.baseline}33`)}
                   >
                     <div
                       style={{
                         fontSize: 14,
                         fontWeight: 700,
-                        color: row.color || "#E8E4DF",
+                        color: row.color || tokens.colors.text,
                         marginBottom: 4,
                       }}
                     >
@@ -303,7 +306,7 @@ export default function PerformanceView() {
                     <div
                       style={{
                         fontSize: 11,
-                        color: "rgba(255,255,255,0.55)",
+                        color: tokens.colors.textMuted,
                         lineHeight: 1.5,
                         marginBottom: 10,
                       }}
@@ -357,7 +360,7 @@ export default function PerformanceView() {
                     </div>
 
                     <div
-                      style={{ fontSize: 11, color: "rgba(255,255,255,0.55)" }}
+                      style={{ fontSize: 11, color: tokens.colors.textMuted }}
                     >
                       {mappedLeg?.positions?.length || 0} mapped positions ·{" "}
                       {formatCurrency(row.totalValue)}
@@ -374,13 +377,13 @@ export default function PerformanceView() {
               <div
                 style={{
                   fontSize: 12,
-                  color: "rgba(255,255,255,0.62)",
+                  color: tokens.colors.textSecondary,
                   marginBottom: 10,
                 }}
               >
                 Actual vs target allocation by leg.
                 {comparisonRows.some((row) => row.usesDerivedTarget) && (
-                  <span style={{ color: "rgba(255,255,255,0.45)" }}>
+                  <span style={{ color: tokens.colors.textMuted }}>
                     {" "}
                     If no target is defined, an equal-weight reference is used
                     for comparison.
@@ -404,7 +407,7 @@ export default function PerformanceView() {
                         {row.leg}
                       </div>
                       <div
-                        style={{ fontSize: 10, color: "rgba(255,255,255,0.5)" }}
+                        style={{ fontSize: 10, color: tokens.colors.textMuted }}
                       >
                         {formatPercent(row.actualPercent)} vs{" "}
                         {formatPercent(row.targetForChart)}
@@ -415,7 +418,7 @@ export default function PerformanceView() {
                         <div
                           style={{
                             fontSize: 9,
-                            color: "rgba(255,255,255,0.4)",
+                            color: tokens.colors.textSoft,
                           }}
                         >
                           Actual
@@ -424,7 +427,7 @@ export default function PerformanceView() {
                           style={{
                             height: 10,
                             borderRadius: 999,
-                            background: "rgba(255,255,255,0.08)",
+                            background: tokens.colors.border,
                             overflow: "hidden",
                           }}
                         >
@@ -432,7 +435,7 @@ export default function PerformanceView() {
                             style={{
                               width: `${Math.min(Math.max(row.actualPercent, 0), 100)}%`,
                               height: "100%",
-                              background: row.color || "#2A9D8F",
+                              background: row.color || tokens.colors.baseline,
                             }}
                           />
                         </div>
@@ -441,7 +444,7 @@ export default function PerformanceView() {
                         <div
                           style={{
                             fontSize: 9,
-                            color: "rgba(255,255,255,0.4)",
+                            color: tokens.colors.textSoft,
                           }}
                         >
                           {row.usesDerivedTarget ? "Ref Target" : "Target"}
@@ -450,7 +453,7 @@ export default function PerformanceView() {
                           style={{
                             height: 10,
                             borderRadius: 999,
-                            background: "rgba(255,255,255,0.08)",
+                            background: tokens.colors.border,
                             overflow: "hidden",
                           }}
                         >
@@ -476,14 +479,14 @@ export default function PerformanceView() {
               {unalignedBucket?.positions?.length ? (
                 <div style={{ display: "grid", gap: 8 }}>
                   <div
-                    style={{ fontSize: 12, color: "rgba(255,255,255,0.62)" }}
+                    style={{ fontSize: 12, color: tokens.colors.textSecondary }}
                   >
                     {unalignedBucket.positions.length} positions are currently
                     unmapped to thesis legs.
                   </div>
                   <div
                     style={{
-                      border: "1px solid rgba(255,255,255,0.08)",
+                      border: `1px solid ${tokens.colors.border}`,
                       borderRadius: 8,
                       overflow: "hidden",
                     }}
@@ -495,9 +498,9 @@ export default function PerformanceView() {
                         gap: 8,
                         padding: "8px 10px",
                         fontSize: 10,
-                        fontFamily: "'IBM Plex Mono', monospace",
-                        color: "rgba(255,255,255,0.45)",
-                        background: "rgba(255,255,255,0.03)",
+                        fontFamily: tokens.typography.fontMono,
+                        color: tokens.colors.textMuted,
+                        background: tokens.colors.surfaceRaised,
                       }}
                     >
                       <span>Symbol</span>
@@ -512,7 +515,7 @@ export default function PerformanceView() {
                           gridTemplateColumns: "1fr 1fr 1fr",
                           gap: 8,
                           padding: "8px 10px",
-                          borderTop: "1px solid rgba(255,255,255,0.05)",
+                          borderTop: `1px solid ${tokens.colors.borderSubtle}`,
                           fontSize: 11,
                         }}
                       >
@@ -521,13 +524,13 @@ export default function PerformanceView() {
                         </span>
                         <span
                           className="ab-tabular-nums"
-                          style={{ color: "rgba(255,255,255,0.68)" }}
+                          style={{ color: tokens.colors.textSecondary }}
                         >
                           {Number(position.quantity || 0).toFixed(4)}
                         </span>
                         <span
                           className="ab-tabular-nums"
-                          style={{ color: "rgba(255,255,255,0.68)" }}
+                          style={{ color: tokens.colors.textSecondary }}
                         >
                           {formatCurrency(position.marketValue)}
                         </span>
@@ -536,7 +539,9 @@ export default function PerformanceView() {
                   </div>
                 </div>
               ) : (
-                <div style={{ fontSize: 12, color: "rgba(255,255,255,0.62)" }}>
+                <div
+                  style={{ fontSize: 12, color: tokens.colors.textSecondary }}
+                >
                   All parsed positions map to your thesis legs.
                 </div>
               )}

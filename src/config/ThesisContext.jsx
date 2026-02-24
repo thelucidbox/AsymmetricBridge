@@ -11,6 +11,53 @@ import { validateThesis } from "./thesis-schema.js";
 const THESIS_STORAGE_KEY = "ab-thesis-config";
 const TEST_MODE_KEY = "ab-test-new-user";
 
+const blankThesis = {
+  meta: {
+    name: "My Thesis",
+    version: "1.0.0",
+  },
+  dominos: [
+    {
+      id: 1,
+      name: "Domino 1",
+      color: "#888888",
+      icon: "◉",
+      description: "Configure your first domino",
+      signals: [
+        {
+          name: "Signal 1",
+          source: "Add your source",
+          frequency: "Add frequency",
+          currentStatus: "green",
+          baseline: "Set baseline",
+          threshold: "Set threshold",
+          notes: "Add notes",
+          dataPoints: [],
+        },
+      ],
+      thresholds: {
+        "Signal 1": "Set threshold",
+      },
+    },
+  ],
+  sources: [
+    {
+      title: "Add your first source",
+      author: "Author",
+      date: "Date",
+      url: "https://example.com",
+      type: "Research",
+      color: "#888888",
+    },
+  ],
+  portfolio: {
+    legs: [],
+  },
+  careerProfile: {
+    goals: [],
+  },
+};
+
 // eslint-disable-next-line react-refresh/only-export-components
 export const isOwnerMode =
   import.meta.env.VITE_OWNER_MODE === "true" ||
@@ -106,10 +153,11 @@ export function ThesisProvider({ children }) {
       window.localStorage.removeItem(TEST_MODE_KEY);
     }
     setIsTestMode(false);
-    const validation = validateThesis(fabianThesis);
+    const fallback = isOwnerMode ? fabianThesis : blankThesis;
+    const validation = validateThesis(fallback);
     if (validation.valid) {
-      persistThesis(fabianThesis);
-      setThesis(fabianThesis);
+      persistThesis(fallback);
+      setThesis(fallback);
     } else {
       setThesis(null);
     }
@@ -119,7 +167,7 @@ export function ThesisProvider({ children }) {
 
   const value = useMemo(
     () => ({
-      thesis: thesis || fabianThesis,
+      thesis: thesis || (isOwnerMode ? fabianThesis : blankThesis),
       updateThesis,
       hasThesis,
       isTestMode,

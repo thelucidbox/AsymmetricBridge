@@ -10,22 +10,32 @@ import { isOwnerMode, useThesis } from "../config/ThesisContext";
 import GuidedTour from "./GuidedTour";
 import { S } from "../styles";
 
-const DEFAULT_SECTIONS = [
-  { id: "dashboard", label: "Dashboard", path: "/", color: "#E63946" },
+const DEFAULT_SECTION_DEFS = [
+  { id: "dashboard", label: "Dashboard", path: "/", colorKey: "alert" },
   {
     id: "performance",
     label: "Performance Lab",
     path: "/performance",
-    color: "#E9C46A",
+    colorKey: "accent",
   },
   {
     id: "conviction",
     label: "Conviction",
     path: "/conviction",
-    color: "#2A9D8F",
+    colorKey: "baseline",
   },
-  { id: "digests", label: "Digests", path: "/digests", color: "#6D6875" },
-  { id: "glossary", label: "Glossary", path: "/glossary", color: "#818CF8" },
+  {
+    id: "digests",
+    label: "Digests",
+    path: "/digests",
+    colorKey: "dominoPolicy",
+  },
+  {
+    id: "glossary",
+    label: "Glossary",
+    path: "/glossary",
+    colorKey: "aiAccent",
+  },
 ];
 
 function isPathActive(pathname, path) {
@@ -58,17 +68,25 @@ export default function Navigation({
     navigate("/onboarding", { replace: true });
   };
 
+  const defaultSections = useMemo(
+    () =>
+      DEFAULT_SECTION_DEFS.map((d) => ({
+        ...d,
+        color: tokens.colors[d.colorKey],
+      })),
+    [tokens],
+  );
+
   const navSections = useMemo(() => {
-    if (!sections?.length) return DEFAULT_SECTIONS;
+    if (!sections?.length) return defaultSections;
     return sections.map((section, index) => ({
       ...section,
       path:
         section.path || (section.id === "dashboard" ? "/" : `/${section.id}`),
       color:
-        section.color ||
-        DEFAULT_SECTIONS[index % DEFAULT_SECTIONS.length].color,
+        section.color || defaultSections[index % defaultSections.length].color,
     }));
-  }, [sections]);
+  }, [sections, defaultSections]);
 
   useEffect(() => {
     if (typeof window === "undefined") return undefined;
@@ -197,14 +215,14 @@ export default function Navigation({
                 </span>
                 <button
                   onClick={() => setDisplayMode(DISPLAY_MODES.simplified)}
-                  style={S.tab(simplifiedMode, "#2A9D8F")}
+                  style={S.tab(simplifiedMode, tokens.colors.baseline)}
                   aria-pressed={simplifiedMode}
                 >
                   Simplified
                 </button>
                 <button
                   onClick={() => setDisplayMode(DISPLAY_MODES.full)}
-                  style={S.tab(!simplifiedMode, "#E9C46A")}
+                  style={S.tab(!simplifiedMode, tokens.colors.accent)}
                   aria-pressed={!simplifiedMode}
                 >
                   Full
@@ -232,7 +250,7 @@ export default function Navigation({
                   <button
                     onClick={handleTestAsNewUser}
                     style={{
-                      ...S.tab(false, "#F4A261"),
+                      ...S.tab(false, tokens.colors.watch),
                       fontSize: tokens.typography.sizes.label,
                       fontFamily: tokens.typography.fontMono,
                       textTransform: "uppercase",
@@ -251,7 +269,7 @@ export default function Navigation({
               aria-label="Toggle navigation menu"
               onClick={() => setIsMenuOpen((current) => !current)}
               style={{
-                ...S.sectionTab(isMenuOpen, "#E9C46A"),
+                ...S.sectionTab(isMenuOpen, tokens.colors.accent),
                 padding: "8px 12px",
                 minWidth: 44,
               }}
@@ -332,14 +350,20 @@ export default function Navigation({
             <div style={{ display: "flex", gap: 6 }}>
               <button
                 onClick={() => setDisplayMode(DISPLAY_MODES.simplified)}
-                style={{ ...S.tab(simplifiedMode, "#2A9D8F"), flex: 1 }}
+                style={{
+                  ...S.tab(simplifiedMode, tokens.colors.baseline),
+                  flex: 1,
+                }}
                 aria-pressed={simplifiedMode}
               >
                 Simplified
               </button>
               <button
                 onClick={() => setDisplayMode(DISPLAY_MODES.full)}
-                style={{ ...S.tab(!simplifiedMode, "#E9C46A"), flex: 1 }}
+                style={{
+                  ...S.tab(!simplifiedMode, tokens.colors.accent),
+                  flex: 1,
+                }}
                 aria-pressed={!simplifiedMode}
               >
                 Full
@@ -357,7 +381,7 @@ export default function Navigation({
                   handleTestAsNewUser();
                 }}
                 style={{
-                  ...S.tab(false, "#F4A261"),
+                  ...S.tab(false, tokens.colors.watch),
                   width: "100%",
                   marginTop: 8,
                 }}

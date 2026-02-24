@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { GLOSSARY } from "../data/glossary";
+import { useTheme } from "../design-tokens";
 import { S } from "../styles";
 
 const VIEWPORT_MARGIN = 8;
@@ -25,6 +26,7 @@ function resolveTerm(term) {
 }
 
 export default function GlossaryTooltip({ term, children }) {
+  const { tokens } = useTheme();
   const anchorRef = useRef(null);
   const tooltipRef = useRef(null);
   const closeTimerRef = useRef(null);
@@ -148,17 +150,16 @@ export default function GlossaryTooltip({ term, children }) {
               marginBottom: 0,
               pointerEvents: "auto",
               boxShadow: "0 10px 24px rgba(0,0,0,0.35)",
-              background:
-                "linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.02))",
+              background: `linear-gradient(180deg, ${tokens.colors.surfaceRaised}, ${tokens.colors.surfaceSoft})`,
             }}
           >
             <div
               style={{
                 fontSize: 10,
-                color: "#E9C46A",
+                color: tokens.colors.accent,
                 letterSpacing: "0.9px",
                 textTransform: "uppercase",
-                fontFamily: "'IBM Plex Mono', monospace",
+                fontFamily: tokens.typography.fontMono,
                 marginBottom: 6,
               }}
             >
@@ -167,7 +168,7 @@ export default function GlossaryTooltip({ term, children }) {
             <div
               style={{
                 fontSize: 12,
-                color: "rgba(255,255,255,0.75)",
+                color: tokens.colors.textSecondary,
                 lineHeight: 1.55,
                 marginBottom: 8,
               }}
@@ -177,11 +178,11 @@ export default function GlossaryTooltip({ term, children }) {
             <div
               style={{
                 fontSize: 11,
-                color: "rgba(255,255,255,0.55)",
+                color: tokens.colors.textMuted,
                 lineHeight: 1.5,
               }}
             >
-              <strong style={{ color: "rgba(255,255,255,0.72)" }}>
+              <strong style={{ color: tokens.colors.textSecondary }}>
                 Analogy:
               </strong>{" "}
               {entry.analogy}
@@ -193,7 +194,7 @@ export default function GlossaryTooltip({ term, children }) {
                 width: 10,
                 height: 10,
                 transform: "rotate(45deg)",
-                background: "rgba(255,255,255,0.06)",
+                background: tokens.colors.border,
                 borderLeft: "1px solid rgba(233,196,106,0.28)",
                 borderTop: "1px solid rgba(233,196,106,0.28)",
                 top: position.placement === "top" ? "calc(100% - 5px)" : -5,

@@ -10,9 +10,9 @@
 @docs/INDEX.md
 
 ## Current Phase
-- v1: Shipped (Features 1-6 done, 7-8 partial)
-- v2: Active — 11 features, 60 tasks, parallel implementation via worktrees
-- See `SPEC.md` for full v2 spec, `productivity/TODO.md` for task decomposition, `DECOMPOSITION.md` for worktree plan
+- v3.2: Shipped — backend persistence, accessibility, 46 e2e tests, Supabase infra deployed
+- v3.3: Planning
+- See `productivity/TODO.md` for milestone history and current tasks
 
 ## Constraints
 - Supabase for all persistence (signal statuses, data points, assessments, portfolios, predictions, digests)
@@ -31,18 +31,17 @@
 - Thesis config via React Context (`src/config/ThesisContext.jsx`) — components read from context, not direct imports (v2)
 - New components go in subdirectories: `src/components/onboarding/`, `src/components/performance-lab/`, `src/components/conviction/`, `src/components/digests/`, `src/components/lucid-box/`
 
-## v2 Feature Map
-1. Configuration & Theming Layer — thesis.config.js, data source plugins, ThesisContext
-2. Onboarding Wizard — career profile, resume ingestion, thesis setup, API keys
-3. Navigation & Architecture — CommandCenter decomposition, persistent nav, error boundaries
-4. Educational Layer — glossary tooltips, "Why This Matters", transmission narratives, Simplified/Full mode
-5. Signal System Polish — freshness indicators, history timeline, cascade visual upgrade
-6. Thesis Performance Lab — CSV brokerage upload, leg mapping, alignment score, QoQ performance
-7. Conviction Ledger — prediction recording, scoring, thesis batting average
-8. Signal Digest Engine — weekly narrative briefs, templates, export
-9. Design System & Responsive — tokens, breakpoints, design pipeline, themeable
-10. Backend Completion — deploy Telegram, cron evaluation, error handling, env validation
-11. OSS Packaging & Export — LICENSE, README, CONTRIBUTING, export capabilities
+## Shipped Features (v3.0-v3.2)
+- Config layer + ThesisContext, Navigation + CommandCenter decomposition
+- Educational layer (glossary, tooltips, simplified/full mode, guided tour)
+- Signal system (freshness, timeline, cascade viz, feed health, auto-threshold)
+- Performance Lab (CSV upload, leg mapping, alignment score)
+- Conviction Ledger (predictions, scoring, batting average)
+- Digest Engine (aggregator, templates, viewer, export)
+- Design system (tokens, Terminal/Observatory themes, responsive)
+- Edition system (Personal vs OSS), Onboarding wizard
+- OSS packaging (LICENSE, README, CONTRIBUTING, exports)
+- Backend: Supabase persistence, edge functions deployed, Telegram alerts
 
 ## ALOS Integration
 - Pipeline: /pipeline status

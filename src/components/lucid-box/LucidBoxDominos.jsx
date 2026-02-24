@@ -1,4 +1,5 @@
 import { S } from "../../styles";
+import { useTheme } from "../../design-tokens";
 import GlossaryTooltip from "../GlossaryTooltip";
 import DominoSection from "../DominoSection";
 
@@ -7,6 +8,8 @@ export default function LucidBoxDominos({
   activeDominos,
   onToggleDomino,
 }) {
+  const { tokens } = useTheme();
+
   return (
     <>
       <div
@@ -14,8 +17,8 @@ export default function LucidBoxDominos({
         style={{
           marginBottom: 20,
           padding: "16px",
-          background: "rgba(255,255,255,0.02)",
-          border: "1px solid rgba(255,255,255,0.06)",
+          background: tokens.colors.surfaceSoft,
+          border: `1px solid ${tokens.colors.border}`,
           borderRadius: 10,
         }}
       >
@@ -77,8 +80,11 @@ export default function LucidBoxDominos({
                         width: 8,
                         height: 8,
                         borderRadius: "50%",
-                        background: heat > 0.75 ? "#E63946" : "#F4A261",
-                        boxShadow: `0 0 5px ${heat > 0.75 ? "#E63946" : "#F4A261"}`,
+                        background:
+                          heat > 0.75
+                            ? tokens.colors.alert
+                            : tokens.colors.watch,
+                        boxShadow: `0 0 5px ${heat > 0.75 ? tokens.colors.alert : tokens.colors.watch}`,
                       }}
                     />
                   )}
@@ -112,8 +118,8 @@ export default function LucidBoxDominos({
                 width: 48,
                 textAlign: "center",
                 fontSize: 8,
-                color: "rgba(255,255,255,0.25)",
-                fontFamily: "'IBM Plex Mono'",
+                color: tokens.colors.textSubtle,
+                fontFamily: tokens.typography.fontMono,
               }}
             >
               {d.name.split(" ")[0]}
@@ -137,15 +143,15 @@ export default function LucidBoxDominos({
         style={{
           marginTop: 16,
           padding: "14px",
-          background: "rgba(255,255,255,0.02)",
-          border: "1px solid rgba(255,255,255,0.06)",
+          background: tokens.colors.surfaceSoft,
+          border: `1px solid ${tokens.colors.border}`,
           borderRadius: 10,
           fontSize: 11,
-          color: "rgba(255,255,255,0.3)",
+          color: tokens.colors.textSubtle,
           lineHeight: 1.6,
         }}
       >
-        <strong style={{ color: "rgba(255,255,255,0.45)" }}>How to Use:</strong>{" "}
+        <strong style={{ color: tokens.colors.textMuted }}>How to Use:</strong>{" "}
         Update <GlossaryTooltip term="signal">signal</GlossaryTooltip> statuses
         as new data arrives. Green ={" "}
         <GlossaryTooltip term="baseline">baseline</GlossaryTooltip>. Amber ={" "}

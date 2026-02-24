@@ -1,8 +1,10 @@
 /* eslint-disable react-refresh/only-export-components */
 import { Component } from "react";
+import { useTheme } from "../design-tokens";
 import { S } from "../styles";
 
 function DefaultFallback({ error, onRetry }) {
+  const { tokens } = useTheme();
   return (
     <div
       style={{
@@ -11,25 +13,38 @@ function DefaultFallback({ error, onRetry }) {
         padding: "16px",
       }}
     >
-      <div style={{ fontSize: 14, fontWeight: 700, color: "#E63946", marginBottom: 6 }}>
+      <div
+        style={{
+          fontSize: 14,
+          fontWeight: 700,
+          color: tokens.colors.alert,
+          marginBottom: 6,
+        }}
+      >
         Something went wrong
       </div>
-      <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", marginBottom: 10 }}>
+      <div
+        style={{
+          fontSize: 11,
+          color: tokens.colors.textMuted,
+          marginBottom: 10,
+        }}
+      >
         This section failed to render. Try reloading this section.
       </div>
       {error && (
         <div
           style={{
             fontSize: 10,
-            color: "rgba(255,255,255,0.35)",
+            color: tokens.colors.textSoft,
             marginBottom: 10,
-            fontFamily: "'IBM Plex Mono', monospace",
+            fontFamily: tokens.typography.fontMono,
           }}
         >
           {error.message}
         </div>
       )}
-      <button onClick={onRetry} style={S.sectionTab(true, "#E63946")}>
+      <button onClick={onRetry} style={S.sectionTab(true, tokens.colors.alert)}>
         Retry
       </button>
     </div>
@@ -72,6 +87,8 @@ export default class ErrorBoundary extends Component {
       return fallback;
     }
 
-    return <DefaultFallback error={this.state.error} onRetry={this.handleRetry} />;
+    return (
+      <DefaultFallback error={this.state.error} onRetry={this.handleRetry} />
+    );
   }
 }

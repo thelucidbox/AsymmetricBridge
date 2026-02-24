@@ -1,5 +1,6 @@
 import { useState } from "react";
 import ResumeIngestion from "./ResumeIngestion";
+import { useTheme } from "../../design-tokens";
 import { S } from "../../styles";
 
 const EXPERIENCE_OPTIONS = [
@@ -23,15 +24,17 @@ function dedupeGoals(goals) {
 }
 
 function FieldError({ message }) {
+  const { tokens } = useTheme();
   if (!message) return null;
   return (
-    <div style={{ color: "#F4A261", fontSize: 11, marginTop: 4 }}>
+    <div style={{ color: tokens.colors.watch, fontSize: 11, marginTop: 4 }}>
       {message}
     </div>
   );
 }
 
 export default function CareerProfile({ value, onChange, errors }) {
+  const { tokens } = useTheme();
   const [goalInput, setGoalInput] = useState("");
 
   const updateField = (field, nextValue) => {
@@ -79,7 +82,7 @@ export default function CareerProfile({ value, onChange, errors }) {
         <div
           style={{
             fontSize: 12,
-            color: "rgba(255,255,255,0.55)",
+            color: tokens.colors.textMuted,
             marginBottom: 10,
             lineHeight: 1.6,
           }}
@@ -163,7 +166,7 @@ export default function CareerProfile({ value, onChange, errors }) {
             <div
               style={{
                 fontSize: 11,
-                color: "rgba(255,255,255,0.45)",
+                color: tokens.colors.textMuted,
                 marginBottom: 6,
               }}
             >

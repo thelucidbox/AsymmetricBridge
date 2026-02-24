@@ -216,6 +216,34 @@ export const GLOSSARY = {
     analogy: "Like a help-wanted board for the entire economy.",
     relatedTerms: ["unemployment rate", "white-collar displacement"],
   },
+  NRR: {
+    definition:
+      "Net Revenue Retention. Measures how much revenue a software company keeps and grows from existing customers, including upsells minus cancellations.",
+    analogy:
+      "Like checking whether your regulars are ordering more or less each month at a restaurant.",
+    relatedTerms: ["SaaS compression", "take rate"],
+  },
+  BATNA: {
+    definition:
+      "Best Alternative To a Negotiated Agreement. The fallback option a buyer has if a deal falls through — the stronger the alternative, the more negotiating power they hold.",
+    analogy:
+      "Like knowing you have another job offer in hand before asking for a raise.",
+    relatedTerms: ["SaaS compression", "NRR"],
+  },
+  "private credit": {
+    definition:
+      "Loans made by non-bank lenders (private equity firms, hedge funds) to companies that cannot or choose not to borrow from traditional banks.",
+    analogy:
+      "Like borrowing from a wealthy neighbor instead of the bank — more flexible terms, but potentially higher stakes.",
+    relatedTerms: ["financial contagion", "default rate", "delinquency"],
+  },
+  "private equity": {
+    definition:
+      "Investment firms that buy companies (or large stakes in them) using a mix of their own money and borrowed funds, aiming to improve and resell at a profit.",
+    analogy:
+      "Like flipping houses but with entire businesses — buy, renovate, sell.",
+    relatedTerms: ["private credit", "financial contagion", "drawdown"],
+  },
 };
 
 export const GLOSSARY_KEYS = Object.keys(GLOSSARY);

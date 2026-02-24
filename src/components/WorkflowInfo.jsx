@@ -1,4 +1,5 @@
 import { S, STATUS_CFG } from "../styles";
+import { useTheme } from "../design-tokens";
 import { THRESHOLD_RULES, RULE_STATS } from "../lib/threshold-rules";
 import { DOMINOS } from "../data/dominos";
 
@@ -26,6 +27,8 @@ const DOMINO_NAMES = {
 };
 
 export default function WorkflowInfo() {
+  const { tokens } = useTheme();
+
   return (
     <div>
       {/* Overview */}
@@ -34,7 +37,7 @@ export default function WorkflowInfo() {
           style={{
             fontSize: 13,
             fontWeight: 600,
-            color: "#E9C46A",
+            color: tokens.colors.accent,
             marginBottom: 8,
           }}
         >
@@ -43,7 +46,7 @@ export default function WorkflowInfo() {
         <div
           style={{
             fontSize: 12,
-            color: "rgba(255,255,255,0.6)",
+            color: tokens.colors.textSecondary,
             lineHeight: 1.7,
           }}
         >
@@ -64,23 +67,29 @@ export default function WorkflowInfo() {
       >
         <div
           style={{
-            background: "rgba(42,157,143,0.1)",
-            border: "1px solid rgba(42,157,143,0.25)",
+            background: tokens.colors.baselineBg,
+            border: `1px solid ${tokens.colors.baselineBorder}`,
             borderRadius: 8,
             padding: "12px",
             textAlign: "center",
           }}
         >
-          <div style={{ fontSize: 22, fontWeight: 700, color: "#2A9D8F" }}>
+          <div
+            style={{
+              fontSize: 22,
+              fontWeight: 700,
+              color: tokens.colors.baseline,
+            }}
+          >
             {RULE_STATS.auto}
           </div>
           <div
             style={{
               fontSize: 9,
-              color: "rgba(255,255,255,0.35)",
+              color: tokens.colors.textSoft,
               textTransform: "uppercase",
               letterSpacing: "1px",
-              fontFamily: "'IBM Plex Mono'",
+              fontFamily: tokens.typography.fontMono,
             }}
           >
             Auto-Evaluated
@@ -88,23 +97,29 @@ export default function WorkflowInfo() {
         </div>
         <div
           style={{
-            background: "rgba(244,162,97,0.1)",
-            border: "1px solid rgba(244,162,97,0.25)",
+            background: tokens.colors.watchBg,
+            border: `1px solid ${tokens.colors.watchBorder}`,
             borderRadius: 8,
             padding: "12px",
             textAlign: "center",
           }}
         >
-          <div style={{ fontSize: 22, fontWeight: 700, color: "#F4A261" }}>
+          <div
+            style={{
+              fontSize: 22,
+              fontWeight: 700,
+              color: tokens.colors.watch,
+            }}
+          >
             {RULE_STATS.manual}
           </div>
           <div
             style={{
               fontSize: 9,
-              color: "rgba(255,255,255,0.35)",
+              color: tokens.colors.textSoft,
               textTransform: "uppercase",
               letterSpacing: "1px",
-              fontFamily: "'IBM Plex Mono'",
+              fontFamily: tokens.typography.fontMono,
             }}
           >
             Manual Input
@@ -112,23 +127,25 @@ export default function WorkflowInfo() {
         </div>
         <div
           style={{
-            background: "rgba(255,255,255,0.04)",
-            border: "1px solid rgba(255,255,255,0.1)",
+            background: tokens.colors.borderSubtle,
+            border: `1px solid ${tokens.colors.borderStrong}`,
             borderRadius: 8,
             padding: "12px",
             textAlign: "center",
           }}
         >
-          <div style={{ fontSize: 22, fontWeight: 700, color: "#E8E4DF" }}>
+          <div
+            style={{ fontSize: 22, fontWeight: 700, color: tokens.colors.text }}
+          >
             {RULE_STATS.total}
           </div>
           <div
             style={{
               fontSize: 9,
-              color: "rgba(255,255,255,0.35)",
+              color: tokens.colors.textSoft,
               textTransform: "uppercase",
               letterSpacing: "1px",
-              fontFamily: "'IBM Plex Mono'",
+              fontFamily: tokens.typography.fontMono,
             }}
           >
             Total Signals
@@ -142,7 +159,7 @@ export default function WorkflowInfo() {
         <div
           style={{
             fontSize: 11,
-            color: "rgba(255,255,255,0.45)",
+            color: tokens.colors.textMuted,
             marginBottom: 10,
             lineHeight: 1.5,
           }}
@@ -161,23 +178,23 @@ export default function WorkflowInfo() {
               padding: "8px 0",
               borderBottom:
                 i < AUTO_SIGNALS.length - 1
-                  ? "1px solid rgba(255,255,255,0.04)"
+                  ? `1px solid ${tokens.colors.borderSubtle}`
                   : "none",
             }}
           >
             <div>
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,0.7)" }}>
+              <div style={{ fontSize: 12, color: tokens.colors.textSecondary }}>
                 {rule.signal_name}
               </div>
-              <div style={{ fontSize: 9, color: "rgba(255,255,255,0.25)" }}>
+              <div style={{ fontSize: 9, color: tokens.colors.textSubtle }}>
                 D{rule.domino_id}: {DOMINO_NAMES[rule.domino_id]}
               </div>
             </div>
             <div
               style={{
                 fontSize: 9,
-                color: "#2A9D8F",
-                fontFamily: "'IBM Plex Mono'",
+                color: tokens.colors.baseline,
+                fontFamily: tokens.typography.fontMono,
                 textTransform: "uppercase",
               }}
             >
@@ -186,11 +203,11 @@ export default function WorkflowInfo() {
             <div
               style={{
                 fontSize: 9,
-                color: "rgba(255,255,255,0.35)",
-                fontFamily: "'IBM Plex Mono'",
+                color: tokens.colors.textSoft,
+                fontFamily: tokens.typography.fontMono,
               }}
             >
-              {CADENCE[rule.data_source] || "—"}
+              {CADENCE[rule.data_source] || "\u2014"}
             </div>
           </div>
         ))}
@@ -206,7 +223,7 @@ export default function WorkflowInfo() {
             <div
               style={{
                 fontSize: 11,
-                color: "rgba(255,255,255,0.45)",
+                color: tokens.colors.textMuted,
                 marginBottom: 10,
                 lineHeight: 1.5,
               }}
@@ -221,17 +238,19 @@ export default function WorkflowInfo() {
                   padding: "8px 0",
                   borderBottom:
                     i < LIMITED_SIGNALS.length - 1
-                      ? "1px solid rgba(255,255,255,0.04)"
+                      ? `1px solid ${tokens.colors.borderSubtle}`
                       : "none",
                 }}
               >
-                <div style={{ fontSize: 12, color: "rgba(255,255,255,0.7)" }}>
+                <div
+                  style={{ fontSize: 12, color: tokens.colors.textSecondary }}
+                >
                   {rule.signal_name}
                 </div>
                 <div
                   style={{
                     fontSize: 10,
-                    color: "rgba(255,255,255,0.35)",
+                    color: tokens.colors.textSoft,
                     marginTop: 2,
                   }}
                 >
@@ -253,7 +272,7 @@ export default function WorkflowInfo() {
         <div
           style={{
             fontSize: 11,
-            color: "rgba(255,255,255,0.5)",
+            color: tokens.colors.textMuted,
             marginBottom: 6,
             lineHeight: 1.6,
           }}
@@ -264,11 +283,11 @@ export default function WorkflowInfo() {
         <div
           style={{
             fontSize: 11,
-            color: "#F4A261",
+            color: tokens.colors.watch,
             fontWeight: 600,
             marginBottom: 12,
             padding: "6px 10px",
-            background: "rgba(244,162,97,0.08)",
+            background: tokens.colors.watchBg,
             borderRadius: 6,
           }}
         >
@@ -287,7 +306,7 @@ export default function WorkflowInfo() {
                 padding: "10px 0",
                 borderBottom:
                   i < MANUAL_SIGNALS.length - 1
-                    ? "1px solid rgba(255,255,255,0.04)"
+                    ? `1px solid ${tokens.colors.borderSubtle}`
                     : "none",
               }}
             >
@@ -303,7 +322,7 @@ export default function WorkflowInfo() {
                   style={{
                     fontSize: 12,
                     fontWeight: 600,
-                    color: "rgba(255,255,255,0.75)",
+                    color: tokens.colors.textSecondary,
                   }}
                 >
                   {rule.signal_name}
@@ -311,10 +330,10 @@ export default function WorkflowInfo() {
                 <div
                   style={{
                     fontSize: 8,
-                    color: "#F4A261",
-                    fontFamily: "'IBM Plex Mono'",
+                    color: tokens.colors.watch,
+                    fontFamily: tokens.typography.fontMono,
                     textTransform: "uppercase",
-                    letterSpacing: "0.5px",
+                    letterSpacing: tokens.typography.letterSpacing.badge,
                   }}
                 >
                   {signal?.frequency || "Manual"}
@@ -323,7 +342,7 @@ export default function WorkflowInfo() {
               <div
                 style={{
                   fontSize: 9,
-                  color: "rgba(255,255,255,0.25)",
+                  color: tokens.colors.textSubtle,
                   marginBottom: 4,
                 }}
               >
@@ -334,23 +353,29 @@ export default function WorkflowInfo() {
                   style={{
                     fontSize: 10,
                     lineHeight: 1.6,
-                    color: "rgba(255,255,255,0.4)",
+                    color: tokens.colors.textSoft,
                   }}
                 >
                   <div>
-                    <span style={{ color: "#2A9D8F", fontWeight: 600 }}>
+                    <span
+                      style={{ color: tokens.colors.baseline, fontWeight: 600 }}
+                    >
                       Source:
                     </span>{" "}
                     {signal.source}
                   </div>
                   <div>
-                    <span style={{ color: "#E9C46A", fontWeight: 600 }}>
+                    <span
+                      style={{ color: tokens.colors.accent, fontWeight: 600 }}
+                    >
                       Baseline:
                     </span>{" "}
                     {signal.baseline}
                   </div>
                   <div>
-                    <span style={{ color: "#E63946", fontWeight: 600 }}>
+                    <span
+                      style={{ color: tokens.colors.alert, fontWeight: 600 }}
+                    >
                       Red when:
                     </span>{" "}
                     {signal.threshold}
@@ -369,22 +394,22 @@ export default function WorkflowInfo() {
 
       {/* How to Update */}
       <div style={S.label}>How to Update Signals</div>
-      <div style={S.card("rgba(255,255,255,0.06)")}>
+      <div style={S.card(tokens.colors.border)}>
         {[
           {
             method: "Update Signal Tab",
             desc: "Use the form in this dashboard to change any signal's status with a reason.",
-            color: "#E9C46A",
+            color: tokens.colors.accent,
           },
           {
             method: "Claude Code Skill",
             desc: "Run /signal-update in Claude Code for conversational updates with context.",
-            color: "#2A9D8F",
+            color: tokens.colors.baseline,
           },
           {
             method: "Supabase Direct",
             desc: "Edit the signal_statuses table directly in the Supabase dashboard.",
-            color: "#6D6875",
+            color: tokens.colors.dominoPolicy,
           },
         ].map((m, i) => (
           <div
@@ -394,7 +419,8 @@ export default function WorkflowInfo() {
               gap: 10,
               alignItems: "flex-start",
               padding: "8px 0",
-              borderBottom: i < 2 ? "1px solid rgba(255,255,255,0.04)" : "none",
+              borderBottom:
+                i < 2 ? `1px solid ${tokens.colors.borderSubtle}` : "none",
             }}
           >
             <div
@@ -411,7 +437,7 @@ export default function WorkflowInfo() {
               <div style={{ fontSize: 12, fontWeight: 600, color: m.color }}>
                 {m.method}
               </div>
-              <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)" }}>
+              <div style={{ fontSize: 11, color: tokens.colors.textSoft }}>
                 {m.desc}
               </div>
             </div>
@@ -420,32 +446,36 @@ export default function WorkflowInfo() {
       </div>
 
       {/* Cadence Guide */}
-      <div style={{ ...S.card("rgba(255,255,255,0.06)"), marginTop: 10 }}>
+      <div style={{ ...S.card(tokens.colors.border), marginTop: 10 }}>
         <div style={S.label}>Suggested Update Cadence</div>
         <div
           style={{
             fontSize: 11,
-            color: "rgba(255,255,255,0.45)",
+            color: tokens.colors.textMuted,
             lineHeight: 1.7,
           }}
         >
           <div>
-            <span style={{ color: "#2A9D8F", fontWeight: 600 }}>Weekly:</span>{" "}
+            <span style={{ color: tokens.colors.baseline, fontWeight: 600 }}>
+              Weekly:
+            </span>{" "}
             Check JOLTS, jobless claims, BLS data as they release
           </div>
           <div>
-            <span style={{ color: "#E9C46A", fontWeight: 600 }}>Monthly:</span>{" "}
+            <span style={{ color: tokens.colors.accent, fontWeight: 600 }}>
+              Monthly:
+            </span>{" "}
             Indeed job postings, mortgage delinquency, Challenger layoffs
           </div>
           <div>
-            <span style={{ color: "#F4A261", fontWeight: 600 }}>
+            <span style={{ color: tokens.colors.watch, fontWeight: 600 }}>
               Quarterly:
             </span>{" "}
             Earnings season signals (NRR, take rates, V/MA volume, PE defaults,
             spending forecasts)
           </div>
           <div>
-            <span style={{ color: "#E63946", fontWeight: 600 }}>
+            <span style={{ color: tokens.colors.alert, fontWeight: 600 }}>
               As Announced:
             </span>{" "}
             Fed language, Congressional activity, NAIC actions, YC batches

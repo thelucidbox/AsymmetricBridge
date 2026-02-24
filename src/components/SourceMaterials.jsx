@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { COMPARISON } from "../data/comparison";
 import { SOURCES } from "../data/sources";
+import { useTheme } from "../design-tokens";
 
 export default function SourceMaterials() {
+  const { tokens } = useTheme();
   const [expanded, setExpanded] = useState(0);
   const [showComparison, setShowComparison] = useState(false);
 
@@ -10,9 +12,9 @@ export default function SourceMaterials() {
     <div
       style={{
         minHeight: "100vh",
-        background: "#0D0D0F",
-        color: "#E8E4DF",
-        fontFamily: "'IBM Plex Sans', -apple-system, sans-serif",
+        background: tokens.colors.bg,
+        color: tokens.colors.text,
+        fontFamily: tokens.typography.fontSans,
         padding: "24px 16px",
       }}
     >
@@ -30,7 +32,7 @@ export default function SourceMaterials() {
               style={{
                 width: 3,
                 height: 24,
-                background: "linear-gradient(180deg, #E9C46A, #E63946)",
+                background: `linear-gradient(180deg, ${tokens.colors.accent}, ${tokens.colors.alert})`,
                 borderRadius: 2,
               }}
             />
@@ -43,9 +45,9 @@ export default function SourceMaterials() {
           <p
             style={{
               fontSize: 10,
-              color: "rgba(255,255,255,0.2)",
+              color: tokens.colors.textSubtle,
               marginLeft: 11,
-              fontFamily: "'IBM Plex Mono'",
+              fontFamily: tokens.typography.fontMono,
             }}
           >
             The foundational readings behind the Asymmetric Bridge strategy
@@ -57,14 +59,13 @@ export default function SourceMaterials() {
           <div
             key={i}
             style={{
-              background: "rgba(255,255,255,0.025)",
-              border: `1px solid ${expanded === i ? `${s.color}33` : "rgba(255,255,255,0.06)"}`,
+              background: tokens.colors.surface,
+              border: `1px solid ${expanded === i ? `${s.color}33` : tokens.colors.border}`,
               borderRadius: 10,
               padding: "16px 18px",
               marginBottom: 12,
               cursor: "pointer",
-              transition:
-                "color 0.2s, background 0.2s, border-color 0.2s, opacity 0.2s, box-shadow 0.2s",
+              transition: tokens.motion.default,
             }}
             onClick={() => setExpanded(expanded === i ? -1 : i)}
           >
@@ -100,8 +101,8 @@ export default function SourceMaterials() {
                   <span
                     style={{
                       fontSize: 10,
-                      color: "rgba(255,255,255,0.25)",
-                      fontFamily: "'IBM Plex Mono'",
+                      color: tokens.colors.textSubtle,
+                      fontFamily: tokens.typography.fontMono,
                     }}
                   >
                     {s.date}
@@ -111,13 +112,13 @@ export default function SourceMaterials() {
                   style={{
                     fontSize: 16,
                     fontWeight: 600,
-                    color: "#E8E4DF",
+                    color: tokens.colors.text,
                     marginBottom: 2,
                   }}
                 >
                   {s.title}
                 </div>
-                <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)" }}>
+                <div style={{ fontSize: 12, color: tokens.colors.textSoft }}>
                   {s.author}
                 </div>
                 {s.tldr && (
@@ -125,7 +126,7 @@ export default function SourceMaterials() {
                     style={{
                       marginTop: 5,
                       fontSize: 11,
-                      color: "rgba(255,255,255,0.58)",
+                      color: tokens.colors.textMuted,
                       lineHeight: 1.5,
                     }}
                   >
@@ -135,7 +136,7 @@ export default function SourceMaterials() {
               </div>
               <span
                 style={{
-                  color: "rgba(255,255,255,0.2)",
+                  color: tokens.colors.textSubtle,
                   transform: expanded === i ? "rotate(180deg)" : "rotate(0)",
                   transition: "transform 0.2s",
                 }}
@@ -149,7 +150,7 @@ export default function SourceMaterials() {
                 style={{
                   marginTop: 14,
                   paddingTop: 14,
-                  borderTop: "1px solid rgba(255,255,255,0.06)",
+                  borderTop: `1px solid ${tokens.colors.border}`,
                 }}
               >
                 {/* Links */}
@@ -178,9 +179,9 @@ export default function SourceMaterials() {
                       rel="noopener noreferrer"
                       style={{
                         fontSize: 11,
-                        color: "rgba(255,255,255,0.5)",
-                        background: "rgba(255,255,255,0.05)",
-                        border: "1px solid rgba(255,255,255,0.1)",
+                        color: tokens.colors.textMuted,
+                        background: tokens.colors.borderSubtle,
+                        border: `1px solid ${tokens.colors.borderStrong}`,
                         padding: "4px 10px",
                         borderRadius: 5,
                       }}
@@ -195,7 +196,7 @@ export default function SourceMaterials() {
                 <div
                   style={{
                     fontSize: 10,
-                    color: "rgba(255,255,255,0.3)",
+                    color: tokens.colors.textSubtle,
                     marginBottom: 4,
                   }}
                 >
@@ -204,7 +205,7 @@ export default function SourceMaterials() {
                 <div
                   style={{
                     fontSize: 12,
-                    color: "rgba(255,255,255,0.7)",
+                    color: tokens.colors.textSecondary,
                     lineHeight: 1.7,
                     marginBottom: 12,
                     padding: "10px 12px",
@@ -221,11 +222,11 @@ export default function SourceMaterials() {
                 <div
                   style={{
                     fontSize: 10,
-                    color: "rgba(255,255,255,0.35)",
+                    color: tokens.colors.textSoft,
                     textTransform: "uppercase",
                     letterSpacing: "1px",
                     marginBottom: 6,
-                    fontFamily: "'IBM Plex Mono'",
+                    fontFamily: tokens.typography.fontMono,
                   }}
                 >
                   Key Arguments
@@ -239,7 +240,7 @@ export default function SourceMaterials() {
                       padding: "6px 0",
                       borderBottom:
                         ci < s.chapters.length - 1
-                          ? "1px solid rgba(255,255,255,0.03)"
+                          ? `1px solid ${tokens.colors.surfaceRaised}`
                           : "none",
                     }}
                   >
@@ -248,7 +249,7 @@ export default function SourceMaterials() {
                         fontSize: 10,
                         color: s.color,
                         fontWeight: 700,
-                        fontFamily: "'IBM Plex Mono'",
+                        fontFamily: tokens.typography.fontMono,
                         flexShrink: 0,
                         width: 16,
                       }}
@@ -258,7 +259,7 @@ export default function SourceMaterials() {
                     <span
                       style={{
                         fontSize: 11,
-                        color: "rgba(255,255,255,0.55)",
+                        color: tokens.colors.textMuted,
                         lineHeight: 1.5,
                       }}
                     >
@@ -272,14 +273,14 @@ export default function SourceMaterials() {
                   style={{
                     marginTop: 12,
                     padding: "10px 12px",
-                    background: "rgba(255,255,255,0.03)",
+                    background: tokens.colors.surfaceRaised,
                     borderRadius: 6,
                   }}
                 >
                   <div
                     style={{
                       fontSize: 10,
-                      color: "#E9C46A",
+                      color: tokens.colors.accent,
                       fontWeight: 600,
                       letterSpacing: "0.8px",
                       marginBottom: 4,
@@ -290,7 +291,7 @@ export default function SourceMaterials() {
                   <div
                     style={{
                       fontSize: 12,
-                      color: "rgba(255,255,255,0.6)",
+                      color: tokens.colors.textSecondary,
                       lineHeight: 1.6,
                     }}
                   >
@@ -311,7 +312,7 @@ export default function SourceMaterials() {
                     <div
                       style={{
                         fontSize: 10,
-                        color: "#2A9D8F",
+                        color: tokens.colors.baseline,
                         fontWeight: 600,
                         letterSpacing: "0.8px",
                         marginBottom: 4,
@@ -324,7 +325,7 @@ export default function SourceMaterials() {
                         key={si}
                         style={{
                           fontSize: 10,
-                          color: "rgba(255,255,255,0.45)",
+                          color: tokens.colors.textMuted,
                           padding: "3px 0",
                           lineHeight: 1.4,
                         }}
@@ -337,7 +338,7 @@ export default function SourceMaterials() {
                     <div
                       style={{
                         fontSize: 10,
-                        color: "#E63946",
+                        color: tokens.colors.alert,
                         fontWeight: 600,
                         letterSpacing: "0.8px",
                         marginBottom: 4,
@@ -350,7 +351,7 @@ export default function SourceMaterials() {
                         key={wi}
                         style={{
                           fontSize: 10,
-                          color: "rgba(255,255,255,0.45)",
+                          color: tokens.colors.textMuted,
                           padding: "3px 0",
                           lineHeight: 1.4,
                         }}
@@ -369,8 +370,8 @@ export default function SourceMaterials() {
         <div
           onClick={() => setShowComparison(!showComparison)}
           style={{
-            background: "rgba(255,255,255,0.03)",
-            border: "1px solid rgba(255,255,255,0.1)",
+            background: tokens.colors.surfaceRaised,
+            border: `1px solid ${tokens.colors.borderStrong}`,
             borderRadius: 10,
             padding: "16px 18px",
             marginTop: 16,
@@ -389,7 +390,7 @@ export default function SourceMaterials() {
             </span>
             <span
               style={{
-                color: "rgba(255,255,255,0.2)",
+                color: tokens.colors.textSubtle,
                 transform: showComparison ? "rotate(180deg)" : "rotate(0)",
                 transition: "transform 0.2s",
               }}
@@ -403,7 +404,7 @@ export default function SourceMaterials() {
               style={{
                 marginTop: 14,
                 paddingTop: 14,
-                borderTop: "1px solid rgba(255,255,255,0.06)",
+                borderTop: `1px solid ${tokens.colors.border}`,
               }}
               onClick={(e) => e.stopPropagation()}
             >
@@ -411,11 +412,11 @@ export default function SourceMaterials() {
               <div
                 style={{
                   fontSize: 10,
-                  color: "rgba(255,255,255,0.35)",
+                  color: tokens.colors.textSoft,
                   textTransform: "uppercase",
                   letterSpacing: "1px",
                   marginBottom: 6,
-                  fontFamily: "'IBM Plex Mono'",
+                  fontFamily: tokens.typography.fontMono,
                 }}
               >
                 Where They Agree
@@ -425,10 +426,10 @@ export default function SourceMaterials() {
                   key={i}
                   style={{
                     fontSize: 11,
-                    color: "rgba(255,255,255,0.55)",
+                    color: tokens.colors.textMuted,
                     padding: "4px 0",
                     paddingLeft: 12,
-                    borderLeft: "2px solid rgba(255,255,255,0.06)",
+                    borderLeft: `2px solid ${tokens.colors.border}`,
                   }}
                 >
                   {o}
@@ -439,12 +440,12 @@ export default function SourceMaterials() {
               <div
                 style={{
                   fontSize: 10,
-                  color: "rgba(255,255,255,0.35)",
+                  color: tokens.colors.textSoft,
                   textTransform: "uppercase",
                   letterSpacing: "1px",
                   marginTop: 16,
                   marginBottom: 8,
-                  fontFamily: "'IBM Plex Mono'",
+                  fontFamily: tokens.typography.fontMono,
                 }}
               >
                 Where They Diverge
@@ -455,14 +456,16 @@ export default function SourceMaterials() {
                   gridTemplateColumns: "80px 1fr 1fr",
                   gap: 0,
                   fontSize: 9,
-                  color: "rgba(255,255,255,0.25)",
-                  fontFamily: "'IBM Plex Mono'",
+                  color: tokens.colors.textSubtle,
+                  fontFamily: tokens.typography.fontMono,
                   marginBottom: 4,
                 }}
               >
                 <div>Topic</div>
-                <div style={{ color: "#E63946" }}>Citrini (Bear)</div>
-                <div style={{ color: "#E9C46A" }}>Leopold (Capability)</div>
+                <div style={{ color: tokens.colors.alert }}>Citrini (Bear)</div>
+                <div style={{ color: tokens.colors.accent }}>
+                  Leopold (Capability)
+                </div>
               </div>
               {COMPARISON.divergence.map((d, i) => (
                 <div
@@ -472,25 +475,25 @@ export default function SourceMaterials() {
                     gridTemplateColumns: "80px 1fr 1fr",
                     gap: 8,
                     padding: "6px 0",
-                    borderBottom: "1px solid rgba(255,255,255,0.03)",
+                    borderBottom: `1px solid ${tokens.colors.surfaceRaised}`,
                   }}
                 >
                   <span
                     style={{
                       fontSize: 10,
                       fontWeight: 600,
-                      color: "rgba(255,255,255,0.5)",
+                      color: tokens.colors.textMuted,
                     }}
                   >
                     {d.topic}
                   </span>
                   <span
-                    style={{ fontSize: 10, color: "rgba(255,255,255,0.45)" }}
+                    style={{ fontSize: 10, color: tokens.colors.textMuted }}
                   >
                     {d.citrini}
                   </span>
                   <span
-                    style={{ fontSize: 10, color: "rgba(255,255,255,0.45)" }}
+                    style={{ fontSize: 10, color: tokens.colors.textMuted }}
                   >
                     {d.leopold}
                   </span>
@@ -504,7 +507,7 @@ export default function SourceMaterials() {
                   padding: "12px 14px",
                   background:
                     "linear-gradient(135deg, #E6394608, #E9C46A08, #2A9D8F08)",
-                  border: "1px solid rgba(255,255,255,0.08)",
+                  border: `1px solid ${tokens.colors.border}`,
                   borderRadius: 8,
                 }}
               >
@@ -512,7 +515,7 @@ export default function SourceMaterials() {
                   style={{
                     fontSize: 10,
                     fontWeight: 700,
-                    color: "#E9C46A",
+                    color: tokens.colors.accent,
                     letterSpacing: "1px",
                     marginBottom: 6,
                   }}
@@ -522,7 +525,7 @@ export default function SourceMaterials() {
                 <div
                   style={{
                     fontSize: 12,
-                    color: "rgba(255,255,255,0.7)",
+                    color: tokens.colors.textSecondary,
                     lineHeight: 1.7,
                   }}
                 >
@@ -538,8 +541,8 @@ export default function SourceMaterials() {
             marginTop: 24,
             textAlign: "center",
             fontSize: 9,
-            color: "rgba(255,255,255,0.12)",
-            borderTop: "1px solid rgba(255,255,255,0.04)",
+            color: tokens.colors.borderStrong,
+            borderTop: `1px solid ${tokens.colors.borderSubtle}`,
             padding: "14px",
           }}
         >

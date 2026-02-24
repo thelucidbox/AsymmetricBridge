@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../lib/supabase";
+import { useTheme } from "../design-tokens";
 import { STATUS_CFG, S } from "../styles";
 
 const MIN_SEGMENT_MS = 60 * 60 * 1000;
@@ -156,6 +157,7 @@ async function fetchSignalTimeline(signal) {
 }
 
 export default function SignalTimeline({ signal }) {
+  const { tokens } = useTheme();
   const { data: history = [], isLoading } = useQuery({
     queryKey: [
       "signal-timeline",
@@ -221,7 +223,7 @@ export default function SignalTimeline({ signal }) {
           style={{
             height: 18,
             borderRadius: 6,
-            background: "rgba(255,255,255,0.08)",
+            background: tokens.colors.border,
           }}
         />
       </div>
@@ -235,9 +237,9 @@ export default function SignalTimeline({ signal }) {
         <div
           style={{
             fontSize: 11,
-            color: "rgba(255,255,255,0.4)",
-            background: "rgba(255,255,255,0.03)",
-            border: "1px dashed rgba(255,255,255,0.16)",
+            color: tokens.colors.textSoft,
+            background: tokens.colors.surfaceRaised,
+            border: `1px dashed ${tokens.colors.borderStrong}`,
             borderRadius: 6,
             padding: "8px 10px",
           }}
@@ -257,8 +259,8 @@ export default function SignalTimeline({ signal }) {
           height: 18,
           borderRadius: 6,
           overflow: "hidden",
-          border: "1px solid rgba(255,255,255,0.1)",
-          background: "rgba(255,255,255,0.03)",
+          border: `1px solid ${tokens.colors.borderStrong}`,
+          background: tokens.colors.surfaceRaised,
         }}
       >
         {segments.map((segment, index) => {
@@ -289,8 +291,8 @@ export default function SignalTimeline({ signal }) {
           display: "flex",
           justifyContent: "space-between",
           fontSize: 10,
-          color: "rgba(255,255,255,0.38)",
-          fontFamily: "'IBM Plex Mono', monospace",
+          color: tokens.colors.textSoft,
+          fontFamily: tokens.typography.fontMono,
         }}
       >
         <span>{formatDate(segments[0].start)}</span>

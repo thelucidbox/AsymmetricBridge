@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { isOwnerMode, useThesis } from "../config/ThesisContext";
+import { useTheme } from "../design-tokens";
 import { getFredApiKey } from "../lib/fred";
 import { getTwelveDataApiKey } from "../lib/stocks";
 import { S } from "../styles";
@@ -70,6 +71,7 @@ function findTarget(selector) {
 export default function GuidedTour() {
   const location = useLocation();
   const { hasThesis } = useThesis();
+  const { tokens } = useTheme();
   const cardRef = useRef(null);
   const previousFocusRef = useRef(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -307,11 +309,11 @@ export default function GuidedTour() {
           <span
             style={{
               fontSize: 10,
-              color: "#E9C46A",
+              color: tokens.colors.accent,
               fontWeight: 700,
               letterSpacing: "0.9px",
               textTransform: "uppercase",
-              fontFamily: "'IBM Plex Mono', monospace",
+              fontFamily: tokens.typography.fontMono,
             }}
           >
             Guided Tour
@@ -319,8 +321,8 @@ export default function GuidedTour() {
           <span
             style={{
               fontSize: 10,
-              color: "rgba(255,255,255,0.45)",
-              fontFamily: "'IBM Plex Mono', monospace",
+              color: tokens.colors.textMuted,
+              fontFamily: tokens.typography.fontMono,
             }}
           >
             {progressText}
@@ -333,7 +335,7 @@ export default function GuidedTour() {
         <div
           style={{
             fontSize: 12,
-            color: "rgba(255,255,255,0.72)",
+            color: tokens.colors.textSecondary,
             lineHeight: 1.6,
             marginBottom: 14,
           }}
@@ -352,9 +354,9 @@ export default function GuidedTour() {
           <button
             onClick={closeTour}
             style={{
-              ...S.tab(false, "#F4A261"),
-              borderColor: "rgba(255,255,255,0.12)",
-              color: "rgba(255,255,255,0.6)",
+              ...S.tab(false, tokens.colors.watch),
+              borderColor: tokens.colors.borderStrong,
+              color: tokens.colors.textSecondary,
             }}
           >
             Skip
@@ -366,7 +368,7 @@ export default function GuidedTour() {
               }
               disabled={stepIndex === 0}
               style={{
-                ...S.tab(stepIndex > 0, "#6D6875"),
+                ...S.tab(stepIndex > 0, tokens.colors.dominoPolicy),
                 opacity: stepIndex === 0 ? 0.5 : 1,
                 cursor: stepIndex === 0 ? "not-allowed" : "pointer",
               }}
@@ -383,7 +385,7 @@ export default function GuidedTour() {
                   Math.min(current + 1, steps.length - 1),
                 );
               }}
-              style={S.tab(true, "#E9C46A")}
+              style={S.tab(true, tokens.colors.accent)}
             >
               {isLast ? "Finish" : "Next"}
             </button>

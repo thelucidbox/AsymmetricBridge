@@ -74,7 +74,7 @@ export function useUpdateSignalStatus() {
           status: newStatus,
           is_override: triggerType === "manual",
           updated_at: new Date().toISOString(),
-          updated_by: triggerType === "manual" ? "claude-code" : "system",
+          updated_by: triggerType === "manual" ? "manual" : "system",
         })
         .eq("domino_id", dominoId)
         .eq("signal_name", signalName);

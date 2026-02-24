@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useThesis, isOwnerMode } from "../../config/ThesisContext";
 import fabianThesis from "../../config/fabian-thesis";
 import { validateThesis } from "../../config/thesis-schema";
+import { useTheme } from "../../design-tokens";
 import { S } from "../../styles";
 import APIKeySetup from "./APIKeySetup";
 import CareerProfile from "./CareerProfile";
@@ -88,6 +89,7 @@ function normalizeGoals(goals) {
 }
 
 export default function OnboardingWizard() {
+  const { tokens } = useTheme();
   const navigate = useNavigate();
   const { updateThesis, isTestMode, exitTestMode } = useThesis();
 
@@ -330,7 +332,7 @@ export default function OnboardingWizard() {
           <div
             style={{
               fontSize: 12,
-              color: "rgba(255,255,255,0.6)",
+              color: tokens.colors.textSecondary,
               lineHeight: 1.6,
             }}
           >
@@ -342,7 +344,7 @@ export default function OnboardingWizard() {
               style={{
                 marginTop: 8,
                 fontSize: 11,
-                color: "rgba(255,255,255,0.4)",
+                color: tokens.colors.textSoft,
               }}
             >
               Step {currentStep} of {STEPS.length - 1}
@@ -427,6 +429,7 @@ function WelcomeStep({
   isTestMode,
   onExitTestMode,
 }) {
+  const { tokens } = useTheme();
   return (
     <div>
       {isTestMode && isOwnerMode && (
@@ -442,7 +445,7 @@ function WelcomeStep({
               <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 4 }}>
                 Testing as new user
               </div>
-              <div style={{ fontSize: 11, color: "rgba(255,255,255,0.55)" }}>
+              <div style={{ fontSize: 11, color: tokens.colors.textMuted }}>
                 You are seeing the open source onboarding experience.
               </div>
             </div>
@@ -464,7 +467,7 @@ function WelcomeStep({
             display: "grid",
             gap: 14,
             fontSize: 13,
-            color: "rgba(255,255,255,0.75)",
+            color: tokens.colors.textSecondary,
             lineHeight: 1.7,
           }}
         >
@@ -472,7 +475,7 @@ function WelcomeStep({
             style={{
               fontSize: 15,
               fontWeight: 600,
-              color: "#E8E4DF",
+              color: tokens.colors.text,
               lineHeight: 1.5,
             }}
           >
@@ -495,7 +498,7 @@ function WelcomeStep({
         <div
           style={{
             fontSize: 12,
-            color: "rgba(255,255,255,0.5)",
+            color: tokens.colors.textMuted,
             marginBottom: 12,
             lineHeight: 1.6,
           }}
@@ -547,7 +550,7 @@ function WelcomeStep({
                 <div
                   style={{
                     fontSize: 12,
-                    color: "rgba(255,255,255,0.55)",
+                    color: tokens.colors.textMuted,
                     lineHeight: 1.5,
                   }}
                 >
@@ -561,7 +564,7 @@ function WelcomeStep({
                     right: -6,
                     top: "50%",
                     transform: "translateY(-50%)",
-                    color: "rgba(255,255,255,0.15)",
+                    color: tokens.colors.borderStrong,
                     fontSize: 14,
                     display: "none",
                   }}
@@ -579,7 +582,7 @@ function WelcomeStep({
         <div
           style={{
             fontSize: 12,
-            color: "rgba(255,255,255,0.55)",
+            color: tokens.colors.textMuted,
             lineHeight: 1.7,
           }}
         >
@@ -603,7 +606,7 @@ function WelcomeStep({
             display: "grid",
             gap: 6,
             fontSize: 12,
-            color: "rgba(255,255,255,0.6)",
+            color: tokens.colors.textSecondary,
             lineHeight: 1.6,
           }}
         >
@@ -654,6 +657,7 @@ function WelcomeStep({
 }
 
 function CompleteStep({ draftThesis, activeDominos, apiKeys, submitError }) {
+  const { tokens } = useTheme();
   return (
     <div>
       <div style={S.card("rgba(42,157,143,0.2)")}>
@@ -706,7 +710,9 @@ function CompleteStep({ draftThesis, activeDominos, apiKeys, submitError }) {
         </div>
 
         {submitError && (
-          <div style={{ marginTop: 10, color: "#F4A261", fontSize: 11 }}>
+          <div
+            style={{ marginTop: 10, color: tokens.colors.watch, fontSize: 11 }}
+          >
             {submitError}
           </div>
         )}
