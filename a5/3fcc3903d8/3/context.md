@@ -96,3 +96,30 @@ Can I take a look at the actual site right now?
 
 commit and push. What isn't clear to me is how the user would add in data that they would need to find somewhere else so for example SAAS job openings. How would they enter in that data? Also, can you open up my person dashborad?
 
+### Prompt 19
+
+No, my personal dashboard has all the information already in it. I don't need to go through the on boarding process. I've said this to 1 million times my personal my personal dashboard will have everything in it because you already have my résumé. You already have everything about me that's why I said there's two distinct path. There's my own preference personal dashboard and then there's the word there's the other dashboard that would be that I'm going to open source for everyone to use it re...
+
+### Prompt 20
+
+it's not. I cannot see my personal one. Then just to let you know like it was just deployed 20 minutes ago. I was able to see it
+
+### Prompt 21
+
+for OOS We need a few things. Number one we need a place for them to be able to upload the other data points on their own. And then, secondly, with the digest what we want to do is understand the signals understand their job and then provide them with guidance on where they were where the thesis is and how they can, and how they can position themselves in their careerand even investment strategy based on this. And so for the on boarding workflow, we would need them to add their own API key. In m...
+
+### Prompt 22
+
+For the personal one, I wanna be able to execute it within the browser, tied to Claude code without having me to go directly to Claude code and the CLI I think that would be within the terms of service.And yes, we have them add stuff in. That sounds great and then we can give them guidance on where to go find this and search for it. The digest scope looks great. And for the personal digest, I already gave you some guidance, but that skill looks great as well.
+
+### Prompt 23
+
+This session is being continued from a previous conversation that ran out of context. The summary below covers the earlier portion of the conversation.
+
+Analysis:
+Let me carefully analyze the entire conversation chronologically:
+
+1. **Session Start**: This is a continuation from a previous session. The summary indicates v3.3 and v3.4 Observatory theme work was completed in the prior session, including a commit (97ec6b5) pushing all v3.3 + v3.4 Observatory theme migration.
+
+2. **Commit and Push**...
+
