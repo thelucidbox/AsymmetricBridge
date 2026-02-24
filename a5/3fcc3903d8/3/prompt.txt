@@ -1789,3 +1789,19 @@ Do we need these descriptions?
 ---
 
 [Image: source: /Users/fabianaguilar/Desktop/Screenshot 2026-02-24 at 12.17.53 PM.png]
+
+---
+
+is possible to put the video on the repo in github. Also, can you play the vicdeo again for me
+
+---
+
+To imagine react 19 in the video, but These are the languages that are mentioned on the repositoryLanguages
+JavaScript
+94.0%
+ 
+TypeScript
+5.0%
+ 
+Other
+1.0%
