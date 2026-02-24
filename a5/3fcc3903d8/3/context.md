@@ -123,3 +123,15 @@ Let me carefully analyze the entire conversation chronologically:
 
 2. **Commit and Push**...
 
+### Prompt 24
+
+When I try to upload a CSV, it does not work
+
+### Prompt 25
+
+[Image: source: /Users/fabianaguilar/Desktop/Screenshot 2026-02-24 at 9.55.25 AM.png]
+
+### Prompt 26
+
+commit and push
+
