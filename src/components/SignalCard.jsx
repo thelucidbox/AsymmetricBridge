@@ -104,21 +104,32 @@ export default function SignalCard({ signal, dominoColor }) {
         border: `1px solid ${exp && !simplifiedMode ? `${dominoColor}44` : "rgba(255,255,255,0.06)"}`,
         borderRadius: 8,
         padding: "12px 14px",
-        transition: "all 0.2s",
+        transition:
+          "color 0.2s, background 0.2s, border-color 0.2s, opacity 0.2s, box-shadow 0.2s",
         marginBottom: 6,
       }}
     >
-      <div
+      <button
+        type="button"
         onClick={() => {
           if (simplifiedMode) return;
           setExp((previous) => !previous);
         }}
+        aria-expanded={simplifiedMode ? undefined : exp}
         style={{
+          appearance: "none",
+          textAlign: "left",
+          width: "100%",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
           gap: 10,
           cursor: simplifiedMode ? "default" : "pointer",
+          background: "transparent",
+          border: "none",
+          padding: 0,
+          color: "inherit",
+          font: "inherit",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1 }}>
@@ -183,7 +194,7 @@ export default function SignalCard({ signal, dominoColor }) {
             </span>
           )}
         </div>
-      </div>
+      </button>
 
       {simplifiedMode && (
         <div
@@ -229,13 +240,17 @@ export default function SignalCard({ signal, dominoColor }) {
               >
                 <div>
                   <div style={S.label}>Source</div>
-                  <div style={{ fontSize: 12, color: "rgba(255,255,255,0.65)" }}>
+                  <div
+                    style={{ fontSize: 12, color: "rgba(255,255,255,0.65)" }}
+                  >
                     {signal.source}
                   </div>
                 </div>
                 <div>
                   <div style={S.label}>Frequency</div>
-                  <div style={{ fontSize: 12, color: "rgba(255,255,255,0.65)" }}>
+                  <div
+                    style={{ fontSize: 12, color: "rgba(255,255,255,0.65)" }}
+                  >
                     {signal.frequency}
                   </div>
                 </div>
@@ -249,10 +264,14 @@ export default function SignalCard({ signal, dominoColor }) {
               </div>
 
               <div data-tour="thresholds" style={{ marginBottom: 8 }}>
-                <div style={{ ...S.label, color: dominoColor, fontWeight: 600 }}>
+                <div
+                  style={{ ...S.label, color: dominoColor, fontWeight: 600 }}
+                >
                   Trigger Threshold
                 </div>
-                <div style={{ fontSize: 12, color: "#E8E4DF", fontWeight: 500 }}>
+                <div
+                  style={{ fontSize: 12, color: "#E8E4DF", fontWeight: 500 }}
+                >
                   {signal.threshold}
                 </div>
               </div>
@@ -333,7 +352,8 @@ export default function SignalCard({ signal, dominoColor }) {
                       <span>Status</span>
                     </div>
                     {dataPoints.map((point, index) => {
-                      const pointStatus = STATUS_CFG[point.status] || STATUS_CFG.green;
+                      const pointStatus =
+                        STATUS_CFG[point.status] || STATUS_CFG.green;
                       return (
                         <div
                           key={`${point.date}-${point.value}-${index}`}
@@ -349,9 +369,18 @@ export default function SignalCard({ signal, dominoColor }) {
                                 : "none",
                           }}
                         >
-                          <span style={{ color: "rgba(255,255,255,0.45)" }}>{point.date}</span>
-                          <span style={{ color: "rgba(255,255,255,0.72)" }}>{point.value}</span>
-                          <span style={{ color: pointStatus.text, fontWeight: 600 }}>
+                          <span style={{ color: "rgba(255,255,255,0.45)" }}>
+                            {point.date}
+                          </span>
+                          <span
+                            className="ab-tabular-nums"
+                            style={{ color: "rgba(255,255,255,0.72)" }}
+                          >
+                            {point.value}
+                          </span>
+                          <span
+                            style={{ color: pointStatus.text, fontWeight: 600 }}
+                          >
                             {pointStatus.label}
                           </span>
                         </div>

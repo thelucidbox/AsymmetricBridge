@@ -2,7 +2,16 @@ import { withRetry } from "./retry.js";
 
 const FRED_BASE = "https://api.stlouisfed.org/fred/series/observations";
 
-export const FRED_API_KEY = import.meta.env.VITE_FRED_API_KEY;
+const FRED_KEY_STORAGE = "ab-fred-api-key";
+
+export function getFredApiKey() {
+  const envKey = import.meta.env.VITE_FRED_API_KEY;
+  if (envKey) return envKey;
+  if (typeof window === "undefined") return "";
+  return window.localStorage.getItem(FRED_KEY_STORAGE) || "";
+}
+
+export const FRED_API_KEY = getFredApiKey();
 const FRED_SOURCE = "fred";
 
 // FRED series -> signal mapping
@@ -90,13 +99,14 @@ function isErrorResult(value) {
 }
 
 async function requestFredSeries(seriesId) {
-  if (!FRED_API_KEY) {
+  const apiKey = getFredApiKey();
+  if (!apiKey) {
     throw createAdapterError("AUTH_ERROR", "Missing VITE_FRED_API_KEY", false);
   }
 
   const params = new URLSearchParams({
     series_id: seriesId,
-    api_key: FRED_API_KEY,
+    api_key: apiKey,
     file_type: "json",
     sort_order: "desc",
     limit: "5",
@@ -171,7 +181,7 @@ export async function fetchFredSeries(seriesId) {
 }
 
 export async function fetchAllFredData() {
-  if (!FRED_API_KEY) {
+  if (!getFredApiKey()) {
     return toErrorResult(
       createAdapterError("AUTH_ERROR", "Missing VITE_FRED_API_KEY", false),
       0,
@@ -179,31 +189,33 @@ export async function fetchAllFredData() {
   }
 
   const seriesIds = Object.keys(FRED_SIGNALS);
-  const results = await Promise.all(seriesIds.map(async (seriesId) => {
-    const observations = await fetchFredSeries(seriesId);
+  const results = await Promise.all(
+    seriesIds.map(async (seriesId) => {
+      const observations = await fetchFredSeries(seriesId);
 
-    if (isErrorResult(observations)) {
-      console.error(`FRED fetch failed for ${seriesId}:`, observations.error);
+      if (isErrorResult(observations)) {
+        console.error(`FRED fetch failed for ${seriesId}:`, observations.error);
+        return [
+          seriesId,
+          {
+            data: null,
+            error: observations.error,
+            attempts: observations.attempts,
+            signal: FRED_SIGNALS[seriesId],
+          },
+        ];
+      }
+
       return [
         seriesId,
         {
-          data: null,
-          error: observations.error,
-          attempts: observations.attempts,
+          observations,
           signal: FRED_SIGNALS[seriesId],
+          fetchedAt: new Date().toISOString(),
         },
       ];
-    }
-
-    return [
-      seriesId,
-      {
-        observations,
-        signal: FRED_SIGNALS[seriesId],
-        fetchedAt: new Date().toISOString(),
-      },
-    ];
-  }));
+    }),
+  );
 
   return Object.fromEntries(results);
 }

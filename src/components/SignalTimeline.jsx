@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../lib/supabase";
 import { STATUS_CFG, S } from "../styles";
@@ -168,6 +168,8 @@ export default function SignalTimeline({ signal }) {
     staleTime: 30 * 1000,
   });
 
+  const [now] = useState(Date.now);
+
   const segments = useMemo(() => {
     if (!history.length) return [];
 
@@ -181,8 +183,6 @@ export default function SignalTimeline({ signal }) {
       .sort((a, b) => a.at.getTime() - b.at.getTime());
 
     if (!points.length) return [];
-
-    const now = Date.now();
     const rawSegments = points.map((entry, index) => {
       const next = points[index + 1];
       const start = entry.at.getTime();
@@ -210,7 +210,7 @@ export default function SignalTimeline({ signal }) {
         ? (segment.duration / totalDuration) * 100
         : 100 / rawSegments.length,
     }));
-  }, [history]);
+  }, [history, now]);
 
   if (isLoading) {
     return (

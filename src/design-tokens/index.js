@@ -66,12 +66,27 @@ function applyTokensToRoot(tokens) {
   root.style.setProperty("--ab-font-sans", tokens.typography.fontSans);
   root.style.setProperty("--ab-font-mono", tokens.typography.fontMono);
   root.style.setProperty("--ab-motion-default", tokens.motion.default);
-  root.style.setProperty("--ab-content-max-width", `${tokens.spacing.contentMaxWidth}px`);
+  root.style.setProperty(
+    "--ab-content-max-width",
+    `${tokens.spacing.contentMaxWidth}px`,
+  );
 
-  root.style.setProperty("--ab-breakpoint-mobile", `${sharedTokens.breakpoints.mobile}px`);
-  root.style.setProperty("--ab-breakpoint-tablet", `${sharedTokens.breakpoints.tablet}px`);
-  root.style.setProperty("--ab-breakpoint-desktop", `${sharedTokens.breakpoints.desktop}px`);
-  root.style.setProperty("--ab-breakpoint-wide", `${sharedTokens.breakpoints.wide}px`);
+  root.style.setProperty(
+    "--ab-breakpoint-mobile",
+    `${sharedTokens.breakpoints.mobile}px`,
+  );
+  root.style.setProperty(
+    "--ab-breakpoint-tablet",
+    `${sharedTokens.breakpoints.tablet}px`,
+  );
+  root.style.setProperty(
+    "--ab-breakpoint-desktop",
+    `${sharedTokens.breakpoints.desktop}px`,
+  );
+  root.style.setProperty(
+    "--ab-breakpoint-wide",
+    `${sharedTokens.breakpoints.wide}px`,
+  );
 }
 
 const initialVariant = safeReadStoredVariant();
@@ -94,9 +109,9 @@ export function ThemeProvider({ children }) {
   const [variant, setVariantState] = useState(activeTokens.variant);
 
   const tokens = useMemo(() => buildTokens(variant), [variant]);
-  activeTokens = tokens;
 
   useEffect(() => {
+    activeTokens = tokens;
     applyTokensToRoot(tokens);
     safePersistVariant(tokens.variant);
   }, [tokens]);
@@ -106,7 +121,9 @@ export function ThemeProvider({ children }) {
   }, []);
 
   const toggleVariant = useCallback(() => {
-    setVariantState((current) => (current === "terminal" ? "observatory" : "terminal"));
+    setVariantState((current) =>
+      current === "terminal" ? "observatory" : "terminal",
+    );
   }, []);
 
   const value = useMemo(
@@ -130,7 +147,9 @@ function toggleButtonStyle(tokens, isActive, accentColor) {
   return {
     fontSize: tokens.typography.sizes.label,
     fontFamily: tokens.typography.fontMono,
-    fontWeight: isActive ? tokens.typography.weights.bold : tokens.typography.weights.medium,
+    fontWeight: isActive
+      ? tokens.typography.weights.bold
+      : tokens.typography.weights.medium,
     color: isActive ? tokens.colors.text : tokens.colors.textMuted,
     background: isActive ? `${accentColor}20` : "transparent",
     border: `${tokens.shape.borderWidth}px solid ${isActive ? `${accentColor}55` : tokens.colors.border}`,
@@ -168,7 +187,11 @@ export function ThemeToggle() {
       {
         type: "button",
         onClick: () => setVariant("terminal"),
-        style: toggleButtonStyle(tokens, variant === "terminal", terminalTokens.colors.baseline),
+        style: toggleButtonStyle(
+          tokens,
+          variant === "terminal",
+          terminalTokens.colors.baseline,
+        ),
         "aria-pressed": variant === "terminal",
       },
       "Terminal",
@@ -178,7 +201,11 @@ export function ThemeToggle() {
       {
         type: "button",
         onClick: () => setVariant("observatory"),
-        style: toggleButtonStyle(tokens, variant === "observatory", observatoryTokens.colors.accent),
+        style: toggleButtonStyle(
+          tokens,
+          variant === "observatory",
+          observatoryTokens.colors.accent,
+        ),
         "aria-pressed": variant === "observatory",
       },
       "Observatory",

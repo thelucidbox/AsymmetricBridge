@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchAllFredData, FRED_API_KEY } from "../lib/fred";
+import { fetchAllFredData, getFredApiKey } from "../lib/fred";
 import { supabase } from "../lib/supabase";
 
 async function cacheFredData(data) {
@@ -28,7 +28,7 @@ export function useFredData() {
       await cacheFredData(data);
       return data;
     },
-    enabled: !!FRED_API_KEY,
+    enabled: !!getFredApiKey(),
     staleTime: 24 * 60 * 60 * 1000,
     gcTime: 7 * 24 * 60 * 60 * 1000,
     refetchOnWindowFocus: false,

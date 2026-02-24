@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import {
   fetchBatchQuotes,
   isMarketOpen,
-  TWELVE_DATA_API_KEY,
+  getTwelveDataApiKey,
 } from "../lib/stocks";
 import { supabase } from "../lib/supabase";
 
@@ -32,10 +32,8 @@ export function useStockData() {
       await cacheStockData(data);
       return data;
     },
-    enabled: !!TWELVE_DATA_API_KEY,
+    enabled: !!getTwelveDataApiKey(),
     refetchInterval: () => (isMarketOpen() ? 15 * 60 * 1000 : false),
     staleTime: 14 * 60 * 1000,
-    retry: 3,
-    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 30000),
   });
 }

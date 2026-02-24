@@ -49,7 +49,13 @@ function formatPeriodText(digest) {
 
 export default function DigestView() {
   const { tokens } = useTheme();
-  const { digests, latestDigest, generateDigest, isGenerating, exportMarkdown } = useDigests();
+  const {
+    digests,
+    latestDigest,
+    generateDigest,
+    isGenerating,
+    exportMarkdown,
+  } = useDigests();
 
   const [selectedPeriod, setSelectedPeriod] = useState(7);
   const [expandedHistoryId, setExpandedHistoryId] = useState(null);
@@ -65,7 +71,6 @@ export default function DigestView() {
     background: tokens.colors.surface,
     border: `${tokens.shape.borderWidth}px solid ${tokens.colors.border}`,
     borderRadius: tokens.shape.buttonRadius,
-    outline: "none",
     cursor: "pointer",
   };
 
@@ -76,7 +81,8 @@ export default function DigestView() {
     background: disabled ? tokens.colors.surface : `${accent}18`,
     color: disabled ? tokens.colors.textMuted : accent,
     fontSize: tokens.typography.sizes.body,
-    fontWeight: tokens.typography.weights.semibold || tokens.typography.weights.bold,
+    fontWeight:
+      tokens.typography.weights.semibold || tokens.typography.weights.bold,
     cursor: disabled ? "not-allowed" : "pointer",
   });
 
@@ -143,7 +149,10 @@ export default function DigestView() {
           <div style={{ ...S.label, marginBottom: 8 }}>Signal Digests</div>
           <div
             style={{
-              fontSize: tokens.variant === "observatory" ? tokens.typography.sizes.h2 : 20,
+              fontSize:
+                tokens.variant === "observatory"
+                  ? tokens.typography.sizes.h2
+                  : 20,
               fontWeight: tokens.typography.weights.bold,
               marginBottom: 8,
             }}
@@ -158,14 +167,23 @@ export default function DigestView() {
               marginBottom: 12,
             }}
           >
-            Generate on-demand intelligence briefs summarizing status shifts, thesis alignment, and
-            action items.
+            Generate on-demand intelligence briefs summarizing status shifts,
+            thesis alignment, and action items.
           </div>
 
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 8,
+              alignItems: "center",
+            }}
+          >
             <select
               value={selectedPeriod}
-              onChange={(event) => setSelectedPeriod(Number(event.target.value))}
+              onChange={(event) =>
+                setSelectedPeriod(Number(event.target.value))
+              }
               style={selectStyle}
               aria-label="Digest period"
             >
@@ -205,8 +223,13 @@ export default function DigestView() {
             <div
               style={{
                 marginTop: 10,
-                fontSize: tokens.typography.sizes.bodySmall || tokens.typography.sizes.body,
-                color: feedback.type === "error" ? tokens.colors.alert : tokens.colors.baseline,
+                fontSize:
+                  tokens.typography.sizes.bodySmall ||
+                  tokens.typography.sizes.body,
+                color:
+                  feedback.type === "error"
+                    ? tokens.colors.alert
+                    : tokens.colors.baseline,
               }}
             >
               {feedback.text}
@@ -288,7 +311,12 @@ export default function DigestView() {
         <div style={S.card(tokens.colors.border)}>
           <div style={{ ...S.label, marginBottom: 8 }}>History</div>
           {!historyDigests.length && (
-            <div style={{ fontSize: tokens.typography.sizes.body, color: tokens.colors.textMuted }}>
+            <div
+              style={{
+                fontSize: tokens.typography.sizes.body,
+                color: tokens.colors.textMuted,
+              }}
+            >
               No previous digests yet.
             </div>
           )}
@@ -310,7 +338,9 @@ export default function DigestView() {
                     }}
                   >
                     <button
-                      onClick={() => setExpandedHistoryId(isExpanded ? null : digest.id)}
+                      onClick={() =>
+                        setExpandedHistoryId(isExpanded ? null : digest.id)
+                      }
                       style={{
                         width: "100%",
                         textAlign: "left",
@@ -323,7 +353,14 @@ export default function DigestView() {
                         gap: 4,
                       }}
                     >
-                      <div style={{ fontSize: tokens.typography.sizes.body, fontWeight: tokens.typography.weights.semibold || tokens.typography.weights.bold }}>
+                      <div
+                        style={{
+                          fontSize: tokens.typography.sizes.body,
+                          fontWeight:
+                            tokens.typography.weights.semibold ||
+                            tokens.typography.weights.bold,
+                        }}
+                      >
                         {formatPeriodText(digest)}
                       </div>
                       <div
@@ -340,7 +377,8 @@ export default function DigestView() {
                       >
                         <span>{formatDateTime(digest.generatedAt)}</span>
                         <span style={{ color }}>
-                          {digest.threatLevel} | +{digest.escalationCount} / -{digest.deescalationCount}
+                          {digest.threatLevel} | +{digest.escalationCount} / -
+                          {digest.deescalationCount}
                         </span>
                       </div>
                     </button>

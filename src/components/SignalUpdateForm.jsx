@@ -60,7 +60,6 @@ export default function SignalUpdateForm() {
     border: "1px solid rgba(255,255,255,0.1)",
     borderRadius: 8,
     color: "#E8E4DF",
-    outline: "none",
     appearance: "none",
     cursor: "pointer",
   };
@@ -208,7 +207,8 @@ export default function SignalUpdateForm() {
                       borderRadius: 8,
                       cursor: isCurrent ? "not-allowed" : "pointer",
                       opacity: isCurrent ? 0.35 : 1,
-                      transition: "all 0.2s",
+                      transition:
+                        "color 0.2s, background 0.2s, border-color 0.2s, opacity 0.2s, box-shadow 0.2s",
                     }}
                     disabled={isCurrent}
                   >
@@ -257,7 +257,8 @@ export default function SignalUpdateForm() {
               border: "none",
               borderRadius: 8,
               cursor: reason.trim() ? "pointer" : "not-allowed",
-              transition: "all 0.2s",
+              transition:
+                "color 0.2s, background 0.2s, border-color 0.2s, opacity 0.2s, box-shadow 0.2s",
             }}
           >
             {mutation.isPending

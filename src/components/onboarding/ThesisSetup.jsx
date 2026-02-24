@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { S } from "../../styles";
 
 function buildThresholdMap(signals, existingThresholds) {
@@ -18,6 +18,7 @@ export default function ThesisSetup({
 }) {
   const [expandedDominoId, setExpandedDominoId] = useState(null);
   const [showThresholds, setShowThresholds] = useState(false);
+  const originalThesisRef = useRef(thesis);
 
   const activeDominos = useMemo(
     () =>
@@ -180,7 +181,26 @@ export default function ThesisSetup({
       <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
         <button
           type="button"
-          onClick={() => setShowThresholds(false)}
+          onClick={() => {
+            if (showThresholds) {
+              const original = originalThesisRef.current;
+              onUpdateThesis((current) => ({
+                ...current,
+                dominos: current.dominos.map((domino) => {
+                  const orig = original.dominos.find((d) => d.id === domino.id);
+                  if (!orig) return domino;
+                  return {
+                    ...domino,
+                    name: orig.name,
+                    description: orig.description,
+                    signals: orig.signals,
+                    thresholds: orig.thresholds,
+                  };
+                }),
+              }));
+            }
+            setShowThresholds(false);
+          }}
           style={{
             ...S.tab(!showThresholds, "#2A9D8F"),
             padding: "10px 16px",

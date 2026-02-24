@@ -31,9 +31,14 @@ export default function DominoSection({
 
   return (
     <div style={{ marginBottom: showConnector ? 8 : 12 }}>
-      <div
+      <button
+        type="button"
         onClick={onToggle}
+        aria-expanded={isActive}
         style={{
+          appearance: "none",
+          textAlign: "left",
+          width: "100%",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
@@ -44,11 +49,23 @@ export default function DominoSection({
           border: `1px solid ${isActive ? `${domino.color}44` : "rgba(255,255,255,0.06)"}`,
           borderRadius: isActive ? "10px 10px 0 0" : 10,
           cursor: "pointer",
-          transition: "all 0.2s",
+          transition:
+            "color 0.2s, background 0.2s, border-color 0.2s, opacity 0.2s, box-shadow 0.2s",
+          color: "inherit",
+          font: "inherit",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
-          <span style={{ fontSize: 19, color: domino.color }}>{domino.icon}</span>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            minWidth: 0,
+          }}
+        >
+          <span style={{ fontSize: 19, color: domino.color }}>
+            {domino.icon}
+          </span>
           <div style={{ minWidth: 0 }}>
             <div
               style={{
@@ -72,7 +89,13 @@ export default function DominoSection({
                 {summaryText}
               </span>
             </div>
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", marginTop: 2 }}>
+            <div
+              style={{
+                fontSize: 11,
+                color: "rgba(255,255,255,0.35)",
+                marginTop: 2,
+              }}
+            >
               {domino.description}
             </div>
           </div>
@@ -120,7 +143,7 @@ export default function DominoSection({
             {health.label}
           </span>
         </div>
-      </div>
+      </button>
 
       {isActive && (
         <div
@@ -158,7 +181,7 @@ export default function DominoSection({
               width: 2,
               height: 18,
               borderRadius: 999,
-              background: `linear-gradient(180deg, ${domino.color}66, ${(nextDominoColor || domino.color)}22)`,
+              background: `linear-gradient(180deg, ${domino.color}66, ${nextDominoColor || domino.color}22)`,
             }}
           />
         </div>

@@ -185,6 +185,7 @@ function BattingRing({ battingAverage, tokens }) {
         }}
       >
         <div
+          className="ab-tabular-nums"
           style={{
             fontSize: tokens.variant === "observatory" ? 34 : 30,
             fontWeight: tokens.typography.weights.bold,
@@ -226,7 +227,10 @@ function PredictionCard({
       : prediction.outcome === "miss"
         ? "Miss"
         : "Partial";
-  const isDue = new Date(prediction.targetDate).getTime() <= Date.now();
+  const isDue = useMemo(
+    () => new Date(prediction.targetDate).getTime() <= Date.now(),
+    [prediction.targetDate],
+  );
 
   return (
     <div

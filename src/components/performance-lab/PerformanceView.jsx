@@ -61,7 +61,10 @@ function ScoreRing({ score }) {
           flexDirection: "column",
         }}
       >
-        <div style={{ fontSize: 30, fontWeight: 700, letterSpacing: "-1px" }}>
+        <div
+          className="ab-tabular-nums"
+          style={{ fontSize: 30, fontWeight: 700, letterSpacing: "-1px" }}
+        >
           {Math.round(score)}
         </div>
         <div
@@ -167,6 +170,7 @@ export default function PerformanceView() {
 
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                   <span
+                    className="ab-tabular-nums"
                     style={{
                       fontSize: 10,
                       fontFamily: "'IBM Plex Mono', monospace",
@@ -318,7 +322,10 @@ export default function PerformanceView() {
                         <div style={{ ...S.label, marginBottom: 3 }}>
                           Actual
                         </div>
-                        <div style={{ fontSize: 16, fontWeight: 700 }}>
+                        <div
+                          className="ab-tabular-nums"
+                          style={{ fontSize: 16, fontWeight: 700 }}
+                        >
                           {formatPercent(row.actualPercent)}
                         </div>
                       </div>
@@ -326,13 +333,17 @@ export default function PerformanceView() {
                         <div style={{ ...S.label, marginBottom: 3 }}>
                           Target
                         </div>
-                        <div style={{ fontSize: 16, fontWeight: 700 }}>
+                        <div
+                          className="ab-tabular-nums"
+                          style={{ fontSize: 16, fontWeight: 700 }}
+                        >
                           {hasTarget ? formatPercent(row.targetPercent) : "N/A"}
                         </div>
                       </div>
                       <div>
                         <div style={{ ...S.label, marginBottom: 3 }}>Delta</div>
                         <div
+                          className="ab-tabular-nums"
                           style={{
                             fontSize: 16,
                             fontWeight: 700,
@@ -507,10 +518,16 @@ export default function PerformanceView() {
                         <span style={{ fontWeight: 700 }}>
                           {position.symbol}
                         </span>
-                        <span style={{ color: "rgba(255,255,255,0.68)" }}>
+                        <span
+                          className="ab-tabular-nums"
+                          style={{ color: "rgba(255,255,255,0.68)" }}
+                        >
                           {Number(position.quantity || 0).toFixed(4)}
                         </span>
-                        <span style={{ color: "rgba(255,255,255,0.68)" }}>
+                        <span
+                          className="ab-tabular-nums"
+                          style={{ color: "rgba(255,255,255,0.68)" }}
+                        >
                           {formatCurrency(position.marketValue)}
                         </span>
                       </div>

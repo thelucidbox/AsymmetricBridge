@@ -9,7 +9,9 @@ import "./index.css";
 const envValidation = validateEnv();
 
 if (envValidation.valid) {
-  console.info("[env-check] Required environment variables are configured.");
+  if (import.meta.env.DEV) {
+    console.info("[env-check] Required environment variables are configured.");
+  }
 } else {
   console.error(
     "[env-check] Missing required environment variables:",
@@ -18,7 +20,10 @@ if (envValidation.valid) {
 }
 
 if (envValidation.warnings.length > 0) {
-  console.warn("[env-check] Optional environment warnings:", envValidation.warnings);
+  console.warn(
+    "[env-check] Optional environment warnings:",
+    envValidation.warnings,
+  );
 }
 
 createRoot(document.getElementById("root")).render(

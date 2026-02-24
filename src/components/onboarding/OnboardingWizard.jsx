@@ -6,6 +6,7 @@ import { validateThesis } from "../../config/thesis-schema";
 import { S } from "../../styles";
 import APIKeySetup from "./APIKeySetup";
 import CareerProfile from "./CareerProfile";
+import ResearchDiscovery from "./ResearchDiscovery";
 import ThesisSetup from "./ThesisSetup";
 
 const FRED_KEY_STORAGE = "ab-fred-api-key";
@@ -56,6 +57,27 @@ function clone(value) {
   return JSON.parse(JSON.stringify(value));
 }
 
+function createBlankDraft(template) {
+  const cloned = clone(template);
+  return {
+    ...cloned,
+    meta: {
+      name: "My Thesis",
+      author: "",
+      version: cloned.meta.version,
+    },
+    careerProfile: {
+      currentRole: "",
+      targetRole: "",
+      industry: "",
+      experience: "",
+      goals: [],
+    },
+    sources: cloned.sources,
+    portfolio: { legs: [] },
+  };
+}
+
 function readStorageValue(key) {
   if (typeof window === "undefined") return "";
   return window.localStorage.getItem(key) || "";
@@ -70,7 +92,11 @@ export default function OnboardingWizard() {
   const { updateThesis, isTestMode, exitTestMode } = useThesis();
 
   const [currentStep, setCurrentStep] = useState(0);
-  const [draftThesis, setDraftThesis] = useState(() => clone(fabianThesis));
+  const [draftThesis, setDraftThesis] = useState(() =>
+    isOwnerMode && !isTestMode
+      ? clone(fabianThesis)
+      : createBlankDraft(fabianThesis),
+  );
   const [enabledDominoIds, setEnabledDominoIds] = useState(() =>
     fabianThesis.dominos.map((domino) => domino.id),
   );
@@ -168,7 +194,7 @@ export default function OnboardingWizard() {
   };
 
   const handleQuickStart = () => {
-    setCurrentStep(1);
+    setCurrentStep(STEPS.length - 1);
   };
 
   const handleComplete = () => {
@@ -283,7 +309,7 @@ export default function OnboardingWizard() {
 
   return (
     <div style={{ minHeight: "100vh", padding: "28px 14px" }}>
-      <div style={{ maxWidth: 980, margin: "0 auto" }}>
+      <div className="ab-content-shell">
         <div style={{ ...S.card("rgba(255,255,255,0.1)"), marginBottom: 14 }}>
           <div style={S.label}>Asymmetric Bridge</div>
           <div
@@ -624,60 +650,69 @@ function WelcomeStep({
 
 function CompleteStep({ draftThesis, activeDominos, apiKeys, submitError }) {
   return (
-    <div style={S.card("rgba(42,157,143,0.2)")}>
-      <div style={S.label}>Review Before Save</div>
+    <div>
+      <div style={S.card("rgba(42,157,143,0.2)")}>
+        <div style={S.label}>Review Before Save</div>
 
-      <div style={{ display: "grid", gap: 10, fontSize: 12 }}>
-        <div style={S.card("rgba(255,255,255,0.08)")}>
-          <div style={S.label}>About You</div>
-          <div style={{ marginBottom: 5 }}>
-            <strong>Current Role:</strong>{" "}
-            {draftThesis.careerProfile.currentRole || "Not set"}
+        <div style={{ display: "grid", gap: 10, fontSize: 12 }}>
+          <div style={S.card("rgba(255,255,255,0.08)")}>
+            <div style={S.label}>About You</div>
+            <div style={{ marginBottom: 5 }}>
+              <strong>Current Role:</strong>{" "}
+              {draftThesis.careerProfile.currentRole || "Not set"}
+            </div>
+            <div style={{ marginBottom: 5 }}>
+              <strong>Target Role:</strong>{" "}
+              {draftThesis.careerProfile.targetRole || "Not set"}
+            </div>
+            <div style={{ marginBottom: 5 }}>
+              <strong>Industry:</strong>{" "}
+              {draftThesis.careerProfile.industry || "Not set"}
+            </div>
+            <div>
+              <strong>Goals:</strong>{" "}
+              {(draftThesis.careerProfile.goals || []).length}
+            </div>
           </div>
-          <div style={{ marginBottom: 5 }}>
-            <strong>Target Role:</strong>{" "}
-            {draftThesis.careerProfile.targetRole || "Not set"}
+
+          <div style={S.card("rgba(255,255,255,0.08)")}>
+            <div style={S.label}>Your Thesis</div>
+            <div style={{ marginBottom: 5 }}>
+              <strong>Active dominos:</strong> {activeDominos.length} /{" "}
+              {draftThesis.dominos.length}
+            </div>
+            <div>
+              <strong>Cascade:</strong>{" "}
+              {activeDominos.map((domino) => domino.name).join(" → ") || "None"}
+            </div>
           </div>
-          <div style={{ marginBottom: 5 }}>
-            <strong>Industry:</strong>{" "}
-            {draftThesis.careerProfile.industry || "Not set"}
-          </div>
-          <div>
-            <strong>Goals:</strong>{" "}
-            {(draftThesis.careerProfile.goals || []).length}
+
+          <div style={S.card("rgba(255,255,255,0.08)")}>
+            <div style={S.label}>Data Sources</div>
+            <div style={{ marginBottom: 5 }}>
+              <strong>FRED:</strong>{" "}
+              {apiKeys.fredKey ? "Configured" : "Using sample data"}
+            </div>
+            <div>
+              <strong>Twelve Data:</strong>{" "}
+              {apiKeys.twelveDataKey ? "Configured" : "Using sample data"}
+            </div>
           </div>
         </div>
 
-        <div style={S.card("rgba(255,255,255,0.08)")}>
-          <div style={S.label}>Your Thesis</div>
-          <div style={{ marginBottom: 5 }}>
-            <strong>Active dominos:</strong> {activeDominos.length} /{" "}
-            {draftThesis.dominos.length}
+        {submitError && (
+          <div style={{ marginTop: 10, color: "#F4A261", fontSize: 11 }}>
+            {submitError}
           </div>
-          <div>
-            <strong>Cascade:</strong>{" "}
-            {activeDominos.map((domino) => domino.name).join(" → ") || "None"}
-          </div>
-        </div>
-
-        <div style={S.card("rgba(255,255,255,0.08)")}>
-          <div style={S.label}>Data Sources</div>
-          <div style={{ marginBottom: 5 }}>
-            <strong>FRED:</strong>{" "}
-            {apiKeys.fredKey ? "Configured" : "Using sample data"}
-          </div>
-          <div>
-            <strong>Twelve Data:</strong>{" "}
-            {apiKeys.twelveDataKey ? "Configured" : "Using sample data"}
-          </div>
-        </div>
+        )}
       </div>
 
-      {submitError && (
-        <div style={{ marginTop: 10, color: "#F4A261", fontSize: 11 }}>
-          {submitError}
-        </div>
-      )}
+      <div style={{ marginTop: 14 }}>
+        <ResearchDiscovery
+          careerProfile={draftThesis.careerProfile}
+          dominos={activeDominos}
+        />
+      </div>
     </div>
   );
 }

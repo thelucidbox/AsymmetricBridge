@@ -135,9 +135,14 @@ export default function LucidBoxSignals({
                           cursor: "pointer",
                           fontWeight: isActive ? 700 : 500,
                           border: `1px solid ${isActive ? `${filter.color}66` : "rgba(255,255,255,0.08)"}`,
-                          background: isActive ? `${filter.color}18` : "transparent",
-                          color: isActive ? filter.color : "rgba(255,255,255,0.45)",
-                          transition: "all 0.2s",
+                          background: isActive
+                            ? `${filter.color}18`
+                            : "transparent",
+                          color: isActive
+                            ? filter.color
+                            : "rgba(255,255,255,0.45)",
+                          transition:
+                            "color 0.2s, background 0.2s, border-color 0.2s, opacity 0.2s, box-shadow 0.2s",
                         }}
                       >
                         {filter.label}
@@ -146,7 +151,14 @@ export default function LucidBoxSignals({
                   })}
                 </div>
 
-                <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    flexWrap: "wrap",
+                  }}
+                >
                   <span style={S.label}>Domino Filter</span>
                   <select
                     value={dominoFilter}

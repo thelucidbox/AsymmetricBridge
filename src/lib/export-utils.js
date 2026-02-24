@@ -121,7 +121,6 @@ export function performanceToMarkdown(
   ];
 
   for (const row of breakdown) {
-    const mapped = legBreakdown.find((l) => l.legName === row.leg);
     const target =
       row.targetPercent !== null ? formatPercent(row.targetPercent) : "N/A";
     const delta = row.delta !== null ? formatPercent(row.delta) : "N/A";

@@ -2,19 +2,22 @@ import { useMemo, useState } from "react";
 import { useThesis } from "../../config/ThesisContext";
 import { S } from "../../styles";
 
-export default function ResearchDiscovery() {
+export default function ResearchDiscovery({ careerProfile, dominos }) {
   const { thesis } = useThesis();
   const [copied, setCopied] = useState(false);
 
+  const resolvedProfile = careerProfile || thesis.careerProfile;
+  const resolvedDominos = dominos || thesis.dominos;
+
   const prompt = useMemo(() => {
-    const role = thesis.careerProfile?.currentRole || "professional";
-    const target = thesis.careerProfile?.targetRole || "career transition";
-    const industry = thesis.careerProfile?.industry || "technology";
-    const dominos =
-      thesis.dominos?.map((d) => d.name).join(", ") ||
+    const role = resolvedProfile?.currentRole || "professional";
+    const target = resolvedProfile?.targetRole || "career transition";
+    const industry = resolvedProfile?.industry || "technology";
+    const dominoNames =
+      resolvedDominos?.map((d) => d.name).join(", ") ||
       "macro disruption forces";
 
-    return `I'm a ${role} transitioning toward ${target} in ${industry}. I track macro disruption signals through a framework with these forces: ${dominos}.
+    return `I'm a ${role} transitioning toward ${target} in ${industry}. I track macro disruption signals through a framework with these forces: ${dominoNames}.
 
 Find me 3-5 recent macro research articles, reports, or analyst notes relevant to my thesis. For each, provide:
 1. Title and author/source
@@ -23,7 +26,7 @@ Find me 3-5 recent macro research articles, reports, or analyst notes relevant t
 4. One actionable insight for my career positioning
 
 Focus on credible sources: research firms, economists, financial analysts, academic papers. Avoid opinion pieces without data.`;
-  }, [thesis]);
+  }, [resolvedProfile, resolvedDominos]);
 
   const handleCopy = async () => {
     try {

@@ -49,12 +49,18 @@ function getInitialThesis() {
       const validation = validateThesis(stored);
       if (validation.valid) return stored;
     }
-    persistThesis(fabianThesis);
-    return fabianThesis;
+    const validation = validateThesis(fabianThesis);
+    if (validation.valid) {
+      persistThesis(fabianThesis);
+      return fabianThesis;
+    }
+    return null;
   }
 
+  if (isTestingAsNewUser()) return null;
+
   const stored = loadStoredThesis();
-  if (!stored) return isOwnerMode ? fabianThesis : null;
+  if (!stored) return null;
 
   const validation = validateThesis(stored);
   if (validation.valid) return stored;
@@ -100,8 +106,13 @@ export function ThesisProvider({ children }) {
       window.localStorage.removeItem(TEST_MODE_KEY);
     }
     setIsTestMode(false);
-    persistThesis(fabianThesis);
-    setThesis(fabianThesis);
+    const validation = validateThesis(fabianThesis);
+    if (validation.valid) {
+      persistThesis(fabianThesis);
+      setThesis(fabianThesis);
+    } else {
+      setThesis(null);
+    }
   }, []);
 
   const hasThesis = thesis !== null;

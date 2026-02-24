@@ -95,7 +95,8 @@ const observatoryTokens = {
     badgeRadius: 24,
   },
   motion: {
-    default: "250ms cubic-bezier(0.22, 1, 0.36, 1)",
+    default:
+      "color 250ms cubic-bezier(0.22, 1, 0.36, 1), background 250ms cubic-bezier(0.22, 1, 0.36, 1), border-color 250ms cubic-bezier(0.22, 1, 0.36, 1), opacity 250ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 250ms cubic-bezier(0.22, 1, 0.36, 1)",
     timing: "250ms",
     easing: "cubic-bezier(0.22, 1, 0.36, 1)",
   },

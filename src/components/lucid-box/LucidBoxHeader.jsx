@@ -55,7 +55,7 @@ export default function LucidBoxHeader({
         >
           {isOwnerMode
             ? "Lucid Box · Signal Tracker · Thesis & Portfolio · AI Jobs"
-            : "Signal Tracker · Thesis & Portfolio · AI Jobs"}
+            : "Dashboard · Signal Tracker · Portfolio · Jobs"}
         </p>
       </div>
 

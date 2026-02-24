@@ -17,8 +17,8 @@ import { useFredData } from "../hooks/useFredData";
 import { useSignalStatuses } from "../hooks/useSignalStatuses";
 import { useStockData } from "../hooks/useStockData";
 import { useAutoThreshold } from "../hooks/useAutoThreshold";
-import { FRED_API_KEY } from "../lib/fred";
-import { TWELVE_DATA_API_KEY } from "../lib/stocks";
+import { getFredApiKey } from "../lib/fred";
+import { getTwelveDataApiKey } from "../lib/stocks";
 import { S } from "../styles";
 
 const PRODUCT_STATUS_LABELS = {
@@ -104,7 +104,7 @@ function EmptyStateCard({ title, description, color }) {
 }
 
 function SampleDataBanner() {
-  const hasApiKeys = FRED_API_KEY || TWELVE_DATA_API_KEY;
+  const hasApiKeys = getFredApiKey() || getTwelveDataApiKey();
   if (hasApiKeys) return null;
 
   return (
@@ -313,7 +313,7 @@ export default function CommandCenter() {
   const feeds = [
     {
       name: "FRED",
-      active: !!FRED_API_KEY,
+      active: !!getFredApiKey(),
       loading: fredLoading || fredFetching,
       connected: fredConnected,
       data: fredConnected,
@@ -322,7 +322,7 @@ export default function CommandCenter() {
     },
     {
       name: "Twelve Data",
-      active: !!TWELVE_DATA_API_KEY,
+      active: !!getTwelveDataApiKey(),
       loading: stockLoading || stockFetching,
       connected: stockConnected,
       data: stockConnected,
@@ -414,16 +414,32 @@ export default function CommandCenter() {
           </ErrorBoundary>
         )}
 
-        {section === "thesis" && (
+        {section === "thesis" && isOwnerMode && (
           <ErrorBoundary>
             <ThesisPortfolio />
           </ErrorBoundary>
         )}
 
-        {section === "jobs" && (
+        {section === "thesis" && !isOwnerMode && (
+          <EmptyStateCard
+            title="Your Thesis Portfolio"
+            description="After tracking signals for a while, build your portfolio thesis here. This section shows how your investment positioning maps to the domino cascade."
+            color="#6D6875"
+          />
+        )}
+
+        {section === "jobs" && isOwnerMode && (
           <ErrorBoundary>
             <AIJobs />
           </ErrorBoundary>
+        )}
+
+        {section === "jobs" && !isOwnerMode && (
+          <EmptyStateCard
+            title="AI Jobs Tracker"
+            description="Track AI-related job market trends and opportunities relevant to your career positioning."
+            color="#2A9D8F"
+          />
         )}
 
         <div

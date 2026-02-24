@@ -36,13 +36,19 @@ export default function LucidBoxDominos({
             const heat = (sc.red * 2 + sc.amber) / denominator;
             return (
               <div key={d.id} style={{ display: "flex", alignItems: "center" }}>
-                <div
+                <button
+                  type="button"
                   onClick={() => onToggleDomino(d.id)}
+                  aria-label={`Toggle Domino ${d.id}: ${d.name}`}
                   style={{
+                    appearance: "none",
+                    padding: 0,
                     width: 48,
                     height: 48,
                     borderRadius: "50%",
-                    background: `radial-gradient(circle, ${d.color}${Math.round(heat * 80 + 20)
+                    background: `radial-gradient(circle, ${d.color}${Math.round(
+                      heat * 80 + 20,
+                    )
                       .toString(16)
                       .padStart(2, "0")}, transparent)`,
                     border: `2px solid ${d.color}${Math.round(heat * 200 + 55)
@@ -53,9 +59,13 @@ export default function LucidBoxDominos({
                     justifyContent: "center",
                     cursor: "pointer",
                     position: "relative",
+                    color: "inherit",
+                    font: "inherit",
                   }}
                 >
-                  <span style={{ fontSize: 10, fontWeight: 700, color: d.color }}>
+                  <span
+                    style={{ fontSize: 10, fontWeight: 700, color: d.color }}
+                  >
                     {d.id}
                   </span>
                   {heat > 0.5 && (
@@ -72,7 +82,7 @@ export default function LucidBoxDominos({
                       }}
                     />
                   )}
-                </div>
+                </button>
                 {i < liveDominos.length - 1 && (
                   <div
                     style={{
@@ -135,13 +145,14 @@ export default function LucidBoxDominos({
           lineHeight: 1.6,
         }}
       >
-        <strong style={{ color: "rgba(255,255,255,0.45)" }}>How to Use:</strong> Update{" "}
-        <GlossaryTooltip term="signal">signal</GlossaryTooltip> statuses as new data
-        arrives. Green = <GlossaryTooltip term="baseline">baseline</GlossaryTooltip>.
-        Amber = <GlossaryTooltip term="watch">watch</GlossaryTooltip>. Red ={" "}
+        <strong style={{ color: "rgba(255,255,255,0.45)" }}>How to Use:</strong>{" "}
+        Update <GlossaryTooltip term="signal">signal</GlossaryTooltip> statuses
+        as new data arrives. Green ={" "}
+        <GlossaryTooltip term="baseline">baseline</GlossaryTooltip>. Amber ={" "}
+        <GlossaryTooltip term="watch">watch</GlossaryTooltip>. Red ={" "}
         <GlossaryTooltip term="alert">alert</GlossaryTooltip>. Review when a{" "}
-        <GlossaryTooltip term="threshold">threshold</GlossaryTooltip> is crossed,
-        then track weekly during earnings season.
+        <GlossaryTooltip term="threshold">threshold</GlossaryTooltip> is
+        crossed, then track weekly during earnings season.
       </div>
     </>
   );

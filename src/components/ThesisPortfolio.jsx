@@ -241,15 +241,23 @@ export default function ThesisPortfolio() {
       {/* Source Materials */}
       <div style={{ ...S.label, marginTop: 14 }}>Source Materials</div>
       {SOURCES.map((s, i) => (
-        <div
+        <button
+          type="button"
           key={i}
           style={{
             ...S.card(
               expandedSource === i ? `${s.color}22` : "rgba(255,255,255,0.04)",
             ),
+            appearance: "none",
+            textAlign: "left",
+            width: "100%",
             cursor: "pointer",
-            transition: "all 0.2s",
+            transition:
+              "color 0.2s, background 0.2s, border-color 0.2s, opacity 0.2s, box-shadow 0.2s",
+            color: "inherit",
+            font: "inherit",
           }}
+          aria-expanded={expandedSource === i}
           onClick={() => setExpandedSource(expandedSource === i ? -1 : i)}
         >
           <div
@@ -421,20 +429,27 @@ export default function ThesisPortfolio() {
               </a>
             </div>
           )}
-        </div>
+        </button>
       ))}
 
       {/* Comparison */}
-      <div
+      <button
+        type="button"
         style={{
           ...S.card(
             showComparison
               ? "rgba(255,255,255,0.08)"
               : "rgba(255,255,255,0.04)",
           ),
+          appearance: "none",
+          textAlign: "left",
+          width: "100%",
           marginTop: 4,
           cursor: "pointer",
+          color: "inherit",
+          font: "inherit",
         }}
+        aria-expanded={showComparison}
         onClick={() => setShowComparison(!showComparison)}
       >
         <div
@@ -530,7 +545,7 @@ export default function ThesisPortfolio() {
             ))}
           </div>
         )}
-      </div>
+      </button>
 
       {/* Disclaimer */}
       <div

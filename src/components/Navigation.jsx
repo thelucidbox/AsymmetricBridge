@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ThemeToggle, useTheme } from "../design-tokens";
 import {
@@ -45,6 +45,13 @@ export default function Navigation({
   const { enterTestMode } = useThesis();
   const [isMobile, setIsMobile] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const drawerRef = useRef(null);
+
+  useEffect(() => {
+    if (isMenuOpen && drawerRef.current) {
+      drawerRef.current.focus();
+    }
+  }, [isMenuOpen]);
 
   const handleTestAsNewUser = () => {
     enterTestMode();
@@ -254,6 +261,7 @@ export default function Navigation({
 
       {isMobile && isMenuOpen && (
         <button
+          aria-label="Close navigation menu"
           onClick={() => setIsMenuOpen(false)}
           style={{
             position: "fixed",
@@ -268,6 +276,14 @@ export default function Navigation({
 
       {isMobile && (
         <div
+          ref={drawerRef}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Navigation menu"
+          tabIndex={-1}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") setIsMenuOpen(false);
+          }}
           style={{
             position: "fixed",
             top: 0,

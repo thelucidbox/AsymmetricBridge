@@ -35,7 +35,10 @@ export default function LucidBoxMarket({
           Feeds
         </span>
         {feeds.map((f) => (
-          <div key={f.name} style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          <div
+            key={f.name}
+            style={{ display: "flex", alignItems: "center", gap: 4 }}
+          >
             <div
               style={{
                 width: 6,
@@ -54,7 +57,9 @@ export default function LucidBoxMarket({
             <span
               style={{
                 fontSize: 10,
-                color: f.data ? "rgba(255,255,255,0.5)" : "rgba(255,255,255,0.25)",
+                color: f.data
+                  ? "rgba(255,255,255,0.5)"
+                  : "rgba(255,255,255,0.25)",
               }}
             >
               {f.name}
@@ -70,9 +75,13 @@ export default function LucidBoxMarket({
               fontFamily: "'IBM Plex Mono'",
             }}
           >
-            Auto: {thresholdResult.evaluated} eval · {thresholdResult.manualOnly} manual
+            Auto: {thresholdResult.evaluated} eval ·{" "}
+            {thresholdResult.manualOnly} manual
             {thresholdResult.applied > 0 && (
-              <span style={{ color: "#E9C46A" }}> · {thresholdResult.applied} updated</span>
+              <span style={{ color: "#E9C46A" }}>
+                {" "}
+                · {thresholdResult.applied} updated
+              </span>
             )}
           </span>
         )}
@@ -158,8 +167,16 @@ export default function LucidBoxMarket({
             >
               {x.l}
             </div>
-            <div style={{ fontSize: 24, fontWeight: 700, color: x.clr }}>{x.c}</div>
-            <div style={{ fontSize: 10, color: "rgba(255,255,255,0.25)" }}>
+            <div
+              className="ab-tabular-nums"
+              style={{ fontSize: 24, fontWeight: 700, color: x.clr }}
+            >
+              {x.c}
+            </div>
+            <div
+              className="ab-tabular-nums"
+              style={{ fontSize: 10, color: "rgba(255,255,255,0.25)" }}
+            >
               of {totalSig}
             </div>
           </div>

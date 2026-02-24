@@ -180,7 +180,7 @@ function parseResumeText(text) {
 
   const goalsFromObjective = [
     ...cleaned.matchAll(
-      /(?:seeking to|looking to|aim(?:ing)? to|goal is to|objective(?: is)? to)\s+([^\.\n]{8,120})/gi,
+      /(?:seeking to|looking to|aim(?:ing)? to|goal is to|objective(?: is)? to)\s+([^.\n]{8,120})/gi,
     ),
   ]
     .map((match) => normalizeSentence(match[1]))

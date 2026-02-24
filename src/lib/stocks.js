@@ -2,7 +2,16 @@ import { withRetry } from "./retry.js";
 
 const TWELVE_DATA_BASE = "https://api.twelvedata.com";
 
-export const TWELVE_DATA_API_KEY = import.meta.env.VITE_TWELVE_DATA_KEY;
+const TWELVE_DATA_KEY_STORAGE = "ab-twelve-data-api-key";
+
+export function getTwelveDataApiKey() {
+  const envKey = import.meta.env.VITE_TWELVE_DATA_KEY;
+  if (envKey) return envKey;
+  if (typeof window === "undefined") return "";
+  return window.localStorage.getItem(TWELVE_DATA_KEY_STORAGE) || "";
+}
+
+export const TWELVE_DATA_API_KEY = getTwelveDataApiKey();
 const STOCK_SOURCE = "twelve_data";
 
 // Tickers -> signal mapping
@@ -67,16 +76,23 @@ function toErrorResult(error, attempts) {
 }
 
 async function requestBatchQuotes() {
-  if (!TWELVE_DATA_API_KEY) {
-    throw createAdapterError("AUTH_ERROR", "Missing VITE_TWELVE_DATA_KEY", false);
+  const apiKey = getTwelveDataApiKey();
+  if (!apiKey) {
+    throw createAdapterError(
+      "AUTH_ERROR",
+      "Missing VITE_TWELVE_DATA_KEY",
+      false,
+    );
   }
 
   const params = new URLSearchParams({
     symbol: ALL_TICKERS.join(","),
-    apikey: TWELVE_DATA_API_KEY,
+    apikey: apiKey,
   });
 
-  const response = await fetch(`${TWELVE_DATA_BASE}/quote?${params.toString()}`);
+  const response = await fetch(
+    `${TWELVE_DATA_BASE}/quote?${params.toString()}`,
+  );
 
   if (response.status === 429) {
     throw createAdapterError(
