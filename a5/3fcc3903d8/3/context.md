@@ -209,7 +209,3 @@ OK, I don't see the The updated financial data and the performance tab, but mayb
 
 OK about the documentation on the on GitHub. I want all mention of the ALOS system removed. There's no reason anybody needs to know about it. There's no reason that needs to be included whatsoever.
 
-### Prompt 39
-
-I didn't want you to delete the files. I just wanted them removed from the repository like do I have a separate repository for my private one? If not, don't worry about it. As long as I still have my personal dashboard, that's what matters.
-
