@@ -35,6 +35,18 @@ test-screenshots/
 
 # Internal planning docs (keep local, not in repo)
 productivity/
+AGENTS.md
+ARCHITECTURE.md
+CLARITY-BRIEF.md
+CODEX-REVIEW-PROMPT.md
+DECOMPOSITION.md
+DESIGN-BRIEF.md
+DISPATCH.md
+GEMINI.md
+QUESTIONS.md
+SPEC.md
+src/source/
+src/components/AIJobs.jsx
 
 # Remotion video project (dev-only)
 video/node_modules
