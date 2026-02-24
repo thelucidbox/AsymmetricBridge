@@ -18,7 +18,8 @@
   <a href="#quickstart">Quickstart</a> &middot;
   <a href="#features">Features</a> &middot;
   <a href="#how-it-works">How It Works</a> &middot;
-  <a href="./CONTRIBUTING.md">Contributing</a>
+  <a href="./CONTRIBUTING.md">Contributing</a> &middot;
+  <a href="https://github.com/thelucidbox/AsymmetricBridge/blob/main/docs/images/demo.mp4">Watch Demo (30s)</a>
 </p>
 
 ---
