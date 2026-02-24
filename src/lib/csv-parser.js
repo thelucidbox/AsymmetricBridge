@@ -9,19 +9,8 @@ const FORMAT_LABELS = {
 };
 
 const TARGET_COLUMNS = {
-  symbol: [
-    "symbol",
-    "ticker",
-    "instrument",
-    "security",
-  ],
-  quantity: [
-    "quantity",
-    "qty",
-    "shares",
-    "position",
-    "units",
-  ],
+  symbol: ["symbol", "ticker", "instrument", "security"],
+  quantity: ["quantity", "qty", "shares", "position", "units"],
   marketValue: [
     "market value",
     "current value",
@@ -37,11 +26,7 @@ const TARGET_COLUMNS = {
     "total cost",
     "book cost",
   ],
-  lastPrice: [
-    "last price",
-    "price",
-    "mark price",
-  ],
+  lastPrice: ["last price", "price", "mark price"],
 };
 
 const REQUIRED_HEADERS = {
@@ -77,7 +62,11 @@ function findColumn(headerLookup, candidates = []) {
   }
 
   for (const [normalized, original] of headerLookup) {
-    if (candidates.some((candidate) => normalized.includes(normalizeHeader(candidate)))) {
+    if (
+      candidates.some((candidate) =>
+        normalized.includes(normalizeHeader(candidate)),
+      )
+    ) {
       return original;
     }
   }
@@ -86,7 +75,9 @@ function findColumn(headerLookup, candidates = []) {
 }
 
 function hasRequiredHeaders(headerLookup, requiredHeaders = []) {
-  return requiredHeaders.every((header) => headerLookup.has(normalizeHeader(header)));
+  return requiredHeaders.every((header) =>
+    headerLookup.has(normalizeHeader(header)),
+  );
 }
 
 function detectBrokerageFormat(headers = []) {
@@ -147,7 +138,10 @@ function detectBrokerageFormat(headers = []) {
 
   const symbolColumn = findColumn(headerLookup, TARGET_COLUMNS.symbol);
   const quantityColumn = findColumn(headerLookup, TARGET_COLUMNS.quantity);
-  const marketValueColumn = findColumn(headerLookup, TARGET_COLUMNS.marketValue);
+  const marketValueColumn = findColumn(
+    headerLookup,
+    TARGET_COLUMNS.marketValue,
+  );
 
   if (!symbolColumn || !quantityColumn || !marketValueColumn) {
     throw new Error(
@@ -211,12 +205,11 @@ function normalizeRow(row, columns) {
   const quantity = parseNumericValue(row?.[columns.quantity]);
   const parsedMarketValue = parseNumericValue(row?.[columns.marketValue]);
   const lastPrice = parseNumericValue(row?.[columns.lastPrice]);
-  const computedMarketValue =
-    Number.isFinite(parsedMarketValue)
-      ? parsedMarketValue
-      : Number.isFinite(quantity) && Number.isFinite(lastPrice)
-        ? quantity * lastPrice
-        : NaN;
+  const computedMarketValue = Number.isFinite(parsedMarketValue)
+    ? parsedMarketValue
+    : Number.isFinite(quantity) && Number.isFinite(lastPrice)
+      ? quantity * lastPrice
+      : NaN;
 
   if (!Number.isFinite(computedMarketValue)) return null;
 
@@ -236,23 +229,13 @@ function normalizeRow(row, columns) {
 
 function parseWithPapa(input, { onProgress } = {}) {
   return new Promise((resolve, reject) => {
-    let rowCounter = 0;
-    const totalBytes = typeof input === "object" && input !== null ? Number(input.size || 0) : 0;
-
     Papa.parse(input, {
       header: true,
       skipEmptyLines: "greedy",
-      transformHeader: (header) => String(header || "").replace(/^\uFEFF/, "").trim(),
-      step: (stepResult) => {
-        rowCounter += 1;
-        if (typeof onProgress !== "function") return;
-        if (totalBytes > 0 && Number.isFinite(stepResult.meta?.cursor)) {
-          const byteProgress = Math.min((stepResult.meta.cursor / totalBytes) * 100, 100);
-          onProgress(byteProgress);
-          return;
-        }
-        onProgress(Math.min(rowCounter, 100));
-      },
+      transformHeader: (header) =>
+        String(header || "")
+          .replace(/^\uFEFF/, "")
+          .trim(),
       complete: (result) => {
         if (typeof onProgress === "function") onProgress(100);
         resolve(result);
@@ -297,10 +280,14 @@ export async function parsePortfolioCsv(input, options = {}) {
     );
   }
 
-  const parseErrors = (parsed.errors || []).filter((entry) => entry.code !== "UndetectableDelimiter");
+  const parseErrors = (parsed.errors || []).filter(
+    (entry) => entry.code !== "UndetectableDelimiter",
+  );
   if (parseErrors.length > 0) {
     const firstError = parseErrors[0];
-    throw new Error(`Malformed CSV near row ${firstError.row ?? "unknown"}: ${firstError.message}`);
+    throw new Error(
+      `Malformed CSV near row ${firstError.row ?? "unknown"}: ${firstError.message}`,
+    );
   }
 
   return {
