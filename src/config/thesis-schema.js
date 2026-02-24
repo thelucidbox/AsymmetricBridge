@@ -20,6 +20,14 @@ function validateStringField(value, path, errors) {
   return true;
 }
 
+function validateOptionalString(value, path, errors) {
+  if (value !== undefined && value !== null && typeof value !== "string") {
+    pushError(errors, path, "must be a string");
+    return false;
+  }
+  return true;
+}
+
 function validateDataPoints(dataPoints, path, errors) {
   if (!Array.isArray(dataPoints)) {
     pushError(errors, path, "must be an array");
@@ -151,8 +159,8 @@ function validatePortfolio(portfolio, errors) {
     return;
   }
 
-  if (!Array.isArray(portfolio.legs) || portfolio.legs.length === 0) {
-    pushError(errors, "portfolio.legs", "must be a non-empty array");
+  if (!Array.isArray(portfolio.legs)) {
+    pushError(errors, "portfolio.legs", "must be an array");
     return;
   }
 
@@ -184,13 +192,29 @@ function validateCareerProfile(careerProfile, errors) {
     return;
   }
 
-  validateStringField(careerProfile.currentRole, "careerProfile.currentRole", errors);
-  validateStringField(careerProfile.targetRole, "careerProfile.targetRole", errors);
-  validateStringField(careerProfile.industry, "careerProfile.industry", errors);
-  validateStringField(careerProfile.experience, "careerProfile.experience", errors);
+  validateOptionalString(
+    careerProfile.currentRole,
+    "careerProfile.currentRole",
+    errors,
+  );
+  validateOptionalString(
+    careerProfile.targetRole,
+    "careerProfile.targetRole",
+    errors,
+  );
+  validateOptionalString(
+    careerProfile.industry,
+    "careerProfile.industry",
+    errors,
+  );
+  validateOptionalString(
+    careerProfile.experience,
+    "careerProfile.experience",
+    errors,
+  );
 
-  if (!Array.isArray(careerProfile.goals) || careerProfile.goals.length === 0) {
-    pushError(errors, "careerProfile.goals", "must be a non-empty array");
+  if (!Array.isArray(careerProfile.goals)) {
+    pushError(errors, "careerProfile.goals", "must be an array");
     return;
   }
 
@@ -213,7 +237,7 @@ export function validateThesis(config) {
     pushError(errors, "meta", "must be an object");
   } else {
     validateStringField(config.meta.name, "meta.name", errors);
-    validateStringField(config.meta.author, "meta.author", errors);
+    validateOptionalString(config.meta.author, "meta.author", errors);
     validateStringField(config.meta.version, "meta.version", errors);
   }
 

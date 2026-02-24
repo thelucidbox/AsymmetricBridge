@@ -231,6 +231,11 @@ export default function OnboardingWizard() {
 
     const candidate = {
       ...draftThesis,
+      meta: {
+        ...draftThesis.meta,
+        author:
+          draftThesis.meta.author || normalizedCareer.currentRole || "User",
+      },
       dominos: normalizedDominos,
       careerProfile: normalizedCareer,
     };
