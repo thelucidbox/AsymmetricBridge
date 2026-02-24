@@ -6,7 +6,6 @@
   "checkpoints_count": 4,
   "files_touched": [
     ".env.example",
-    ".gitignore",
     "ARCHITECTURE.md",
     "CLAUDE.md",
     "CODEX-REVIEW-PROMPT.md",
@@ -16,7 +15,6 @@
     "LICENSE",
     "README.md",
     "SPEC.md",
-    "docs/tutorials/getting-started.md",
     "e2e/accessibility.spec.js",
     "e2e/conviction.spec.js",
     "e2e/digests.spec.js",
@@ -34,7 +32,6 @@
     "src/components/GlossaryTooltip.jsx",
     "src/components/GuidedTour.jsx",
     "src/components/Navigation.jsx",
-    "src/components/ThesisPortfolio.jsx",
     "src/components/conviction/ConvictionScorecard.jsx",
     "src/components/digests/DigestView.jsx",
     "src/components/lucid-box/LucidBoxHeader.jsx",
@@ -44,7 +41,6 @@
     "src/components/performance-lab/PerformanceView.jsx",
     "src/config/ThesisContext.jsx",
     "src/config/thesis-schema.js",
-    "src/data/comparison.js",
     "src/design-tokens/observatory.js",
     "src/design-tokens/terminal.js",
     "src/hooks/useFredData.js",
@@ -107,10 +103,10 @@
     }
   ],
   "token_usage": {
-    "input_tokens": 1721,
-    "cache_creation_tokens": 403709,
-    "cache_read_tokens": 19341358,
-    "output_tokens": 23961,
-    "api_call_count": 168
+    "input_tokens": 1697,
+    "cache_creation_tokens": 397491,
+    "cache_read_tokens": 17529277,
+    "output_tokens": 25975,
+    "api_call_count": 142
   }
 }

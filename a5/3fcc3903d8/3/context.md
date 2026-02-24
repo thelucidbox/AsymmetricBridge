@@ -209,3 +209,21 @@ OK, I don't see the The updated financial data and the performance tab, but mayb
 
 OK about the documentation on the on GitHub. I want all mention of the ALOS system removed. There's no reason anybody needs to know about it. There's no reason that needs to be included whatsoever.
 
+### Prompt 39
+
+I didn't want you to delete the files. I just wanted them removed from the repository like do I have a separate repository for my private one? If not, don't worry about it. As long as I still have my personal dashboard, that's what matters.
+
+### Prompt 40
+
+I want everything scrubbed
+
+### Prompt 41
+
+A couple things about the repository. I want to replace a screenshot with the larger screenshot. I showed you. I've just attached this message and then you'll also see a screenshot of the repo on GitHub and you'll see how there's like an image missing there. What's up with that? How do we fix it?
+
+### Prompt 42
+
+[Image: source: /Users/fabianaguilar/Desktop/Screenshot 2026-02-24 at 12.02.36 PM.png]
+
+[Image: source: /Users/fabianaguilar/Desktop/Screenshot 2026-02-24 at 12.02.06 PM.png]
+
