@@ -47,8 +47,6 @@ Open `http://localhost:5173` and the onboarding wizard walks you through setup i
 
 ### Thesis Framework — The 6-Domino Cascade
 
-<img src="docs/images/domino-cascade.png" alt="Domino Cascade" width="700" />
-
 Define your macro thesis as a chain of cause-and-effect disruption forces. The default thesis tracks 6 dominos with 24 signals:
 
 | Domino | What It Tracks |
@@ -64,8 +62,6 @@ When one domino tips, it pressures the next. Each signal is connected to live da
 
 ### Live Signal Tracker
 
-<img src="docs/images/signal-tracker.png" alt="Signal Tracker" width="700" />
-
 - **24 signals** pulling from FRED, Twelve Data, and CoinGecko
 - **Auto-threshold engine** evaluates every data fetch — client-side and via 15-minute Supabase cron
 - **Green / Amber / Red** status with audit trail (who changed it, when, why)
@@ -75,17 +71,13 @@ When one domino tips, it pressures the next. Each signal is connected to live da
 
 ### Performance Lab — Portfolio Alignment
 
-<img src="docs/images/performance-lab.png" alt="Performance Lab" width="700" />
-
 Upload your brokerage CSV (Schwab, Fidelity, IBKR, Robinhood auto-detected) and see:
 
 - **Thesis alignment score** — what % of your portfolio matches your macro thesis
-- **Leg mapping** — positions grouped by thesis leg (Long AI Infra, Short SaaS, Hedge, etc.)
-- **QoQ attribution** — did your beliefs translate into returns?
+- **Leg mapping** — positions grouped by thesis leg (AI Infrastructure, SaaS Survivors, Duration Hedge, etc.)
+- **Actual vs target** — see where your allocation drifts from your conviction
 
 ### Conviction Scorecard
-
-<img src="docs/images/conviction-scorecard.png" alt="Conviction Scorecard" width="700" />
 
 Record predictions when signals cross thresholds. Set 30/60/90-day evaluation windows. Outcomes get scored into a batting average over time.
 
@@ -106,12 +98,7 @@ Export as Markdown, copy to clipboard, or download.
 
 ### Two Design Themes
 
-| Terminal | Observatory |
-|----------|------------|
-| Bloomberg-style, monospace, grid-based | Glass-morphism, Inter font, glow effects |
-| <img src="docs/images/theme-terminal.png" alt="Terminal Theme" width="350" /> | <img src="docs/images/theme-observatory.png" alt="Observatory Theme" width="350" /> |
-
-Switch with a toggle. Both themes use the same design token system — build your own variant by editing one file.
+Switch between **Terminal** (Bloomberg-style, monospace, grid-based) and **Observatory** (glass-morphism, Inter font, glow effects) with a toggle. Both themes use the same design token system — build your own variant by editing one file.
 
 ## How It Works
 
