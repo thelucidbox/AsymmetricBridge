@@ -500,3 +500,249 @@ Give it to me give me the prompt here so I can just drop it in the Codex app. Yo
 ---
 
 yes commit please
+
+---
+
+Concerning the Codex prompt, should I just open this on the main one like what folder or directory should I point it to what path?
+
+---
+
+Here is what Codex found:**CRITICAL**
+[CRITICAL] [src/components/onboarding/APIKeySetup.jsx:26](/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/onboarding/APIKeySetup.jsx:26) — Onboarding API keys are saved, but never used by live data hooks.
+Why: Keys are written to `localStorage`, while runtime fetchers only read build-time env constants in [src/lib/fred.js:5](/Users/fabianaguilar/Projects/AsymmetricBridge/src/lib/fred.js:5), [src/lib/stocks.js:5](/Users/fabianaguilar/Projects/AsymmetricBridge/src/lib/stocks.js:5), and gating in [src/hooks/useFredData.js:31](/Users/fabianaguilar/Projects/AsymmetricBridge/src/hooks/useFredData.js:31), [src/hooks/useStockData.js:35](/Users/fabianaguilar/Projects/AsymmetricBridge/src/hooks/useStockData.js:35), [src/components/CommandCenter.jsx:107](/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/CommandCenter.jsx:107). So v3.1 “add keys in onboarding for live data” is functionally broken.
+Fix: Replace static constants with runtime key getters (`env || localStorage`), include keys in query keys to trigger refetch, and derive banner/feed active state from the same runtime source.
+
+**HIGH**
+[HIGH] [src/components/onboarding/OnboardingWizard.jsx:170](/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/onboarding/OnboardingWizard.jsx:170) — “Quick Start” does not skip to review.
+Why: `handleQuickStart` sets step to `1` (Career step), same flow as Custom Setup in practice.
+Fix: Set `currentStep` to review (`STEPS.length - 1`) and ensure defaults are prevalidated, or explicitly rename the button to avoid false behavior claims.
+
+[HIGH] [src/components/onboarding/OnboardingWizard.jsx:73](/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/onboarding/OnboardingWizard.jsx:73) — OSS/test onboarding starts from Fabian-specific thesis/profile data.
+Why: Draft state clones `fabianThesis`, including personal profile text from [src/config/fabian-thesis.js:600](/Users/fabianaguilar/Projects/AsymmetricBridge/src/config/fabian-thesis.js:600). That leaks personal defaults into OSS flow.
+Fix: Create a neutral onboarding template (generic author + empty/non-personal career defaults) and use it for OSS and test mode.
+
+[HIGH] [src/config/ThesisContext.jsx:57](/Users/fabianaguilar/Projects/AsymmetricBridge/src/config/ThesisContext.jsx:57) — `getInitialThesis()` returns Fabian thesis in owner test mode when storage is empty.
+Why: Owner+testing+no-stored path returns `fabianThesis`, undermining “test as new user” fidelity.
+Fix: In test mode branch, return `null` or the neutral template (not Fabian thesis).
+
+[HIGH] [src/components/CommandCenter.jsx:417](/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/CommandCenter.jsx:417) — Edition gating is incomplete; OSS still sees Fabian-specific sections.
+Why: `thesis` and `jobs` sections render for OSS, and tabs are still shown in [src/components/lucid-box/LucidBoxHeader.jsx:103](/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/lucid-box/LucidBoxHeader.jsx:103).
+Fix: Gate those sections/tabs behind `isOwnerMode` or replace with OSS-safe empty states.
+
+[HIGH] [src/components/onboarding/ResearchDiscovery.jsx:5](/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/onboarding/ResearchDiscovery.jsx:5) — Research discovery prompt generator is implemented but unreachable.
+Why: No route/nav/step references it; onboarding render flow in [src/components/onboarding/OnboardingWizard.jsx:228](/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/onboarding/OnboardingWizard.jsx:228) never mounts it.
+Fix: Add it to onboarding review step or dashboard (and optionally a dedicated route).
+
+[HIGH] [src/components/Navigation.jsx:269](/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/Navigation.jsx:269) — Mobile drawer lacks focus trap and proper modal semantics.
+Why: Drawer is a positioned `div` without `role="dialog"`/`aria-modal`; focus can move behind drawer. Backdrop is an unlabeled button at [src/components/Navigation.jsx:255](/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/Navigation.jsx:255).
+Fix: Implement dialog semantics, focus trapping, Escape-close, focus restore on close, and use a semantic non-interactive backdrop + explicit close control.
+
+[HIGH] [src/hooks/useStockData.js:38](/Users/fabianaguilar/Projects/AsymmetricBridge/src/hooks/useStockData.js:38) — Retry logic is duplicated (query + adapter), multiplying calls and rate-limit risk.
+Why: Hooks retry and adapters also retry (`withRetry` in [src/lib/stocks.js:149](/Users/fabianaguilar/Projects/AsymmetricBridge/src/lib/stocks.js:149), [src/lib/fred.js:153](/Users/fabianaguilar/Projects/AsymmetricBridge/src/lib/fred.js:153), [src/lib/crypto.js:125](/Users/fabianaguilar/Projects/AsymmetricBridge/src/lib/crypto.js:125)).
+Fix: Keep retries in one layer only (prefer adapter), and set React Query retries to `false`/`1` for these hooks.
+
+**MEDIUM**
+[MEDIUM] [src/design-tokens/observatory.js:98](/Users/fabianaguilar/Projects/AsymmetricBridge/src/design-tokens/observatory.js:98) — Observatory transition token is non-specific (effectively “all”).
+Why: `motion.default` is duration/easing only, then reused by styles in [src/styles.js:90](/Users/fabianaguilar/Projects/AsymmetricBridge/src/styles.js:90), violating v3.1 “specific transition properties” intent.
+Fix: Define explicit property list (`color`, `background-color`, `border-color`, `opacity`, `box-shadow`, etc.).
+
+[MEDIUM] [src/components/SignalCard.jsx:107](/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/SignalCard.jsx:107) — Multiple components still use `transition: "all 0.2s"`.
+Why: Present in several files (e.g. SignalCard, LucidBoxPortfolio, ThesisPortfolio, CSVUpload), which can cause expensive animations.
+Fix: Replace each with property-specific transitions.
+
+[MEDIUM] [src/components/SignalUpdateForm.jsx:63](/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/SignalUpdateForm.jsx:63) — Inline `outline: "none"` remains.
+Why: Also present in [src/components/digests/DigestView.jsx:68](/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/digests/DigestView.jsx:68); this can suppress visible keyboard focus.
+Fix: Remove `outline: none` and rely on global `:focus-visible` styles (or add explicit accessible focus styles).
+
+[MEDIUM] [src/components/DominoSection.jsx:34](/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/DominoSection.jsx:34) — Clickable non-button elements are used for core interactions.
+Why: Similar patterns in [src/components/lucid-box/LucidBoxDominos.jsx:39](/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/lucid-box/LucidBoxDominos.jsx:39), [src/components/SignalCard.jsx:112](/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/SignalCard.jsx:112), [src/components/ThesisPortfolio.jsx:253](/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/ThesisPortfolio.jsx:253).
+Fix: Use semantic `<button type="button">` for toggles/expanders and add `aria-expanded` where applicable.
+
+[MEDIUM] [src/components/GuidedTour.jsx:156](/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/GuidedTour.jsx:156) — Hook dependency issues and effect state pattern can cause stale behavior.
+Why: Missing deps warnings + sync state changes inside effect at [src/components/GuidedTour.jsx:73](/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/GuidedTour.jsx:73); similar in [src/components/GlossaryTooltip.jsx:127](/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/GlossaryTooltip.jsx:127).
+Fix: Memoize callback dependencies (`useCallback`), include complete deps, and avoid direct setState-in-effect patterns when derivable.
+
+[MEDIUM] [src/components/SignalTimeline.jsx:185](/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/SignalTimeline.jsx:185) — Impure `Date.now()` during render.
+Why: Same issue in [src/components/conviction/ConvictionScorecard.jsx:229](/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/conviction/ConvictionScorecard.jsx:229); flagged by lint purity rules.
+Fix: Move time reference into memoized state/effect-driven ticker or pass `now` as stable input.
+
+[MEDIUM] [src/design-tokens/index.js:97](/Users/fabianaguilar/Projects/AsymmetricBridge/src/design-tokens/index.js:97) — Module-global mutation inside render (`activeTokens = tokens`).
+Why: Render side effects are unsafe under concurrent rendering.
+Fix: Move assignment to effect/ref or redesign `getThemeTokens()` to read from context-safe state.
+
+[MEDIUM] [src/components/onboarding/ThesisSetup.jsx:182](/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/onboarding/ThesisSetup.jsx:182) — “Use defaults” toggle hides controls but does not restore defaults.
+Why: Users can believe defaults are active when customized values are still persisted.
+Fix: On toggle-to-default, reset domino names/descriptions/thresholds from baseline template.
+
+[MEDIUM] [src/components/digests/DigestView.jsx:282](/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/digests/DigestView.jsx:282) — HTML sink exists without visible CSP hardening in app shell.
+Why: Current markdown path escapes content, but defense-in-depth CSP is absent in [index.html:3](/Users/fabianaguilar/Projects/AsymmetricBridge/index.html:3).
+Fix: Add strict CSP at hosting/edge (preferred) and keep sanitized HTML pipeline centralized.
+
+[MEDIUM] [src/App.jsx:9](/Users/fabianaguilar/Projects/AsymmetricBridge/src/App.jsx:9) — No route-level code splitting; production bundle is large.
+Why: `vite build` outputs a 702KB JS chunk and warns about chunk size.
+Fix: Lazy-load route views (`React.lazy` + `Suspense`) and split heavy sections.
+
+**LOW**
+[LOW] [src/index.css:102](/Users/fabianaguilar/Projects/AsymmetricBridge/src/index.css:102) — Tabular-number utility exists but is unused.
+Why: No component applies `ab-tabular-nums`, so numeric UI can jitter.
+Fix: Apply class to KPI/count/time/price elements.
+
+[LOW] [src/components/onboarding/OnboardingWizard.jsx:286](/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/onboarding/OnboardingWizard.jsx:286) — Onboarding max width is hardcoded, bypassing content-shell token system.
+Why: Inconsistent with other screens using `.ab-content-shell`.
+Fix: Use `.ab-content-shell` and tokenized max width.
+
+[LOW] [src/lib/export-utils.js:124](/Users/fabianaguilar/Projects/AsymmetricBridge/src/lib/export-utils.js:124) — Unused variable and lint errors remain.
+Why: Also regex lint errors in [src/components/onboarding/ResumeIngestion.jsx:183](/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/onboarding/ResumeIngestion.jsx:183).
+Fix: Remove unused `mapped` variable and clean unnecessary escapes; keep `npm run lint` green.
+
+[LOW] [src/main.jsx:12](/Users/fabianaguilar/Projects/AsymmetricBridge/src/main.jsx:12) — Production console logging is noisy.
+Why: Multiple `console.info/warn/error` calls can flood logs and obscure actionable errors.
+Fix: Gate diagnostic logs with `import.meta.env.DEV` or centralized logger levels.
+
+[LOW] [src/config/ThesisContext.jsx:103](/Users/fabianaguilar/Projects/AsymmetricBridge/src/config/ThesisContext.jsx:103) — Some `persistThesis` calls bypass `validateThesis`.
+Why: Current static payload is valid, but future schema drift could persist invalid state.
+Fix: Validate before all persist writes, including bootstrapping/test-mode exit paths.
+
+Coverage notes: no hardcoded secret keys found, no obvious circular import cycles detected in the local import graph, and `ThesisProvider` placement is correct in [src/main.jsx:27](/Users/fabianaguilar/Projects/AsymmetricBridge/src/main.jsx:27).
+
+---
+
+Run all four please
+
+---
+
+<teammate-message teammate_id="a11y-fixes" color="blue" summary="Batch B: All 3 accessibility fixes complete">
+Batch B accessibility fixes are complete. Here's what was done:
+
+**1. Removed `outline: "none"` from inline styles (2 files):**
+- `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/SignalUpdateForm.jsx` line 63 — removed from `selectStyle`
+- `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/digests/DigestView.jsx` line 68 — removed from `selectStyle`
+
+**2. Converted clickable divs to semantic buttons (4 files):**
+- `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/DominoSection.jsx` — outer `<div onClick={onToggle}>` → `<button type="button">` with `aria-expanded={isActive}`, `appearance: "none"`, `textAlign: "left"`, `width: "100%"`, `color: "inherit"`, `font: "inherit"`
+- `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/SignalCard.jsx` — expand/collapse `<div onClick>` → `<button type="button">` with `aria-expanded` (only set when not in simplified mode), transparent background, no border, inherits color/font
+- `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/lucid-box/LucidBoxDominos.jsx` — circular domino node `<div onClick>` → `<button type="button">` with `aria-label="Toggle Domino N: Name"`
+- `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/ThesisPortfolio.jsx` — two conversions:
+  - Source Materials cards: `<div onClick>` → `<button type="button">` with `aria-expanded`
+  - Comparison section: `<div onClick>` → `<button type="button">` with `aria-expanded`
+
+**3. Mobile nav drawer dialog semantics (1 file):**
+- `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/Navigation.jsx`:
+  - Added `useRef` import and `drawerRef`
+  - Drawer div: `role="dialog"`, `aria-modal="true"`, `aria-label="Navigation menu"`, `tabIndex={-1}`
+  - Escape key handler: `onKeyDown` closes drawer on Escape
+  - Auto-focus: `useEffect` focuses drawer when `isMenuOpen` becomes true
+  - Backdrop button: added `aria-label="Close navigation menu"`
+
+All existing functionality preserved. No new dependencies added.
+</teammate-message>
+
+<teammate-message teammate_id="a11y-fixes" color="blue">
+{"type":"idle_notification","from":"a11y-fixes","timestamp":"2026-02-24T00:00:44.158Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="a11y-fixes" color="blue">
+{"type":"idle_notification","from":"a11y-fixes","timestamp":"2026-02-24T00:00:48.346Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="a11y-fixes" color="blue">
+{"type":"idle_notification","from":"a11y-fixes","timestamp":"2026-02-24T00:00:55.963Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="a11y-fixes" color="blue">
+{"type":"idle_notification","from":"a11y-fixes","timestamp":"2026-02-24T00:00:59.742Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="tech-debt" color="green" summary="Batch C: all 6 tech debt fixes done, build clean">
+Batch C technical debt fixes complete. All 6 items done, build passes clean.
+
+**1. Observatory transition token** — `src/design-tokens/observatory.js:98`
+Changed `motion.default` from `"250ms cubic-bezier(0.22, 1, 0.36, 1)"` to specific properties (color, background, border-color, opacity, box-shadow).
+
+**2. Replace `transition: "all 0.2s"` in components** — 10 occurrences across 8 files:
+- `DominoSection.jsx` (1)
+- `SignalCard.jsx` (1)
+- `LucidBoxPortfolio.jsx` (2)
+- `ThesisPortfolio.jsx` (1)
+- `CSVUpload.jsx` (1)
+- `SourceMaterials.jsx` (1)
+- `LucidBoxSignals.jsx` (1)
+- `SignalUpdateForm.jsx` (2)
+
+All replaced with `"color 0.2s, background 0.2s, border-color 0.2s, opacity 0.2s, box-shadow 0.2s"`.
+
+**3. Remove duplicate retry in useStockData** — `src/hooks/useStockData.js`
+Removed `retry: 3` and `retryDelay` from React Query config. Adapter-level `withRetry` in stocks.js handles retries.
+
+**4. "Use defaults" toggle restores baseline** — `src/components/onboarding/ThesisSetup.jsx`
+Added `useRef` to capture original thesis on mount. When clicking "Use defaults" after customizing, domino names, descriptions, signals, and thresholds reset to the original prop values.
+
+**5. Move `Date.now()` out of render** — Two files:
+- `SignalTimeline.jsx`: Moved `Date.now()` into `useState(Date.now)` so it's captured once on mount, added to `useMemo` deps.
+- `ConvictionScorecard.jsx`: Wrapped `isDue` computation in `useMemo` with `[prediction.targetDate]` dependency.
+
+**6. Fix module-global mutation in design-tokens/index.js** — line 97
+Moved `activeTokens = tokens;` from render body into the existing `useEffect`, so it runs as a side effect rather than during render.
+</teammate-message>
+
+<teammate-message teammate_id="tech-debt" color="green">
+{"type":"idle_notification","from":"tech-debt","timestamp":"2026-02-24T00:01:07.155Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="tech-debt" color="green">
+{"type":"idle_notification","from":"tech-debt","timestamp":"2026-02-24T00:01:15.247Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="system">
+{"type":"teammate_terminated","message":"tech-debt has shut down."}
+</teammate-message>
+
+<teammate-message teammate_id="system">
+{"type":"teammate_terminated","message":"a11y-fixes has shut down."}
+</teammate-message>
+
+<teammate-message teammate_id="tech-debt" color="green">
+{"type":"shutdown_approved","requestId":"shutdown-1771891375003@tech-debt","from":"tech-debt","timestamp":"2026-02-24T00:02:58.376Z","paneId":"in-process","backendType":"in-process"}
+</teammate-message>
+
+<teammate-message teammate_id="a11y-fixes" color="blue">
+{"type":"shutdown_approved","requestId":"shutdown-1771891374607@a11y-fixes","from":"a11y-fixes","timestamp":"2026-02-24T00:02:59.682Z","paneId":"in-process","backendType":"in-process"}
+</teammate-message>
+
+<teammate-message teammate_id="polish" color="yellow" summary="Batch D complete: all 5 polish fixes done, build clean">
+Batch D polish fixes complete. All 5 items done, build passes clean.
+
+**1. ab-tabular-nums applied to numeric elements:**
+- `src/components/lucid-box/LucidBoxMarket.jsx` — threat counts (greenCt, amberCt, redCt) and "of totalSig" labels
+- `src/components/SignalCard.jsx` — data point values in the expanded table
+- `src/components/lucid-box/LucidBoxPortfolio.jsx` — product prices, ALOS stat numbers, revenue grid rows, 6-month total
+- `src/components/performance-lab/PerformanceView.jsx` — score ring, portfolio total value, actual/target/delta percentages, unaligned position quantities and market values
+- `src/components/conviction/ConvictionScorecard.jsx` — batting average percent in the ring
+
+**2. ab-content-shell in OnboardingWizard:**
+- `src/components/onboarding/OnboardingWizard.jsx:312` — replaced `style={{ maxWidth: 980, margin: "0 auto" }}` with `className="ab-content-shell"`
+
+**3. Lint errors cleaned:**
+- `src/lib/export-utils.js:124` — removed unused `mapped` variable
+- `src/components/onboarding/ResumeIngestion.jsx:183` — fixed unnecessary regex escape `[^\.\n]` → `[^.\n]`
+
+**4. Console gating in main.jsx:**
+- `src/main.jsx:12` — wrapped `console.info` in `if (import.meta.env.DEV)` block. Left `console.error` and `console.warn` ungated (they report real problems).
+
+**5. persistThesis validation:**
+- Already applied (both `getInitialThesis` and `exitTestMode` already have `validateThesis` guards). No changes needed.
+</teammate-message>
+
+---
+
+<teammate-message teammate_id="system">
+{"type":"teammate_terminated","message":"polish has shut down."}
+</teammate-message>
+
+<teammate-message teammate_id="polish" color="yellow">
+{"type":"idle_notification","from":"polish","timestamp":"2026-02-24T00:03:09.915Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="polish" color="yellow">
+{"type":"shutdown_approved","requestId":"shutdown-1771891375721@polish","from":"polish","timestamp":"2026-02-24T00:03:13.801Z","paneId":"in-process","backendType":"in-process"}
+</teammate-message>
