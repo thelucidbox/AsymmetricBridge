@@ -33,7 +33,9 @@ dist-ssr
 test-results/
 test-screenshots/
 
-# Internal planning docs (keep local, not in repo)
+# Internal tooling (keep local, not in repo)
+.claude/
+.entire/
 productivity/
 AGENTS.md
 ARCHITECTURE.md
