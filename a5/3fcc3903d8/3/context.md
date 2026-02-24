@@ -205,3 +205,7 @@ Let me chronologically analyze the conversation:
 
 OK, I don't see the The updated financial data and the performance tab, but maybe we need to push and commit it first and then can you save the tweets in my Obsidian folder related to this project if you haven't created a folder already and then how can I review all of the documentation that's been created I'm also gonna want to definitely revise the Twitter post. It sounds a little bit AI like. And I just wanna be clear like I want people to be able to download this stuff not go to the website....
 
+### Prompt 38
+
+OK about the documentation on the on GitHub. I want all mention of the ALOS system removed. There's no reason anybody needs to know about it. There's no reason that needs to be included whatsoever.
+
