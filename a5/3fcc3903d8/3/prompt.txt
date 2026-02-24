@@ -809,3 +809,343 @@ Can I take a look at the actual site right now?
 ---
 
 commit and push. What isn't clear to me is how the user would add in data that they would need to find somewhere else so for example SAAS job openings. How would they enter in that data? Also, can you open up my person dashborad?
+
+---
+
+No, my personal dashboard has all the information already in it. I don't need to go through the on boarding process. I've said this to 1 million times my personal my personal dashboard will have everything in it because you already have my résumé. You already have everything about me that's why I said there's two distinct path. There's my own preference personal dashboard and then there's the word there's the other dashboard that would be that I'm going to open source for everyone to use it requires the on boarding workflow does that make sense?
+
+---
+
+it's not. I cannot see my personal one. Then just to let you know like it was just deployed 20 minutes ago. I was able to see it
+
+---
+
+for OOS We need a few things. Number one we need a place for them to be able to upload the other data points on their own. And then, secondly, with the digest what we want to do is understand the signals understand their job and then provide them with guidance on where they were where the thesis is and how they can, and how they can position themselves in their careerand even investment strategy based on this. And so for the on boarding workflow, we would need them to add their own API key. In my personal site, I would like to be able to get a digest as well, but that could just be provided via Claude code.
+
+---
+
+For the personal one, I wanna be able to execute it within the browser, tied to Claude code without having me to go directly to Claude code and the CLI I think that would be within the terms of service.And yes, we have them add stuff in. That sounds great and then we can give them guidance on where to go find this and search for it. The digest scope looks great. And for the personal digest, I already gave you some guidance, but that skill looks great as well.
+
+---
+
+This session is being continued from a previous conversation that ran out of context. The summary below covers the earlier portion of the conversation.
+
+Analysis:
+Let me carefully analyze the entire conversation chronologically:
+
+1. **Session Start**: This is a continuation from a previous session. The summary indicates v3.3 and v3.4 Observatory theme work was completed in the prior session, including a commit (97ec6b5) pushing all v3.3 + v3.4 Observatory theme migration.
+
+2. **Commit and Push**: User asked to commit and push. I staged 17 files (auth + glass changes), committed as `feat: Add Supabase Auth + RLS + Navigation glass-morphism fix` (commit f22fbd3), and pushed to origin.
+
+3. **"Let's move on"**: User wanted to know what's next. Previous session had two remaining items: Visual QA and Auth+RLS.
+
+4. **"both"**: User wanted both Visual QA and Auth+RLS. Two parallel research agents were launched.
+
+5. **Glass audit results**: 87% proper wiring, Navigation.jsx had hardcoded backdrop-filter.
+
+6. **Auth+RLS plan**: Comprehensive 9-phase plan.
+
+7. **This session picks up** implementing both:
+
+**Phase 1 - Navigation Glass Fix**:
+- Replaced hardcoded `blur(12px)` with `tokens.glass.blur` (line 158-159)
+- Replaced hardcoded `blur(16px)` with `tokens.glass.elevatedBlur` (line 322-325)
+
+**Phase 2 - Auth + RLS Implementation**:
+- Migration 006_auth_and_rls.sql (new file)
+- AuthContext.jsx (new file)
+- AuthPage.jsx (new file)
+- supabase.js updated with auth config
+- main.jsx wrapped with AuthProvider
+- App.jsx with auth gate + AuthLoading
+- All 6 hooks updated by parallel agent
+- Navigation.jsx updated with sign out button
+- seed.sql updated with user_id
+- .env.example updated with VITE_REQUIRE_AUTH
+- OnboardingWizard.jsx updated with signal seeding
+
+Build passed (203 modules), 46/46 tests passed.
+
+8. **"Can I take a look at the actual site right now?"**: Started Vite preview server at localhost:4173.
+
+9. **"Commit and push"**: Committed and pushed (f22fbd3).
+
+10. **"What isn't clear to me is how the user would add in data..."**: User asked about manual data entry for OSS users. I explained the gap — users can toggle status but can't log underlying data values. Also asked to open personal dashboard.
+
+11. **User frustrated**: "No, my personal dashboard has all the information already in it..." — User clarified the two-path architecture:
+    - Personal Edition = his deployment, fabian-thesis.js pre-loaded, no onboarding
+    - OSS Edition = everyone else, requires onboarding
+
+12. **"it's not. I cannot see my personal one"**: The dev server was running but showing onboarding because `VITE_OWNER_MODE=true` was missing from `.env`. I added it and restarted the dev server.
+
+13. **"for OSS We need a few things..."**: User outlined three features:
+    - OSS: Signal data entry for manual signals
+    - OSS: Career-aware digest (thesis state + career positioning + investment strategy)
+    - Personal: Digest via browser, tied to Claude Code (not CLI)
+    
+14. **"For the personal one, I wanna be able to execute it within the browser..."**: User confirmed:
+    - Data entry expansion sounds great
+    - Digest scope (3-part) looks great
+    - Personal digest should work in browser using his AI provider key
+    - Also wants the ALOS `/digest` skill
+
+15. **Implementation of three features**:
+
+**a. Career-aware Digest** (ai-digest.js):
+- Updated SYSTEM_PROMPT with 5-section structure: Executive Summary, Signal Analysis, Career Positioning, Investment Considerations, Bottom Line
+- Updated `buildUserPrompt` to accept and include `careerProfile`
+- Updated `generateAIDigest` signature to accept `careerProfile`
+- Updated useDigests.js to import useThesis and pass careerProfile
+
+**b. Signal Data Entry** (SignalUpdateForm.jsx):
+- Complete rewrite with new fields: dataValue, dataDate, sourceUrl
+- "Where to find this data" guidance section showing signal.source + signal.frequency + signal.notes
+- "Log a Data Point" section with value, date, source URL inputs
+- Status change is now optional (can log data without changing status)
+- persistDataPoint function using supabase upsert to signal_data_points
+- Smart submit button that adapts label based on what's being submitted
+
+**c. Build & Test Results**:
+- Build passed (203 modules)
+- 43/46 tests passed, 3 failed
+- Failures due to VITE_OWNER_MODE=true in .env — tests expect OSS mode
+
+The 3 failing tests:
+1. `accessibility.spec.js:54` - domino sections use heading role (timeout on dashboard with owner mode)
+2. `guided-tour.spec.js:13` - redirect to onboarding when no thesis (owner mode always has thesis)
+3. `onboarding.spec.js:10` - redirect to onboarding when no thesis stored (same reason)
+
+I was about to look at the playwright config to fix the test build when the summary was requested.
+
+Summary:
+1. Primary Request and Intent:
+   The user's overarching goal is shipping v3.4 of Asymmetric Bridge. This session continued from a previous one that completed v3.3 and the v3.4 Observatory theme migration. The specific requests in this session were:
+   
+   - **Commit and push** all auth + glass work (completed twice — once for auth+glass, once pending for OSS features)
+   - **Fix Navigation glass-morphism** — replace hardcoded backdrop-filter with design tokens
+   - **Implement Supabase Auth + RLS** — dual-mode auth (personal vs multi-user), migration, RLS policies, auth UI
+   - **Open personal dashboard** at localhost — required adding `VITE_OWNER_MODE=true` to `.env` (was missing)
+   - **Build OSS signal data entry** — expand SignalUpdateForm so users can log data values, dates, and source URLs for manual signals, with guidance on where to find the data
+   - **Build career-aware digest** — inject career profile (role, target, industry, goals) into AI digest prompt, producing three-part analysis: thesis state, career positioning, investment strategy
+   - **Personal digest via browser** — user wants to generate digests from the browser UI using his BYO LLM API key, NOT through Claude Code CLI. The existing AI digest system supports this since it uses the ai-provider.js registry.
+   - **ALOS `/digest` skill** — also requested but not yet built
+
+   Critical user clarification: There are TWO distinct paths:
+   - **Personal Edition** (`VITE_OWNER_MODE=true`): Fabian's dashboard, pre-loaded with `fabian-thesis.js`, NO onboarding needed
+   - **OSS Edition** (no owner mode): Open source version for everyone else, REQUIRES onboarding workflow
+
+2. Key Technical Concepts:
+   - **Dual-mode auth architecture**: `VITE_REQUIRE_AUTH=true` → multi-user (Supabase Auth), unset → personal mode (user_id = 'personal')
+   - **RLS COALESCE pattern**: `COALESCE(auth.uid()::text, 'personal')` — authenticated users get their UUID, unauthenticated get 'personal'
+   - **Per-user vs shared tables**: signal_statuses, signal_history, predictions, portfolio_snapshots, digests are per-user; signal_data_points, live_data_cache, assessments, threshold_config are shared
+   - **BYO LLM system**: ai-provider.js registry supporting Claude, OpenAI, Gemini with keys in localStorage
+   - **Design token system**: `useTheme()` → `{ tokens }` with Terminal and Observatory themes
+   - **Glass tokens**: Terminal `{ blur: "none" }`, Observatory `{ blur: "blur(20px)", elevatedBlur: "blur(24px)" }`
+   - **Signal metadata**: Each signal has `source`, `frequency`, `baseline`, `threshold`, `whyItMatters`, `notes` fields in fabian-thesis.js
+   - **Edition system**: `isOwnerMode = VITE_OWNER_MODE === "true"` gates Personal vs OSS features
+
+3. Files and Code Sections:
+
+   - **`supabase/migrations/006_auth_and_rls.sql`** (NEW)
+     - Core migration for auth + RLS. Adds user_id columns, enables RLS on all 9 tables.
+     - Adds user_id to signal_statuses, signal_history, digests with DEFAULT 'personal'
+     - Drops old unique constraint on signal_statuses, creates new one including user_id
+     - Per-user policies use COALESCE pattern; shared tables use permissive policies
+   
+   - **`src/lib/AuthContext.jsx`** (NEW)
+     - React context provider for authentication state
+     - Exports `AuthProvider` and `useAuth()` hook returning `{ user, userId, loading, requireAuth, signOut }`
+     - `userId` defaults to 'personal' when not authenticated
+     - `requireAuth` reads from `VITE_REQUIRE_AUTH` env var
+     ```jsx
+     export function AuthProvider({ children }) {
+       const [user, setUser] = useState(null);
+       const [loading, setLoading] = useState(true);
+       // Listens for supabase.auth.onAuthStateChange
+       // signOut clears user state
+       const userId = user?.id || "personal";
+       // ...
+     }
+     ```
+
+   - **`src/components/auth/AuthPage.jsx`** (NEW)
+     - Login/signup/magic-link UI using design tokens
+     - Three modes: login (email+password), signup, magic link
+     - Fully themed with `useTheme()` and `S.card()`, `S.tab()`, `S.label`
+
+   - **`src/App.jsx`** (MODIFIED)
+     - Added `AuthLoading` component for loading state
+     - Added auth gate in `AppShell`: `if (requireAuth && !user) return <AuthPage />`
+     - Import AuthPage and useAuth
+     ```jsx
+     function AppShell() {
+       const { user, loading, requireAuth } = useAuth();
+       if (loading) return <AuthLoading tokens={tokens} />;
+       if (requireAuth && !user) return <AuthPage />;
+       // ... rest of existing logic
+     }
+     ```
+
+   - **`src/main.jsx`** (MODIFIED)
+     - Wrapped with `<AuthProvider>` between ThemeProvider and ThesisProvider
+     ```jsx
+     <ThemeProvider>
+       <AuthProvider>
+         <ThesisProvider>
+           <App />
+         </ThesisProvider>
+       </AuthProvider>
+     </ThemeProvider>
+     ```
+
+   - **`src/lib/supabase.js`** (MODIFIED)
+     - Added auth config to createClient options:
+     ```js
+     createClient(supabaseUrl, supabaseAnonKey, {
+       auth: {
+         autoRefreshToken: true,
+         persistSession: true,
+         detectSessionInUrl: true,
+       },
+     })
+     ```
+
+   - **`src/components/Navigation.jsx`** (MODIFIED)
+     - **Glass fix**: Replaced `tokens.useGlass ? tokens.glass.blur : "blur(12px)"` with `tokens.glass.blur` and `tokens.useGlass ? tokens.glass.blur : "blur(16px)"` with `tokens.glass.elevatedBlur`
+     - Added `useAuth` import and destructured `{ requireAuth, signOut }`
+     - Added Sign Out button to desktop nav and mobile drawer (conditionally shown when `requireAuth` is true)
+
+   - **`src/hooks/useSignalStatuses.js`** (MODIFIED by agent)
+     - Added `useAuth` import, `userId` to all hook functions
+     - All queries filter by `.eq("user_id", userId)` and include userId in queryKey
+     - signal_history inserts include `user_id: userId`
+
+   - **`src/hooks/useDigests.js`** (MODIFIED)
+     - Added `useAuth` and `useThesis` imports
+     - Gets `careerProfile` from thesis context
+     - Passes `careerProfile` to `generateAIDigest(aggregatedData, careerProfile)`
+     - All queries filter by user_id, inserts include user_id
+
+   - **`src/hooks/usePredictions.js`** (MODIFIED by agent)
+     - Removed entire `resolveStorageMode()` function
+     - Uses `userId` from `useAuth()` directly
+     - Simplified all mutation functions to use direct supabase checks with userId
+
+   - **`src/hooks/usePortfolioData.js`** (MODIFIED by agent)
+     - `persistSnapshot` now accepts userId parameter instead of calling `supabase.auth.getUser()`
+     - userId passed from hook scope through uploadCSV callback
+
+   - **`src/hooks/useAutoThreshold.js`** (MODIFIED by agent)
+     - Passes `userId` to `applyEvaluationResults(results, signalStatuses, userId)`
+     - userId in useEffect dependency array
+
+   - **`src/lib/threshold-engine.js`** (MODIFIED by agent)
+     - `applyEvaluationResults` signature updated to `(results, currentStatuses, userId = "personal")`
+     - Status update adds `.eq("user_id", userId)`
+     - History insert includes `user_id: userId`
+
+   - **`src/lib/ai-digest.js`** (MODIFIED)
+     - **System prompt rewritten** for 5-section structure:
+       1. Executive Summary
+       2. Signal Analysis (domino-by-domino)
+       3. Career Positioning (skills, roles, moves specific to reader's profile)
+       4. Investment Considerations (portfolio alignment to signals)
+       5. Bottom Line
+     - `buildUserPrompt(aggregatedData, careerProfile)` now includes career profile section
+     - `generateAIDigest(aggregatedData, careerProfile = null)` accepts career profile
+     ```js
+     if (careerProfile) {
+       parts.push("\n--- Reader's Career Profile ---");
+       if (careerProfile.currentRole) parts.push(`Current role: ${careerProfile.currentRole}`);
+       if (careerProfile.targetRole) parts.push(`Target role: ${careerProfile.targetRole}`);
+       if (careerProfile.industry) parts.push(`Industry: ${careerProfile.industry}`);
+       if (careerProfile.experience) parts.push(`Experience: ${careerProfile.experience}`);
+       const goals = careerProfile.goals || [];
+       if (goals.length) parts.push(`Goals: ${goals.join(", ")}`);
+       parts.push("Use this profile to make the Career Positioning and Investment Considerations sections specific to this person's situation.");
+     }
+     ```
+
+   - **`src/components/SignalUpdateForm.jsx`** (REWRITTEN)
+     - Complete rewrite adding data entry capabilities
+     - New state: `dataValue`, `dataDate`, `sourceUrl`
+     - **"Where to find this data" guidance** section showing signal.source, signal.frequency, signal.notes
+     - **"Log a Data Point"** section with value input, date picker, source URL input
+     - Status change is now OPTIONAL — users can log data without changing status
+     - `persistDataPoint()` function upserts to `signal_data_points` table
+     - Smart `canSubmit` logic: needs either data point OR (status change + reason)
+     - Dynamic submit button label: "Log Data + Update to X" / "Update to X" / "Log Data Point"
+     - Status buttons are now toggleable (click again to deselect)
+
+   - **`src/components/onboarding/OnboardingWizard.jsx`** (MODIFIED)
+     - Added `seedSignalStatuses(userId, dominos)` function that upserts signal_statuses for new users
+     - Added `useAuth` import, gets `userId` 
+     - Calls `seedSignalStatuses(userId, candidate.dominos)` in `handleComplete`
+
+   - **`supabase/seed.sql`** (MODIFIED)
+     - All inserts now include explicit `user_id: 'personal'`
+     - ON CONFLICT updated to match new unique constraint `(user_id, domino_id, signal_name)`
+
+   - **`.env.example`** (MODIFIED)
+     - Added `VITE_REQUIRE_AUTH=` with documentation comment
+
+   - **`.env`** (MODIFIED)
+     - Added `VITE_OWNER_MODE=true` (was missing, causing personal dashboard to show onboarding)
+
+   - **`productivity/TODO.md`** (MODIFIED)
+     - All v3.4 items marked complete with detailed sub-items
+
+4. Errors and fixes:
+   - **Personal dashboard showing onboarding instead of personal data**:
+     - Cause: `VITE_OWNER_MODE=true` was missing from `.env` file
+     - Fix: Added `VITE_OWNER_MODE=true` to `.env` and restarted dev server
+     - User feedback: User was frustrated — "I've said this a million times my personal dashboard will have everything in it because you already have my résumé"
+   
+   - **3 test failures after adding VITE_OWNER_MODE to .env** (CURRENT):
+     - `accessibility.spec.js:54` — domino sections heading role test times out (dashboard loads differently in owner mode)
+     - `guided-tour.spec.js:13` — expects redirect to /onboarding when no thesis, but owner mode always has thesis
+     - `onboarding.spec.js:10` — same as above, expects onboarding redirect
+     - Cause: `npx vite build` reads `.env` which now has `VITE_OWNER_MODE=true`, so the production build is Personal Edition
+     - Fix: NOT YET APPLIED — was about to check playwright.config.js to fix test builds to override VITE_OWNER_MODE
+
+5. Problem Solving:
+   - **Auth + RLS dual-mode**: Solved by using COALESCE pattern in RLS policies and environment variable to toggle auth requirement
+   - **Hook updates for user_id isolation**: Delegated to parallel agent for 6 hooks + threshold-engine
+   - **Signal seeding for new users**: Added seedSignalStatuses function to OnboardingWizard
+   - **Career-aware digest**: Injected career profile through the chain: useDigests → useThesis → generateAIDigest → buildUserPrompt
+   - **Test failures from VITE_OWNER_MODE**: Identified root cause but fix not yet applied
+
+6. All user messages:
+   - (System-generated continuation from previous session with full context summary)
+   - "Can I take a look at the actual site right now?"
+   - "commit and push. What isn't clear to me is how the user would add in data that they would need to find somewhere else so for example SAAS job openings. How would they enter in that data? Also, can you open up my person dashborad?"
+   - "Oh, it's running, but it's still putting me through the on boarding workflow, which I don't need to be on boarded"
+   - "No, my personal dashboard has all the information already in it. I don't need to go through the on boarding process. I've said this to 1 million times my personal my personal dashboard will have everything in it because you already have my résumé. You already have everything about me that's why I said there's two distinct path. There's my own preference personal dashboard and then there's the word there's the other dashboard that would be that I'm going to open source for everyone to use it requires the on boarding workflow does that make sense?"
+   - "it's not. I cannot see my personal one. Then just to let you know like it was just deployed 20 minutes ago. I was able to see it"
+   - "for OOS We need a few things. Number one we need a place for them to be able to upload the other data points on their own. And then, secondly, with the digest what we want to do is understand the signals understand their job and then provide them with guidance on where they were where the thesis is and how they can, and how they can position themselves in their careerand even investment strategy based on this. And so for the on boarding workflow, we would need them to add their own API key. In my personal site, I would like to be able to get a digest as well, but that could just be provided via Claude code."
+   - "For the personal one, I wanna be able to execute it within the browser, tied to Claude code without having me to go directly to Claude code and the CLI I think that would be within the terms of service.And yes, we have them add stuff in. That sounds great and then we can give them guidance on where to go find this and search for it. The digest scope looks great. And for the personal digest, I already gave you some guidance, but that skill looks great as well."
+
+7. Pending Tasks:
+   - **Fix 3 failing e2e tests**: Tests fail because `.env` now has `VITE_OWNER_MODE=true` and the test build expects OSS mode. Need to override env var for test builds (was about to check playwright.config.js).
+   - **ALOS `/digest` skill**: User confirmed they want this skill but it hasn't been built yet.
+   - **Commit and push** the OSS features (signal data entry + career-aware digest) once tests pass.
+   - **Visual QA checkbox**: `[ ] Verify Observatory glass-morphism renders correctly on all screens` — the glass fix was applied and audit showed 87% wired, but full visual QA across all screens hasn't been done.
+
+8. Current Work:
+   I had just completed building the three OSS features:
+   1. Signal data entry form (SignalUpdateForm.jsx rewrite with data value/date/source + guidance)
+   2. Career-aware AI digest (ai-digest.js prompt rewrite + useDigests career profile injection)
+   3. Career profile wiring through the digest chain
+   
+   Build passed (203 modules). Tests ran: 43 passed, 3 failed. I identified the cause — `VITE_OWNER_MODE=true` in `.env` makes the production build use Personal Edition, breaking tests that expect OSS onboarding redirects. I was about to read `playwright.config.js` to determine how to fix the test build to override the env var.
+
+9. Optional Next Step:
+   Fix the 3 failing tests by ensuring the test build uses `VITE_OWNER_MODE=` (empty/unset) regardless of what's in `.env`. I had just run `Glob` to find `playwright.config.js` at `/Users/fabianaguilar/Projects/AsymmetricBridge/playwright.config.js` and was about to read it when the summary was requested. The approach would be to either:
+   - Add environment variable override in the playwright webServer config
+   - Create a `.env.test` file without VITE_OWNER_MODE
+   - Override during the build command in playwright config
+   
+   After fixing tests, commit and push the OSS features.
+
+If you need specific details from before compaction (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/fabianaguilar/.REDACTED.jsonl
+Please continue the conversation from where we left off without asking the user any further questions. Continue with the last task that you were asked to work on.
