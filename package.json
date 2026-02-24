@@ -11,8 +11,8 @@
     "db:push": "supabase db push",
     "db:reset": "supabase db reset",
     "functions:deploy": "supabase functions deploy",
-    "test:e2e": "playwright test",
-    "test:e2e:headed": "playwright test --headed"
+    "test:e2e": "VITE_OWNER_MODE= vite build && playwright test",
+    "test:e2e:headed": "VITE_OWNER_MODE= vite build && playwright test --headed"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.97.0",

@@ -4,24 +4,34 @@
 import { callAI, isAIConfigured } from "./ai-provider";
 import { renderDigest } from "./digest-templates";
 
-const SYSTEM_PROMPT = `You are an analyst writing a signal intelligence digest for a macro thesis dashboard.
-Your audience is NOT a financial expert — write in plain, accessible English.
-Explain economic concepts as if talking to a smart friend who doesn't work in finance.
+const SYSTEM_PROMPT = `You are a strategic intelligence analyst writing a personalized signal digest.
+Your audience is a professional navigating career and investment decisions during economic disruption.
+Write in plain, accessible English — no unexplained jargon.
 
 Rules:
-- Use everyday analogies to explain macro signals (e.g., "M2 velocity measures how fast money changes hands — think of it like how quickly cash moves through a neighborhood economy")
-- When a signal changes status, explain what it means in practical terms for regular people
-- Avoid jargon without explanation. If you use a term like "NRR" or "JOLTS", immediately explain it
+- Use everyday analogies for macro signals (e.g., "M2 velocity measures how fast money changes hands — like how quickly cash moves through a neighborhood economy")
+- When a signal changes status, explain what it means in practical terms
+- Avoid jargon without explanation. If you use "NRR" or "JOLTS", explain it immediately
 - Be direct about what matters and what doesn't
-- Structure: Executive summary (2-3 sentences), then domino-by-domino analysis, then action items
-- Keep it under 800 words
-- Use markdown formatting (headers, bold, bullet points)
-- End with a "Bottom Line" section — one sentence on what this means for the thesis`;
 
-function buildUserPrompt(aggregatedData) {
+Structure (use these exact headers):
+1. **Executive Summary** — 2-3 sentences on the overall state
+2. **Signal Analysis** — Domino-by-domino breakdown of what moved and why
+3. **Career Positioning** — What this means for the reader's career trajectory. Be specific: what skills to build, what roles are gaining/losing leverage, what moves to consider based on their profile
+4. **Investment Considerations** — How portfolio alignment maps to the current signal state. Not financial advice — strategic framing for how disruption signals connect to asset positioning
+5. **Bottom Line** — One sentence on what this all means for the thesis
+
+- Keep it under 1000 words
+- Use markdown formatting (headers, bold, bullet points)
+- If career profile is provided, make sections 3 and 4 specific to their situation
+- If no career profile, keep sections 3 and 4 general but still actionable`;
+
+function buildUserPrompt(aggregatedData, careerProfile) {
   const parts = [];
 
-  parts.push("Generate a signal intelligence digest from this data:\n");
+  parts.push(
+    "Generate a personalized signal intelligence digest from this data:\n",
+  );
 
   const period = aggregatedData.period;
   if (period?.label) {
@@ -74,10 +84,27 @@ function buildUserPrompt(aggregatedData) {
     );
   }
 
+  if (careerProfile) {
+    parts.push("\n--- Reader's Career Profile ---");
+    if (careerProfile.currentRole)
+      parts.push(`Current role: ${careerProfile.currentRole}`);
+    if (careerProfile.targetRole)
+      parts.push(`Target role: ${careerProfile.targetRole}`);
+    if (careerProfile.industry)
+      parts.push(`Industry: ${careerProfile.industry}`);
+    if (careerProfile.experience)
+      parts.push(`Experience: ${careerProfile.experience}`);
+    const goals = careerProfile.goals || [];
+    if (goals.length) parts.push(`Goals: ${goals.join(", ")}`);
+    parts.push(
+      "Use this profile to make the Career Positioning and Investment Considerations sections specific to this person's situation.",
+    );
+  }
+
   return parts.join("\n");
 }
 
-export async function generateAIDigest(aggregatedData) {
+export async function generateAIDigest(aggregatedData, careerProfile = null) {
   if (!isAIConfigured()) {
     return {
       content: renderDigest(aggregatedData),
@@ -86,7 +113,7 @@ export async function generateAIDigest(aggregatedData) {
   }
 
   try {
-    const userPrompt = buildUserPrompt(aggregatedData);
+    const userPrompt = buildUserPrompt(aggregatedData, careerProfile);
     const aiContent = await callAI(SYSTEM_PROMPT, userPrompt);
 
     if (!aiContent || aiContent.trim().length < 50) {

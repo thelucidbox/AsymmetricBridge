@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useTheme } from "../design-tokens";
 import { S, STATUS_CFG } from "../styles";
 import { DOMINOS } from "../data/dominos";
+import { useAuth } from "../lib/AuthContext";
+import { supabase } from "../lib/supabase";
 import {
   useUpdateSignalStatus,
   useRecentHistory,
@@ -11,10 +13,16 @@ const STATUS_OPTIONS = ["green", "amber", "red"];
 
 export default function SignalUpdateForm() {
   const { tokens } = useTheme();
+  const { userId } = useAuth();
   const [selectedDomino, setSelectedDomino] = useState("");
   const [selectedSignal, setSelectedSignal] = useState("");
   const [newStatus, setNewStatus] = useState("");
   const [reason, setReason] = useState("");
+  const [dataValue, setDataValue] = useState("");
+  const [dataDate, setDataDate] = useState(() =>
+    new Date().toISOString().slice(0, 10),
+  );
+  const [sourceUrl, setSourceUrl] = useState("");
   const [feedback, setFeedback] = useState(null);
 
   const mutation = useUpdateSignalStatus();
@@ -23,32 +31,77 @@ export default function SignalUpdateForm() {
   const domino = DOMINOS.find((d) => d.id === Number(selectedDomino));
   const signal = domino?.signals.find((s) => s.name === selectedSignal);
 
+  const hasDataPoint = dataValue.trim().length > 0;
+  const hasStatusChange = newStatus.length > 0;
+  const canSubmit =
+    domino && signal && (hasDataPoint || (hasStatusChange && reason.trim()));
+
+  const persistDataPoint = async () => {
+    if (!supabase || !domino || !signal || !hasDataPoint) return;
+
+    const { error } = await supabase.from("signal_data_points").upsert(
+      {
+        domino_id: domino.id,
+        signal_name: signal.name,
+        date: dataDate,
+        value: dataValue.trim(),
+        status: newStatus || signal.currentStatus || "green",
+        source: sourceUrl.trim() || signal.source || "manual",
+      },
+      { onConflict: "domino_id,signal_name,date" },
+    );
+
+    if (error) {
+      console.warn("Unable to persist data point:", error.message);
+      throw new Error(`Data point save failed: ${error.message}`);
+    }
+  };
+
   const handleSubmit = async () => {
-    if (!domino || !signal || !newStatus || !reason.trim()) return;
+    if (!canSubmit) return;
 
     setFeedback(null);
     try {
-      const result = await mutation.mutateAsync({
-        dominoId: domino.id,
-        signalName: signal.name,
-        newStatus,
-        reason: reason.trim(),
-        triggerType: "manual",
-      });
+      if (hasDataPoint) {
+        await persistDataPoint();
+      }
 
-      if (result?.skipped) {
-        setFeedback({
-          type: "info",
-          text: "No change — signal already at that status.",
+      if (hasStatusChange && reason.trim()) {
+        const result = await mutation.mutateAsync({
+          dominoId: domino.id,
+          signalName: signal.name,
+          newStatus,
+          reason: reason.trim(),
+          triggerType: "manual",
         });
-      } else {
+
+        if (result?.skipped) {
+          setFeedback({
+            type: "info",
+            text: hasDataPoint
+              ? "Data point saved. Status unchanged (already at that level)."
+              : "No change — signal already at that status.",
+          });
+        } else {
+          setFeedback({
+            type: "success",
+            text: hasDataPoint
+              ? `Data logged + status updated: ${result.oldStatus} → ${result.newStatus}`
+              : `Updated: ${result.oldStatus} → ${result.newStatus}`,
+          });
+        }
+      } else if (hasDataPoint) {
         setFeedback({
           type: "success",
-          text: `Updated: ${result.oldStatus} → ${result.newStatus}`,
+          text: `Data point logged: ${dataValue.trim()} (${dataDate})`,
         });
-        setNewStatus("");
-        setReason("");
       }
+
+      setNewStatus("");
+      setReason("");
+      setDataValue("");
+      setSourceUrl("");
+      setDataDate(new Date().toISOString().slice(0, 10));
     } catch (err) {
       setFeedback({ type: "error", text: err.message || "Update failed" });
     }
@@ -64,6 +117,12 @@ export default function SignalUpdateForm() {
     color: tokens.colors.text,
     appearance: "none",
     cursor: "pointer",
+  };
+
+  const inputStyle = {
+    ...selectStyle,
+    cursor: "text",
+    fontFamily: tokens.typography.fontSans,
   };
 
   return (
@@ -91,6 +150,8 @@ export default function SignalUpdateForm() {
               setSelectedSignal("");
               setNewStatus("");
               setFeedback(null);
+              setDataValue("");
+              setSourceUrl("");
             }}
             style={selectStyle}
           >
@@ -113,6 +174,8 @@ export default function SignalUpdateForm() {
                 setSelectedSignal(e.target.value);
                 setNewStatus("");
                 setFeedback(null);
+                setDataValue("");
+                setSourceUrl("");
               }}
               style={selectStyle}
             >
@@ -127,7 +190,7 @@ export default function SignalUpdateForm() {
           </div>
         )}
 
-        {/* Signal Context */}
+        {/* Signal Context + Source Guidance */}
         {signal && (
           <div
             style={{
@@ -181,17 +244,128 @@ export default function SignalUpdateForm() {
               </div>
             )}
             {signal.threshold && (
-              <div style={{ fontSize: 11, color: tokens.colors.textSoft }}>
+              <div
+                style={{
+                  fontSize: 11,
+                  color: tokens.colors.textSoft,
+                  marginBottom: 6,
+                }}
+              >
                 Threshold: {signal.threshold}
               </div>
             )}
+
+            {/* Source Guidance */}
+            {signal.source && (
+              <div
+                style={{
+                  marginTop: 6,
+                  padding: "8px 10px",
+                  borderRadius: 6,
+                  background: tokens.colors.surfaceSoft,
+                  border: `1px solid ${tokens.colors.borderSubtle}`,
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 600,
+                    color: tokens.colors.accent,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.5px",
+                    marginBottom: 4,
+                  }}
+                >
+                  Where to find this data
+                </div>
+                <div
+                  style={{
+                    fontSize: 12,
+                    color: tokens.colors.textSecondary,
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {signal.source}
+                  {signal.frequency && (
+                    <span style={{ color: tokens.colors.textMuted }}>
+                      {" "}
+                      · Updated {signal.frequency.toLowerCase()}
+                    </span>
+                  )}
+                </div>
+                {signal.notes && (
+                  <div
+                    style={{
+                      fontSize: 11,
+                      color: tokens.colors.textSoft,
+                      marginTop: 4,
+                      fontStyle: "italic",
+                    }}
+                  >
+                    {signal.notes}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Data Point Entry */}
+        {signal && (
+          <div
+            style={{
+              background: tokens.colors.surfaceSoft,
+              border: `1px solid ${tokens.colors.border}`,
+              borderRadius: 8,
+              padding: "10px 12px",
+              marginBottom: 12,
+            }}
+          >
+            <div
+              style={{
+                ...S.label,
+                marginBottom: 8,
+                color: tokens.colors.baseline,
+              }}
+            >
+              Log a Data Point (optional)
+            </div>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr auto",
+                gap: 8,
+                marginBottom: 8,
+              }}
+            >
+              <input
+                value={dataValue}
+                onChange={(e) => setDataValue(e.target.value)}
+                placeholder="Value (e.g., 118%, 1.8M, $42.50)"
+                style={inputStyle}
+              />
+              <input
+                type="date"
+                value={dataDate}
+                onChange={(e) => setDataDate(e.target.value)}
+                style={{ ...inputStyle, width: 150 }}
+              />
+            </div>
+            <input
+              value={sourceUrl}
+              onChange={(e) => setSourceUrl(e.target.value)}
+              placeholder="Source URL (optional — link to where you found this)"
+              style={inputStyle}
+            />
           </div>
         )}
 
         {/* New Status Buttons */}
         {signal && (
           <div style={{ marginBottom: 12 }}>
-            <div style={{ ...S.label, marginBottom: 6 }}>New Status</div>
+            <div style={{ ...S.label, marginBottom: 6 }}>
+              Change Status (optional if logging data)
+            </div>
             <div style={{ display: "flex", gap: 8 }}>
               {STATUS_OPTIONS.map((status) => {
                 const cfg = STATUS_CFG[status];
@@ -200,7 +374,7 @@ export default function SignalUpdateForm() {
                 return (
                   <button
                     key={status}
-                    onClick={() => setNewStatus(status)}
+                    onClick={() => setNewStatus(isActive ? "" : status)}
                     style={{
                       flex: 1,
                       padding: "10px 0",
@@ -226,10 +400,12 @@ export default function SignalUpdateForm() {
           </div>
         )}
 
-        {/* Reason */}
+        {/* Reason (required only for status changes) */}
         {newStatus && (
           <div style={{ marginBottom: 12 }}>
-            <div style={{ ...S.label, marginBottom: 4 }}>Reason (required)</div>
+            <div style={{ ...S.label, marginBottom: 4 }}>
+              Reason (required for status change)
+            </div>
             <textarea
               value={reason}
               onChange={(e) => setReason(e.target.value)}
@@ -246,28 +422,32 @@ export default function SignalUpdateForm() {
         )}
 
         {/* Submit */}
-        {newStatus && (
+        {canSubmit && (
           <button
             onClick={handleSubmit}
-            disabled={!reason.trim() || mutation.isPending}
+            disabled={mutation.isPending}
             style={{
               width: "100%",
               padding: "12px",
               fontSize: 13,
               fontWeight: 700,
-              color: reason.trim() ? "#0D0D0F" : tokens.colors.textSubtle,
-              background: reason.trim()
+              color: "#0D0D0F",
+              background: hasStatusChange
                 ? STATUS_CFG[newStatus].dot
-                : tokens.colors.border,
+                : tokens.colors.baseline,
               border: "none",
               borderRadius: 8,
-              cursor: reason.trim() ? "pointer" : "not-allowed",
+              cursor: "pointer",
               transition: tokens.motion.default,
             }}
           >
             {mutation.isPending
-              ? "Updating..."
-              : `Update to ${STATUS_CFG[newStatus].label}`}
+              ? "Saving..."
+              : hasStatusChange && hasDataPoint
+                ? `Log Data + Update to ${STATUS_CFG[newStatus].label}`
+                : hasStatusChange
+                  ? `Update to ${STATUS_CFG[newStatus].label}`
+                  : "Log Data Point"}
           </button>
         )}
 

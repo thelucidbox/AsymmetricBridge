@@ -20,6 +20,7 @@ import {
 import { generateAIDigest } from "../lib/ai-digest";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../lib/AuthContext";
+import { useThesis } from "../config/ThesisContext";
 
 const DIGESTS_QUERY_KEY = ["signal-digests"];
 const DIGEST_STORAGE_KEY = "ab-signal-digests";
@@ -144,6 +145,8 @@ async function loadDigests(userId) {
 export function useDigests() {
   const queryClient = useQueryClient();
   const { userId } = useAuth();
+  const { thesis } = useThesis();
+  const careerProfile = thesis?.careerProfile || null;
 
   const digestsQuery = useQuery({
     queryKey: [...DIGESTS_QUERY_KEY, userId],
@@ -154,7 +157,7 @@ export function useDigests() {
   const generateMutation = useMutation({
     mutationFn: async (dayRange = 7) => {
       const aggregatedData = await aggregateDigestData(dayRange);
-      const aiResult = await generateAIDigest(aggregatedData);
+      const aiResult = await generateAIDigest(aggregatedData, careerProfile);
       const contentMd = aiResult.content;
       const contentHtml = markdownToHtml(contentMd);
       const generatedAt = new Date().toISOString();
