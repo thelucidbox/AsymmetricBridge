@@ -3,14 +3,8 @@ import AIJobs from "./AIJobs";
 import ErrorBoundary from "./ErrorBoundary";
 import ThesisPortfolio from "./ThesisPortfolio";
 import LucidBoxHeader from "./lucid-box/LucidBoxHeader";
-import LucidBoxPortfolio from "./lucid-box/LucidBoxPortfolio";
 import LucidBoxSignals from "./lucid-box/LucidBoxSignals";
-import { ALOS_COMPONENTS } from "../data/alos-components";
 import { DOMINOS } from "../data/dominos";
-import { PRODUCTS } from "../data/products";
-import { REVENUE_SCENARIOS } from "../data/revenue";
-import { TWITTER_PILLARS } from "../data/twitter";
-import { isOwnerMode } from "../config/ThesisContext";
 import { useTheme } from "../design-tokens";
 import { useCryptoData } from "../hooks/useCryptoData";
 import { useFredData } from "../hooks/useFredData";
@@ -20,24 +14,6 @@ import { useAutoThreshold } from "../hooks/useAutoThreshold";
 import { getFredApiKey } from "../lib/fred";
 import { getTwelveDataApiKey } from "../lib/stocks";
 import { S } from "../styles";
-
-const PRODUCT_STATUS_LABELS = {
-  launch_now: "LAUNCH NOW",
-  build_this_month: "THIS MONTH",
-  launch_month_2: "MONTH 2",
-  launch_quarter_2: "Q2",
-  launch_quarter_3: "Q3",
-  build_quarter_3: "BUILD Q3",
-};
-
-const PRODUCT_STATUS_COLORS = {
-  launch_now: "#E63946",
-  build_this_month: "#F4A261",
-  launch_month_2: "#E9C46A",
-  launch_quarter_2: "#2A9D8F",
-  launch_quarter_3: "#6D6875",
-  build_quarter_3: "#264653",
-};
 
 function normalizeFeedError(error, source = "unknown") {
   if (!error) return null;
@@ -135,10 +111,8 @@ function SampleDataBanner() {
 
 export default function CommandCenter() {
   const { tokens } = useTheme();
-  const [section, setSection] = useState(isOwnerMode ? "lucidbox" : "signals");
-  const [subTab, setSubTab] = useState(isOwnerMode ? "products" : "dominos");
+  const [section, setSection] = useState("signals");
   const [activeDominos, setActiveDominos] = useState(new Set([1]));
-  const [expandedProduct, setExpandedProduct] = useState(3);
   const [signalSubTab, setSignalSubTab] = useState("tracker");
 
   const fredQuery = useFredData();
@@ -344,8 +318,6 @@ export default function CommandCenter() {
 
   const switchSection = (nextSection) => {
     setSection(nextSection);
-    if (nextSection === "lucidbox") setSubTab("products");
-    else setSubTab("dominos");
   };
 
   return (
@@ -364,7 +336,6 @@ export default function CommandCenter() {
           onSwitchSection={switchSection}
           threat={threat}
           threatClr={threatClr}
-          isOwnerMode={isOwnerMode}
         />
 
         <div
@@ -380,26 +351,9 @@ export default function CommandCenter() {
           {greenCt} green · {amberCt} amber · {redCt} red — {threat}
         </div>
 
-        {!isOwnerMode && <SampleDataBanner />}
+        <SampleDataBanner />
 
-        {section === "lucidbox" && isOwnerMode && (
-          <ErrorBoundary>
-            <LucidBoxPortfolio
-              subTab={subTab}
-              setSubTab={setSubTab}
-              expandedProduct={expandedProduct}
-              setExpandedProduct={setExpandedProduct}
-              products={PRODUCTS}
-              alosComponents={ALOS_COMPONENTS}
-              twitterPillars={TWITTER_PILLARS}
-              revenueScenarios={REVENUE_SCENARIOS}
-              statusLabels={PRODUCT_STATUS_LABELS}
-              statusColors={PRODUCT_STATUS_COLORS}
-            />
-          </ErrorBoundary>
-        )}
-
-        {section === "lucidbox" && !isOwnerMode && (
+        {section === "lucidbox" && (
           <EmptyStateCard
             title="Your Portfolio"
             description="Upload your portfolio CSV in the Performance Lab to see thesis alignment and track your positioning."
@@ -429,32 +383,16 @@ export default function CommandCenter() {
           </ErrorBoundary>
         )}
 
-        {section === "thesis" && isOwnerMode && (
+        {section === "thesis" && (
           <ErrorBoundary>
             <ThesisPortfolio />
           </ErrorBoundary>
         )}
 
-        {section === "thesis" && !isOwnerMode && (
-          <EmptyStateCard
-            title="Your Thesis Portfolio"
-            description="After tracking signals for a while, build your portfolio thesis here. This section shows how your investment positioning maps to the domino cascade."
-            color="#6D6875"
-          />
-        )}
-
-        {section === "jobs" && isOwnerMode && (
+        {section === "jobs" && (
           <ErrorBoundary>
             <AIJobs />
           </ErrorBoundary>
-        )}
-
-        {section === "jobs" && !isOwnerMode && (
-          <EmptyStateCard
-            title="AI Jobs Tracker"
-            description="Track AI-related job market trends and opportunities relevant to your career positioning."
-            color="#2A9D8F"
-          />
         )}
 
         <div

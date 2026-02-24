@@ -6,7 +6,6 @@ export default function LucidBoxHeader({
   onSwitchSection,
   threat,
   threatClr,
-  isOwnerMode,
 }) {
   const { tokens } = useTheme();
 
@@ -49,7 +48,7 @@ export default function LucidBoxHeader({
               marginLeft: 6,
             }}
           >
-            {isOwnerMode ? "PERSONAL EDITION" : "COMMAND CENTER"}
+            COMMAND CENTER
           </span>
         </div>
         <p
@@ -60,9 +59,7 @@ export default function LucidBoxHeader({
             fontFamily: tokens.typography.fontMono,
           }}
         >
-          {isOwnerMode
-            ? "Lucid Box · Signal Tracker · Thesis & Portfolio · AI Jobs"
-            : "Dashboard · Signal Tracker · Portfolio · Jobs"}
+          Dashboard · Signal Tracker · Portfolio · Jobs
         </p>
       </div>
 
@@ -74,22 +71,12 @@ export default function LucidBoxHeader({
           flexWrap: "wrap",
         }}
       >
-        {isOwnerMode && (
-          <button
-            onClick={() => onSwitchSection("lucidbox")}
-            style={S.sectionTab(section === "lucidbox", tokens.colors.alert)}
-          >
-            Lucid Box
-          </button>
-        )}
-        {!isOwnerMode && (
-          <button
-            onClick={() => onSwitchSection("lucidbox")}
-            style={S.sectionTab(section === "lucidbox", tokens.colors.alert)}
-          >
-            My Dashboard
-          </button>
-        )}
+        <button
+          onClick={() => onSwitchSection("lucidbox")}
+          style={S.sectionTab(section === "lucidbox", tokens.colors.alert)}
+        >
+          My Dashboard
+        </button>
         <button
           onClick={() => onSwitchSection("signals")}
           data-tour="section-signals"

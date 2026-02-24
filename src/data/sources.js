@@ -1,3 +1,3 @@
-import { fabianThesis } from "../config/fabian-thesis.js";
+import { defaultThesis } from "../config/default-thesis.js";
 
-export const SOURCES = fabianThesis.sources;
+export const SOURCES = defaultThesis.sources;

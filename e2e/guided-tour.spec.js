@@ -40,7 +40,7 @@ test.describe("Guided Tour", () => {
     await seedThesisNoTour(page);
     await page.goto("/");
     await page.waitForTimeout(500);
-    // OSS mode (no VITE_OWNER_MODE) should show "Step 1 of N"
+    // Should show "Step 1 of N"
     const stepText = page.locator("text=/Step 1 of \\d/");
     await expect(stepText).toBeVisible();
   });

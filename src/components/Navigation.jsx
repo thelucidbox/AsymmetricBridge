@@ -6,7 +6,6 @@ import {
   setDisplayMode,
   useDisplayMode,
 } from "../hooks/useDisplayMode";
-import { isOwnerMode, useThesis } from "../config/ThesisContext";
 import { useAuth } from "../lib/AuthContext";
 import GuidedTour from "./GuidedTour";
 import { S } from "../styles";
@@ -53,7 +52,6 @@ export default function Navigation({
   const location = useLocation();
   const { tokens } = useTheme();
   const displayMode = useDisplayMode();
-  const { enterTestMode } = useThesis();
   const { requireAuth, signOut } = useAuth();
   const [isMobile, setIsMobile] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -64,11 +62,6 @@ export default function Navigation({
       drawerRef.current.focus();
     }
   }, [isMenuOpen]);
-
-  const handleTestAsNewUser = () => {
-    enterTestMode();
-    navigate("/onboarding", { replace: true });
-  };
 
   const defaultSections = useMemo(
     () =>
@@ -239,29 +232,6 @@ export default function Navigation({
                 <ThemeToggle />
               </div>
 
-              {isOwnerMode && (
-                <div
-                  style={{
-                    marginLeft: 2,
-                    paddingLeft: 8,
-                    borderLeft: `1px solid ${tokens.colors.border}`,
-                  }}
-                >
-                  <button
-                    onClick={handleTestAsNewUser}
-                    style={{
-                      ...S.tab(false, tokens.colors.watch),
-                      fontSize: tokens.typography.sizes.label,
-                      fontFamily: tokens.typography.fontMono,
-                      textTransform: "uppercase",
-                      letterSpacing: tokens.typography.letterSpacing.label,
-                    }}
-                  >
-                    Test as new user
-                  </button>
-                </div>
-              )}
-
               {requireAuth && (
                 <div
                   style={{
@@ -394,22 +364,6 @@ export default function Navigation({
             <div style={{ marginTop: 4 }}>
               <ThemeToggle />
             </div>
-
-            {isOwnerMode && (
-              <button
-                onClick={() => {
-                  setIsMenuOpen(false);
-                  handleTestAsNewUser();
-                }}
-                style={{
-                  ...S.tab(false, tokens.colors.watch),
-                  width: "100%",
-                  marginTop: 8,
-                }}
-              >
-                Test as new user
-              </button>
-            )}
 
             {requireAuth && (
               <button

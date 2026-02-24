@@ -122,14 +122,14 @@ function AppShell() {
   const location = useLocation();
   const { tokens } = useTheme();
   const { user, loading, requireAuth } = useAuth();
-  const { hasThesis, isTestMode } = useThesis();
+  const { hasThesis } = useThesis();
   const isOnboardingRoute = location.pathname === "/onboarding";
 
   if (loading) return <AuthLoading tokens={tokens} />;
 
   if (requireAuth && !user) return <AuthPage />;
 
-  const needsOnboarding = !hasThesis || isTestMode;
+  const needsOnboarding = !hasThesis;
 
   if (needsOnboarding && !isOnboardingRoute) {
     return <Navigate to="/onboarding" replace />;

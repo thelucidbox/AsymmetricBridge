@@ -1,8 +1,31 @@
-# Asymmetric Bridge
+<p align="center">
+  <img src="docs/images/dashboard-hero.png" alt="Asymmetric Bridge Dashboard" width="800" />
+</p>
 
-Strategic intelligence platform that merges live macro data with thesis tracking, portfolio analysis, and career positioning.
+<h1 align="center">Asymmetric Bridge</h1>
 
-Define your macro thesis as a chain of dominos — each with measurable signals pulling from live data feeds. Upload your brokerage exports to see if your portfolio matches your beliefs. Track predictions, score your conviction over time, and generate publishable intelligence digests.
+<p align="center">
+  <strong>Open-source macro intelligence platform. Track your thesis. Score your conviction.</strong>
+</p>
+
+<p align="center">
+  <a href="https://github.com/thelucidbox/AsymmetricBridge/stargazers"><img src="https://img.shields.io/github/stars/thelucidbox/AsymmetricBridge?style=flat&color=E9C46A" alt="Stars"></a>
+  <a href="./LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="License: MIT"></a>
+  <a href="https://github.com/thelucidbox/AsymmetricBridge/issues"><img src="https://img.shields.io/github/issues/thelucidbox/AsymmetricBridge" alt="Issues"></a>
+</p>
+
+<p align="center">
+  <a href="#quickstart">Quickstart</a> &middot;
+  <a href="#features">Features</a> &middot;
+  <a href="#how-it-works">How It Works</a> &middot;
+  <a href="./CONTRIBUTING.md">Contributing</a>
+</p>
+
+---
+
+Most people invest based on vibes, not conviction. Asymmetric Bridge gives you a structured framework to define your macro thesis as a chain of dominos, connect each one to live economic signals, upload your portfolio, and see if your bets actually match your beliefs.
+
+No black boxes. No subscriptions. Your API keys stay in your browser. You own the data.
 
 ## Quickstart
 
@@ -10,76 +33,166 @@ Define your macro thesis as a chain of dominos — each with measurable signals 
 git clone https://github.com/thelucidbox/AsymmetricBridge.git
 cd AsymmetricBridge
 npm install
-cp .env.example .env   # Add your API keys
+cp .env.example .env   # Add your API keys (all free tier)
 npm run dev
 ```
 
-Open `http://localhost:5173` and run through the onboarding wizard to configure your thesis.
-
-## API Keys (all free tier)
-
-| Service | What it provides | Sign up |
-|---------|-----------------|---------|
-| **Supabase** | Database, auth, edge functions | [supabase.com](https://supabase.com) |
-| **FRED** | Federal Reserve economic data (rates, inflation, employment) | [fred.stlouisfed.org/docs/api/api_key.html](https://fred.stlouisfed.org/docs/api/api_key.html) |
-| **Twelve Data** | Stock/ETF quotes (800 calls/day free) | [twelvedata.com](https://twelvedata.com/pricing) |
-| **CoinGecko** | Crypto/stablecoin data (free, key optional) | [coingecko.com](https://www.coingecko.com/en/api) |
+Open `http://localhost:5173` and the onboarding wizard walks you through setup in about 3 minutes.
 
 ## Features
 
-**Thesis Framework** — Define dominos (macro forces) with signals that pull live data. Thresholds trigger status changes automatically.
+### Thesis Framework — The 6-Domino Cascade
 
-**Performance Lab** — Upload brokerage CSV exports (Schwab, Fidelity, IBKR, Robinhood). Positions are mapped to thesis legs with an alignment score showing whether your bets match your beliefs.
+<img src="docs/images/domino-cascade.png" alt="Domino Cascade" width="700" />
 
-**Conviction Ledger** — Record predictions when signals trip thresholds. Set evaluation windows (30/60/90 days). Outcomes are scored into a batting average over time.
+Define your macro thesis as a chain of cause-and-effect disruption forces. The default thesis tracks 6 dominos with 24 signals:
 
-**Signal Digest Engine** — Generate narrative intelligence briefs from live signal data. Export as Markdown, copy to clipboard, or download.
+| Domino | What It Tracks |
+|--------|---------------|
+| **SaaS Compression** | Software pricing power collapses as AI replaces enterprise tools |
+| **White-Collar Displacement** | Knowledge-worker roles shrink as automation scales |
+| **Friction Collapse** | Middlemen lose pricing power to direct AI |
+| **Ghost GDP** | GDP looks fine but fewer people share in the growth |
+| **Financial Contagion** | Stress spreads from one sector into credit and housing |
+| **Policy Response** | Governments react with regulation, stimulus, or restructuring |
 
-**Educational Layer** — Glossary tooltips on every macro term, "Why This Matters" on every signal, simplified/full mode toggle. Built for people without finance backgrounds.
+When one domino tips, it pressures the next. Each signal is connected to live data feeds that evaluate thresholds automatically.
 
-**Design Variants** — Terminal (Bloomberg-style, IBM Plex) and Observatory (glass-morphism, Inter). Switch with a toggle, or build your own via design tokens.
+### Live Signal Tracker
+
+<img src="docs/images/signal-tracker.png" alt="Signal Tracker" width="700" />
+
+- **24 signals** pulling from FRED, Twelve Data, and CoinGecko
+- **Auto-threshold engine** evaluates every data fetch — client-side and via 15-minute Supabase cron
+- **Green / Amber / Red** status with audit trail (who changed it, when, why)
+- **Manual overrides** for signals where you disagree with the algorithm
+- **Freshness indicators** so you know when data is stale
+- **"Why This Matters"** on every signal — written for people, not quants
+
+### Performance Lab — Portfolio Alignment
+
+<img src="docs/images/performance-lab.png" alt="Performance Lab" width="700" />
+
+Upload your brokerage CSV (Schwab, Fidelity, IBKR, Robinhood auto-detected) and see:
+
+- **Thesis alignment score** — what % of your portfolio matches your macro thesis
+- **Leg mapping** — positions grouped by thesis leg (Long AI Infra, Short SaaS, Hedge, etc.)
+- **QoQ attribution** — did your beliefs translate into returns?
+
+### Conviction Scorecard
+
+<img src="docs/images/conviction-scorecard.png" alt="Conviction Scorecard" width="700" />
+
+Record predictions when signals cross thresholds. Set 30/60/90-day evaluation windows. Outcomes get scored into a batting average over time.
+
+Stop guessing whether your macro calls were right. Start keeping score.
+
+### Signal Digest Engine
+
+Generate AI-powered intelligence briefs from your live signal data. Bring your own LLM key (Claude, GPT, or Gemini) — the key stays in your browser, never hits a server.
+
+Export as Markdown, copy to clipboard, or download.
+
+### Educational Layer
+
+- **150+ term glossary** with inline tooltips throughout the app
+- **Simplified mode** hides advanced thresholds for new users
+- **Full mode** shows everything — historical data, transmission mechanics, override details
+- **Guided tour** walks first-time users through the dashboard
+
+### Two Design Themes
+
+| Terminal | Observatory |
+|----------|------------|
+| Bloomberg-style, monospace, grid-based | Glass-morphism, Inter font, glow effects |
+| <img src="docs/images/theme-terminal.png" alt="Terminal Theme" width="350" /> | <img src="docs/images/theme-observatory.png" alt="Observatory Theme" width="350" /> |
+
+Switch with a toggle. Both themes use the same design token system — build your own variant by editing one file.
+
+## How It Works
+
+```
+Your Thesis (6 dominos, 24 signals)
+        |
+        v
+Live Data Feeds (FRED, Twelve Data, CoinGecko)
+        |
+        v
+Auto-Threshold Engine (evaluates every fetch + 15-min cron)
+        |
+        v
+Signal Status Updates (green -> amber -> red)
+        |
+        v
+Dashboard + Alerts (UI, Telegram notifications)
+        |
+        v
+Conviction Scoring (predictions tracked over time)
+```
+
+**All data stays local.** API keys are stored in your browser's localStorage. Supabase is optional — the app works without it using localStorage persistence. When configured, Supabase adds: persistent signal history, cron-based threshold evaluation, Telegram alerts, and multi-user auth.
+
+## API Keys (All Free Tier)
+
+| Service | What It Provides | Free Tier | Sign Up |
+|---------|-----------------|-----------|---------|
+| **FRED** | Rates, inflation, employment, GDP | Unlimited | [fred.stlouisfed.org](https://fred.stlouisfed.org/docs/api/api_key.html) |
+| **Twelve Data** | Stock & ETF quotes | 800 calls/day | [twelvedata.com](https://twelvedata.com/pricing) |
+| **CoinGecko** | Crypto & stablecoin data | No key needed | [coingecko.com](https://www.coingecko.com/en/api) |
+| **Supabase** | Database, auth, edge functions | Free tier generous | [supabase.com](https://supabase.com) |
+
+No API keys? The app runs with sample data and shows a banner. Add keys when you're ready.
 
 ## Stack
 
-- **Frontend:** Vite + React 19
-- **Data:** Supabase (Postgres + Edge Functions)
-- **Queries:** TanStack Query
-- **Routing:** React Router 7
-- **Styling:** Design tokens (no CSS framework)
+| Layer | Technology |
+|-------|-----------|
+| Frontend | React 19 + Vite |
+| Data Fetching | TanStack Query v5 |
+| Routing | React Router 7 |
+| Backend (optional) | Supabase (Postgres + Edge Functions + Auth) |
+| CSV Parsing | Papa Parse |
+| Styling | Design tokens (no CSS framework) |
+| Testing | Playwright (46 e2e tests) |
 
 ## Project Structure
 
 ```
 src/
-  components/          # UI by feature (onboarding, conviction, digests, etc.)
+  components/          # UI by feature (onboarding, conviction, digests, performance)
   config/              # Thesis config, schema validation, ThesisContext
   data/                # Static data (dominos, signals, glossary, sources)
-  design-tokens/       # Theme variants + ThemeProvider
-  hooks/               # React hooks (predictions, portfolios, signals, etc.)
-  lib/                 # Utilities (API adapters, parsers, retry, export)
+  design-tokens/       # Theme variants (Terminal, Observatory) + ThemeProvider
+  hooks/               # Custom hooks (predictions, portfolios, signals, display mode)
+  lib/                 # Utilities (API adapters, parsers, threshold engine, export)
+  styles.js            # Shared style helpers
 supabase/
-  functions/           # Edge Functions (evaluate-thresholds)
+  functions/           # Edge Functions (evaluate-thresholds, signal-alert)
+  migrations/          # Database schema + RLS policies
+e2e/                   # Playwright test suite
 ```
 
 ## Configuration
 
-All thesis data lives in `src/config/fabian-thesis.js`. To bring your own thesis:
+**Onboarding wizard** (recommended) — runs on first launch. Walks you through career profile, thesis selection, API keys, and portfolio upload.
 
-1. Run the onboarding wizard (first launch), or
-2. Copy `fabian-thesis.js`, rename it, define your dominos/signals/portfolio, and import it in `ThesisContext.jsx`
+**Manual** — edit `src/config/default-thesis.js` to define your own dominos, signals, and thresholds. The schema is validated at runtime via `thesis-schema.js`.
 
-The `DataSourceRegistry` in `src/lib/data-sources.js` accepts new adapters with `{ fetch, validate, transform }`.
+**Adding data sources** — create an adapter in `src/lib/` and register it in `data-sources.js` with `{ fetch, validate, transform }`.
 
-## Export
+## Accessibility
 
-- **Digests** — Markdown copy/download from the Digests view
-- **Conviction Ledger** — Markdown copy/download from the Conviction view
-- **Performance Lab** — Markdown report copy/download from the Performance view
+- Skip-to-content link
+- ARIA labels on all interactive elements
+- Focus trap in modals and guided tour
+- Keyboard navigation throughout
+- WCAG AAA contrast on Terminal theme
+- Status communicated via text labels, not color alone
 
 ## Contributing
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md).
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for setup instructions, code style, and how to add new data sources or signals.
 
 ## License
 
-[MIT](./LICENSE)
+[MIT](./LICENSE) — Fabian Aguilar

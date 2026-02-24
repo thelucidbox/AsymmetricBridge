@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { isOwnerMode, useThesis } from "../config/ThesisContext";
+import { useThesis } from "../config/ThesisContext";
 import { useTheme } from "../design-tokens";
 import { getFredApiKey } from "../lib/fred";
 import { getTwelveDataApiKey } from "../lib/stocks";
@@ -17,7 +17,6 @@ const ALL_TOUR_STEPS = [
     selector: '[data-tour="domino-cascade"]',
     description:
       "Each domino is a disruption vector. Heat and status mix tell you where stress is starting and where it may spread next.",
-    ownerOnly: false,
   },
   {
     id: "signal-cards",
@@ -25,7 +24,6 @@ const ALL_TOUR_STEPS = [
     selector: '[data-tour="signal-cards"]',
     description:
       "Every signal is one measurable checkpoint. Status colors give the quick read, and full mode lets you expand for deeper context.",
-    ownerOnly: false,
   },
   {
     id: "status-colors",
@@ -33,7 +31,6 @@ const ALL_TOUR_STEPS = [
     selector: '[data-tour="status-colors"]',
     description:
       "Green means baseline, amber means watch, and red means alert. Treat color shifts as momentum changes, not one-off noise.",
-    ownerOnly: false,
   },
   {
     id: "thresholds",
@@ -41,15 +38,13 @@ const ALL_TOUR_STEPS = [
     selector: '[data-tour="thresholds"]',
     description:
       "Baselines define normal. Thresholds define escalation. When a signal crosses its threshold, the domino risk level should be reconsidered.",
-    ownerOnly: false,
   },
   {
     id: "portfolio",
-    title: "Lucid Box",
-    selector: '[data-tour="portfolio-section"]',
+    title: "Thesis & Portfolio",
+    selector: '[data-tour="section-portfolio-tab"]',
     description:
-      "This section connects the macro thesis to positioning. Use it to map signal movement to practical decision points.",
-    ownerOnly: true,
+      "This section connects the macro thesis to positioning. Upload your portfolio CSV and map signal movement to practical decision points.",
   },
 ];
 
@@ -82,10 +77,7 @@ export default function GuidedTour() {
   const hasApiKeys = getFredApiKey() || getTwelveDataApiKey();
 
   const steps = useMemo(() => {
-    return ALL_TOUR_STEPS.filter((s) => {
-      if (s.ownerOnly && !isOwnerMode) return false;
-      return true;
-    }).map((s) => {
+    return ALL_TOUR_STEPS.map((s) => {
       if (!hasApiKeys && s.id === "signal-cards") {
         return {
           ...s,

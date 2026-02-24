@@ -1,0 +1,17 @@
+{
+  "name": "asymmetric-bridge-video",
+  "version": "1.0.0",
+  "description": "Demo video for Asymmetric Bridge",
+  "scripts": {
+    "start": "remotion studio",
+    "build": "remotion render DemoVideo out/demo.mp4",
+    "build:gif": "remotion render DemoVideo out/demo.gif --image-format png"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.428",
+    "@remotion/transitions": "^4.0.428",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "remotion": "^4.0.428"
+  }
+}

@@ -5,11 +5,10 @@ import {
   useMemo,
   useState,
 } from "react";
-import fabianThesis from "./fabian-thesis.js";
+import defaultThesis from "./default-thesis.js";
 import { validateThesis } from "./thesis-schema.js";
 
 const THESIS_STORAGE_KEY = "ab-thesis-config";
-const TEST_MODE_KEY = "ab-test-new-user";
 
 const blankThesis = {
   meta: {
@@ -58,10 +57,7 @@ const blankThesis = {
   },
 };
 
-// eslint-disable-next-line react-refresh/only-export-components
-export const isOwnerMode =
-  import.meta.env.VITE_OWNER_MODE === "true" ||
-  import.meta.env.VITE_OWNER_MODE === true;
+export { defaultThesis };
 
 const ThesisContext = createContext(null);
 
@@ -84,28 +80,7 @@ function persistThesis(config) {
   window.localStorage.setItem(THESIS_STORAGE_KEY, JSON.stringify(config));
 }
 
-function isTestingAsNewUser() {
-  if (typeof window === "undefined") return false;
-  return window.localStorage.getItem(TEST_MODE_KEY) === "true";
-}
-
 function getInitialThesis() {
-  if (isOwnerMode && !isTestingAsNewUser()) {
-    const stored = loadStoredThesis();
-    if (stored) {
-      const validation = validateThesis(stored);
-      if (validation.valid) return stored;
-    }
-    const validation = validateThesis(fabianThesis);
-    if (validation.valid) {
-      persistThesis(fabianThesis);
-      return fabianThesis;
-    }
-    return null;
-  }
-
-  if (isTestingAsNewUser()) return null;
-
   const stored = loadStoredThesis();
   if (!stored) return null;
 
@@ -118,7 +93,6 @@ function getInitialThesis() {
 
 export function ThesisProvider({ children }) {
   const [thesis, setThesis] = useState(getInitialThesis);
-  const [isTestMode, setIsTestMode] = useState(isTestingAsNewUser);
 
   const updateThesis = useCallback((nextThesis) => {
     setThesis((current) => {
@@ -139,42 +113,15 @@ export function ThesisProvider({ children }) {
     });
   }, []);
 
-  const enterTestMode = useCallback(() => {
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(TEST_MODE_KEY, "true");
-      window.localStorage.removeItem(THESIS_STORAGE_KEY);
-    }
-    setIsTestMode(true);
-    setThesis(null);
-  }, []);
-
-  const exitTestMode = useCallback(() => {
-    if (typeof window !== "undefined") {
-      window.localStorage.removeItem(TEST_MODE_KEY);
-    }
-    setIsTestMode(false);
-    const fallback = isOwnerMode ? fabianThesis : blankThesis;
-    const validation = validateThesis(fallback);
-    if (validation.valid) {
-      persistThesis(fallback);
-      setThesis(fallback);
-    } else {
-      setThesis(null);
-    }
-  }, []);
-
   const hasThesis = thesis !== null;
 
   const value = useMemo(
     () => ({
-      thesis: thesis || (isOwnerMode ? fabianThesis : blankThesis),
+      thesis: thesis || blankThesis,
       updateThesis,
       hasThesis,
-      isTestMode,
-      enterTestMode,
-      exitTestMode,
     }),
-    [thesis, updateThesis, hasThesis, isTestMode, enterTestMode, exitTestMode],
+    [thesis, updateThesis, hasThesis],
   );
 
   return (

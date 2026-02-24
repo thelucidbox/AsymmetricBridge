@@ -1,14 +1,16 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useThesis, isOwnerMode } from "../../config/ThesisContext";
-import fabianThesis from "../../config/fabian-thesis";
+import { useThesis } from "../../config/ThesisContext";
+import defaultThesis from "../../config/default-thesis";
 import { validateThesis } from "../../config/thesis-schema";
 import { useAuth } from "../../lib/AuthContext";
 import { supabase } from "../../lib/supabase";
 import { useTheme } from "../../design-tokens";
+import { usePortfolioData } from "../../hooks/usePortfolioData";
 import { S } from "../../styles";
 import APIKeySetup from "./APIKeySetup";
 import CareerProfile from "./CareerProfile";
+import CSVUpload from "../performance-lab/CSVUpload";
 import ResearchDiscovery from "./ResearchDiscovery";
 import ThesisSetup from "./ThesisSetup";
 
@@ -20,6 +22,7 @@ const STEPS = [
   { key: "career", label: "About You", estimate: "About 60 seconds" },
   { key: "thesis", label: "Your Thesis", estimate: "About 90 seconds" },
   { key: "api", label: "Data Sources", estimate: "About 30 seconds" },
+  { key: "portfolio", label: "Portfolio", estimate: "About 60 seconds" },
   { key: "complete", label: "Review", estimate: null },
 ];
 
@@ -116,22 +119,22 @@ async function seedSignalStatuses(userId, dominos) {
 export default function OnboardingWizard() {
   const { tokens } = useTheme();
   const navigate = useNavigate();
-  const { updateThesis, isTestMode, exitTestMode } = useThesis();
+  const { updateThesis } = useThesis();
   const { userId } = useAuth();
+  const { uploadCSV } = usePortfolioData();
 
   const [currentStep, setCurrentStep] = useState(0);
   const [draftThesis, setDraftThesis] = useState(() =>
-    isOwnerMode && !isTestMode
-      ? clone(fabianThesis)
-      : createBlankDraft(fabianThesis),
+    createBlankDraft(defaultThesis),
   );
   const [enabledDominoIds, setEnabledDominoIds] = useState(() =>
-    fabianThesis.dominos.map((domino) => domino.id),
+    defaultThesis.dominos.map((domino) => domino.id),
   );
   const [apiKeys, setApiKeys] = useState(() => ({
     fredKey: readStorageValue(FRED_KEY_STORAGE),
     twelveDataKey: readStorageValue(TWELVE_DATA_KEY_STORAGE),
   }));
+  const [parsedPortfolio, setParsedPortfolio] = useState(null);
   const [stepErrors, setStepErrors] = useState({
     career: {},
     thesis: "",
@@ -225,7 +228,7 @@ export default function OnboardingWizard() {
     setCurrentStep(STEPS.length - 1);
   };
 
-  const handleComplete = () => {
+  const handleComplete = async () => {
     if (isSaving) return;
 
     const normalizedCareer = {
@@ -282,6 +285,15 @@ export default function OnboardingWizard() {
 
     updateThesis(candidate);
     seedSignalStatuses(userId, candidate.dominos);
+
+    if (parsedPortfolio) {
+      try {
+        await uploadCSV(parsedPortfolio);
+      } catch (error) {
+        console.warn("Portfolio upload during onboarding failed:", error);
+      }
+    }
+
     navigate("/", { replace: true });
   };
 
@@ -291,11 +303,6 @@ export default function OnboardingWizard() {
         <WelcomeStep
           onQuickStart={handleQuickStart}
           onCustomSetup={() => setCurrentStep(1)}
-          isTestMode={isTestMode}
-          onExitTestMode={() => {
-            exitTestMode();
-            navigate("/", { replace: true });
-          }}
         />
       );
     }
@@ -328,11 +335,21 @@ export default function OnboardingWizard() {
       return <APIKeySetup value={apiKeys} onChange={setApiKeys} />;
     }
 
+    if (currentStep === 4) {
+      return (
+        <PortfolioStep
+          parsedPortfolio={parsedPortfolio}
+          onPortfolioParsed={setParsedPortfolio}
+        />
+      );
+    }
+
     return (
       <CompleteStep
         draftThesis={draftThesis}
         activeDominos={activeDominos}
         apiKeys={apiKeys}
+        parsedPortfolio={parsedPortfolio}
         submitError={stepErrors.submit}
       />
     );
@@ -450,43 +467,10 @@ export default function OnboardingWizard() {
   );
 }
 
-function WelcomeStep({
-  onQuickStart,
-  onCustomSetup,
-  isTestMode,
-  onExitTestMode,
-}) {
+function WelcomeStep({ onQuickStart, onCustomSetup }) {
   const { tokens } = useTheme();
   return (
     <div>
-      {isTestMode && isOwnerMode && (
-        <div style={{ ...S.card("rgba(233,196,106,0.25)"), marginBottom: 14 }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <div>
-              <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 4 }}>
-                Testing as new user
-              </div>
-              <div style={{ fontSize: 11, color: tokens.colors.textMuted }}>
-                You are seeing the open source onboarding experience.
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={onExitTestMode}
-              style={S.tab(true, "#E9C46A")}
-            >
-              Return to my dashboard
-            </button>
-          </div>
-        </div>
-      )}
-
       <div style={S.card("rgba(42,157,143,0.15)")}>
         <div style={S.label}>What is Asymmetric Bridge?</div>
         <div
@@ -584,21 +568,6 @@ function WelcomeStep({
                   {domino.summary}
                 </div>
               </div>
-              {index < DOMINO_PREVIEWS.length - 1 && (
-                <div
-                  style={{
-                    position: "absolute",
-                    right: -6,
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    color: tokens.colors.borderStrong,
-                    fontSize: 14,
-                    display: "none",
-                  }}
-                >
-                  →
-                </div>
-              )}
             </div>
           ))}
         </div>
@@ -683,7 +652,66 @@ function WelcomeStep({
   );
 }
 
-function CompleteStep({ draftThesis, activeDominos, apiKeys, submitError }) {
+function PortfolioStep({ parsedPortfolio, onPortfolioParsed }) {
+  const { tokens } = useTheme();
+  return (
+    <div>
+      <div
+        style={{
+          ...S.card("rgba(233,196,106,0.15)"),
+          marginBottom: 14,
+        }}
+      >
+        <div style={S.label}>Portfolio Upload (Optional)</div>
+        <div
+          style={{
+            fontSize: 12,
+            color: tokens.colors.textSecondary,
+            lineHeight: 1.6,
+            marginBottom: 14,
+          }}
+        >
+          Upload a CSV export from your brokerage (Schwab, Fidelity, IBKR,
+          Robinhood) to see how your portfolio aligns with the disruption
+          thesis. You can always do this later in the Performance Lab.
+        </div>
+      </div>
+
+      <CSVUpload
+        onConfirm={(payload) => {
+          onPortfolioParsed(payload);
+        }}
+        isProcessing={false}
+      />
+
+      {parsedPortfolio && (
+        <div
+          style={{
+            marginTop: 12,
+            padding: "10px 14px",
+            borderRadius: 8,
+            background: "rgba(42,157,143,0.15)",
+            border: "1px solid rgba(42,157,143,0.3)",
+            fontSize: 12,
+            fontWeight: 600,
+            color: tokens.colors.baseline,
+          }}
+        >
+          Portfolio uploaded: {parsedPortfolio.positions.length} positions from{" "}
+          {parsedPortfolio.format}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function CompleteStep({
+  draftThesis,
+  activeDominos,
+  apiKeys,
+  parsedPortfolio,
+  submitError,
+}) {
   const { tokens } = useTheme();
   return (
     <div>
@@ -732,6 +760,15 @@ function CompleteStep({ draftThesis, activeDominos, apiKeys, submitError }) {
             <div>
               <strong>Twelve Data:</strong>{" "}
               {apiKeys.twelveDataKey ? "Configured" : "Using sample data"}
+            </div>
+          </div>
+
+          <div style={S.card("rgba(255,255,255,0.08)")}>
+            <div style={S.label}>Portfolio</div>
+            <div>
+              {parsedPortfolio
+                ? `${parsedPortfolio.positions.length} positions from ${parsedPortfolio.format}`
+                : "No portfolio uploaded — you can add one later in the Performance Lab"}
             </div>
           </div>
         </div>

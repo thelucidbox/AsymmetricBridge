@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import { useThesis } from "../config/ThesisContext";
+import { SAMPLE_POSITIONS } from "../data/sample-portfolio";
 import { calculateAlignmentScore } from "../lib/alignment-score";
 import { parsePortfolioCsv } from "../lib/csv-parser";
 import { mapPositionsToLegs } from "../lib/leg-mapper";
@@ -67,9 +68,12 @@ async function persistSnapshot(parsedPortfolio, analyzedPortfolio, userId) {
 export function usePortfolioData() {
   const { thesis } = useThesis();
   const { userId } = useAuth();
-  const [positions, setPositions] = useState([]);
+  const isDemo = !supabase;
+  const [positions, setPositions] = useState(isDemo ? SAMPLE_POSITIONS : []);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [detectedFormat, setDetectedFormat] = useState(null);
+  const [detectedFormat, setDetectedFormat] = useState(
+    isDemo ? "Sample" : null,
+  );
   const [lastImportMeta, setLastImportMeta] = useState(null);
 
   const thesisLegs = useMemo(() => thesis?.portfolio?.legs || [], [thesis]);

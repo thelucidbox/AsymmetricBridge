@@ -16,13 +16,7 @@ export function getDisplayMode() {
   if (typeof window === "undefined") return DISPLAY_MODES.full;
   const stored = window.localStorage.getItem(DISPLAY_MODE_KEY);
   if (stored) return normalizeDisplayMode(stored);
-  // Default OSS users to simplified mode (plain English view)
-  // Owner mode defaults to full (expert view)
-  const isOwner =
-    typeof import.meta !== "undefined" &&
-    (import.meta.env?.VITE_OWNER_MODE === "true" ||
-      import.meta.env?.VITE_OWNER_MODE === true);
-  return isOwner ? DISPLAY_MODES.full : DISPLAY_MODES.simplified;
+  return DISPLAY_MODES.simplified;
 }
 
 export function setDisplayMode(mode) {

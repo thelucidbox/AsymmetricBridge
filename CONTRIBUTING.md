@@ -45,12 +45,16 @@ src/
    ```bash
    npm run build
    ```
-4. Commit using [conventional commits](https://www.conventionalcommits.org/):
+4. Run the e2e test suite:
+   ```bash
+   npm run test:e2e
+   ```
+5. Commit using [conventional commits](https://www.conventionalcommits.org/):
    ```
    feat: Add new signal type
    fix: Handle empty API response in FRED adapter
    ```
-5. Open a pull request against `main`
+6. Open a pull request against `main`
 
 ## Adding a Data Source
 
@@ -67,10 +71,12 @@ src/
 
 ## Adding Signals to a Thesis
 
-Edit `src/config/fabian-thesis.js` (or create your own thesis file). Each signal needs:
+Edit `src/config/default-thesis.js` or create your own thesis file. Each signal needs:
 - `name`, `source`, `frequency`, `currentStatus`
 - `baseline`, `threshold`, `notes`
 - `dataPoints` (array of historical measurements)
+
+To add auto-threshold evaluation, define rules in the threshold engine with `{ domino_id, signal_name, data_source, extract, thresholds }`.
 
 ## Reporting Issues
 
@@ -82,7 +88,8 @@ Open an issue with:
 
 ## Code Style
 
-- No TypeScript (planned for v3)
+- No TypeScript (JSX only)
 - Prefer named exports for utilities, default exports for components
 - Use design tokens for all colors, spacing, and typography — no hardcoded values in new code
 - Keep components focused — one responsibility per file
+- All 46 e2e tests must pass before merging
