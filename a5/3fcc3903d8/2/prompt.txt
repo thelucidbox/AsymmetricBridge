@@ -1,0 +1,489 @@
+Implement the following plan:
+
+# AsymmetricBridge v3.2 — "Make It Actually Work"
+
+## Context
+
+v3.1 shipped and passed 39/39 Playwright tests. The onboarding flow, edition system, OSS dashboard, glossary, and a11y button semantics all work. Now v3.2 completes the backend so data actually persists and automation runs.
+
+**The good news:** Most backend code already exists. Hooks (`usePredictions`, `usePortfolioData`, `useDigests`) already have full Supabase CRUD code with localStorage fallback. Edge functions (`evaluate-thresholds`, `signal-alert`) are fully written (465 and 366 lines respectively). The gaps are:
+
+1. **3 missing Supabase tables** — hooks try to save, fail silently, fall back to localStorage
+2. **Auth assumption** — `usePredictions` and `usePortfolioData` call `supabase.auth.getUser()` and bail if no user. This is a single-user app without auth.
+3. **Edge functions aren't triggered** — no cron for threshold evaluation, no webhook for alerts
+4. **Accessibility gaps** — no aria-live, no skip-to-content, no semantic headings
+
+## Implementation Plan
+
+### Batch A: Database Schema + Auth Fix (Code + Deploy)
+
+**1. Write 3 migration files**
+
+`supabase/migrations/002_create_predictions.sql`:
+```sql
+CREATE TABLE IF NOT EXISTS predictions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id TEXT NOT NULL DEFAULT 'personal',
+  signal_id UUID REFERENCES signal_statuses(id),
+  type TEXT NOT NULL,              -- 'threshold', 'direction', 'range'
+  condition JSONB NOT NULL,
+  target_date DATE NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  scored_at TIMESTAMPTZ,
+  outcome TEXT,                    -- 'hit', 'miss', 'partial'
+  notes TEXT
+);
+CREATE INDEX idx_predictions_user ON predictions(user_id);
+CREATE INDEX idx_predictions_signal ON predictions(signal_id);
+```
+
+`supabase/migrations/003_create_portfolio_snapshots.sql`:
+```sql
+CREATE TABLE IF NOT EXISTS portfolio_snapshots (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id TEXT NOT NULL DEFAULT 'personal',
+  captured_at TIMESTAMPTZ DEFAULT now(),
+  source_format TEXT,
+  positions JSONB NOT NULL,
+  leg_breakdown JSONB,
+  alignment_score NUMERIC,
+  summary JSONB
+);
+CREATE INDEX idx_portfolio_user ON portfolio_snapshots(user_id);
+```
+
+`supabase/migrations/004_create_digests.sql`:
+```sql
+CREATE TABLE IF NOT EXISTS digests (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  period_start TIMESTAMPTZ,
+  period_end TIMESTAMPTZ,
+  content_md TEXT,
+  threat_level TEXT,
+  generated_at TIMESTAMPTZ DEFAULT now(),
+  escalation_count INTEGER DEFAULT 0,
+  deescalation_count INTEGER DEFAULT 0
+);
+CREATE INDEX idx_digests_generated ON digests(generated_at DESC);
+```
+
+**2. Fix auth assumptions in hooks**
+
+- `src/hooks/usePredictions.js` — Change `resolveStorageMode()`:
+  - If Supabase available but no auth user → still use `mode: "supabase"` with `user: { id: "personal" }`
+  - This preserves the `user_id` column for future multi-user support
+- `src/hooks/usePortfolioData.js` — Change `persistSnapshot()`:
+  - If no auth user → use `user_id: "personal"` instead of bailing
+- Both changes are ~5 lines each
+
+**3. Deploy migrations via Supabase CLI**
+```bash
+supabase link --project-ref slyhwbmbeqoaanvloraa
+supabase db push
+```
+
+**4. Add convenience scripts to package.json**
+```json
+"db:push": "supabase db push",
+"db:reset": "supabase db reset",
+"functions:deploy": "supabase functions deploy"
+```
+
+**Files:**
+- `supabase/migrations/002_create_predictions.sql` (new)
+- `supabase/migrations/003_create_portfolio_snapshots.sql` (new)
+- `supabase/migrations/004_create_digests.sql` (new)
+- `src/hooks/usePredictions.js` (~5 lines changed)
+- `src/hooks/usePortfolioData.js` (~5 lines changed)
+- `package.json` (add scripts)
+
+---
+
+### Batch B: Edge Function Deployment
+
+**1. Deploy edge functions**
+```bash
+supabase functions deploy evaluate-thresholds
+supabase functions deploy signal-alert
+```
+
+**2. Set secrets**
+```bash
+supabase secrets set SUPABASE_SERVICE_ROLE_KEY=<key>
+supabase secrets set TELEGRAM_BOT_TOKEN=<token>
+supabase secrets set TELEGRAM_CHAT_ID=<chat_id>
+supabase secrets set WEBHOOK_SECRET=<secret>
+```
+→ Needs Fabian's Telegram bot credentials
+
+**3. Configure database webhook** (Supabase Dashboard)
+- Table: `signal_history` → INSERT trigger
+- Target: `signal-alert` edge function
+- Auth: Bearer token (WEBHOOK_SECRET)
+
+**4. Schedule threshold evaluation** (Supabase Dashboard → Cron)
+- Function: `evaluate-thresholds`
+- Schedule: `0 14,18,22 * * *` (8am, 12pm, 4pm Central)
+
+**Files:** No code changes — infrastructure only.
+
+---
+
+### Batch C: Accessibility
+
+**1. Skip-to-content link**
+- Add visually hidden skip link at top of `Navigation.jsx`
+- `<a href="#main-content" class="ab-skip-link">Skip to main content</a>`
+- Add `id="main-content"` to main content area in `AppShell`
+- CSS: hidden by default, visible on `:focus`
+
+**2. Semantic heading hierarchy**
+- `CommandCenter.jsx` section titles → `<h2>` (Signals, Thesis & Portfolio, AI Jobs)
+- `DominoSection.jsx` domino names → `<h2>` within section
+- `GlossaryPage.jsx` → `<h1>` for page title (already has)
+- `PerformanceView.jsx`, `ConvictionScorecard.jsx`, `DigestView.jsx` → `<h1>` for page titles
+
+**3. aria-live regions**
+- `GuidedTour.jsx` — Add `aria-live="polite"` to tour card content area
+- `CommandCenter.jsx` — Add `aria-live="polite"` to signal status summary area
+- Toast/error messages — wrap in `aria-live="assertive"`
+
+**4. Focus management**
+- `GuidedTour.jsx` — Focus trap: move focus to card on open, restore on close
+- `GuidedTour.jsx` — Focus Next/Back/Skip buttons on step change
+- Ensure Escape handler already works (it does)
+
+**5. Focus-visible styling**
+- Add `:focus-visible` outline to `index.css` for all interactive elements
+- Replace any remaining `outline: "none"` in inline styles
+
+**Files:**
+- `src/components/Navigation.jsx` (skip link)
+- `src/App.jsx` (main-content id)
+- `src/index.css` (skip-link CSS, focus-visible)
+- `src/components/CommandCenter.jsx` (h2s, aria-live)
+- `src/components/DominoSection.jsx` (h2)
+- `src/components/GuidedTour.jsx` (aria-live, focus trap)
+- `src/components/performance-lab/PerformanceView.jsx` (h1)
+- `src/components/conviction/ConvictionScorecard.jsx` (h1)
+- `src/components/digests/DigestView.jsx` (h1)
+
+---
+
+### Batch D: Guided Tour Context-Awareness
+
+**Current state:** 5 static steps, auto-launches on first `/` visit.
+
+**Changes:**
+- Check `hasThesis` — if false, don't show tour (user needs onboarding first)
+- Check API key state — if no keys, add context note: "Using sample data"
+- If `isOwnerMode`, show step about Lucid Box; if OSS, skip it
+- Add step count adaptation: "Step 2 of 4" (not always 5)
+
+**Files:**
+- `src/components/GuidedTour.jsx` (context filtering, dynamic steps)
+
+---
+
+## Execution Order
+
+```
+Batch A (migrations + auth fix) → Deploy → Verify persistence works
+Batch B (edge functions)         → Deploy → Verify alerts fire
+Batch C (accessibility)          → Implement → Spot-check with screen reader
+Batch D (tour enhancement)       → Implement → Visual verify
+```
+
+Batches C and D can run in parallel since they touch different files.
+
+## Verification
+
+1. **Persistence**: Create a prediction in ConvictionScorecard, refresh browser → still there
+2. **Portfolio**: Upload CSV in Performance Lab, refresh → snapshot history shows
+3. **Digests**: Generate digest, refresh → appears in archive
+4. **Edge functions**: Manually invoke `evaluate-thresholds`, check signal_history for changes
+5. **Alerts**: If Telegram configured, verify alert fires on status change
+6. **A11y**: Tab through page — skip link works, focus visible, headings announced
+7. **Tour**: Fresh user sees context-appropriate tour steps
+8. **Playwright**: Re-run v3.1 test suite to confirm no regressions
+
+
+If you need specific details from before exiting plan mode (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/fabianaguilar/.REDACTED.jsonl
+
+If this plan can be broken down into multiple independent tasks, consider using the TeamCreate tool to create a team and parallelize the work.
+
+---
+
+from codex:CRITICAL
+- None.
+
+HIGH
+- **[HIGH]** [src/hooks/usePredictions.js:54](/Users/fabianaguilar/Projects/AsymmetricBridge/src/hooks/usePredictions.js:54), [src/hooks/usePortfolioData.js:37](/Users/fabianaguilar/Projects/AsymmetricBridge/src/hooks/usePortfolioData.js:37) — Auth errors are treated as “no user” and silently routed to `user_id: "personal"` | Why: if real multi-user auth is added, transient auth failures can mix data into a shared bucket instead of failing safely | Fix: only use `"personal"` for explicit no-session in a single-user mode flag; on auth errors, fail or fall back to local mode.
+- **[HIGH]** [src/components/DominoSection.jsx:34](/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/DominoSection.jsx:34), [src/components/DominoSection.jsx:80](/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/DominoSection.jsx:80) — `<h2>` is nested inside a `<button>` | Why: invalid button content model can create inconsistent semantics/AT behavior for the accordion header | Fix: use accordion pattern `<h2><button .../></h2>` or keep button content phrasing-only and apply `role="heading" aria-level="2"` to a span.
+- **[HIGH]** [src/components/GuidedTour.jsx:236](/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/GuidedTour.jsx:236) — Tour is marked modal (`role="dialog"`, `aria-modal`) but does not trap Tab focus | Why: keyboard users can move focus to background UI while modal is open | Fix: implement Tab/Shift+Tab focus loop (or use a focus-trap library) and inert/aria-hide background while open.
+
+MEDIUM
+- **[MEDIUM]** [package.json:6](/Users/fabianaguilar/Projects/AsymmetricBridge/package.json:6), [test-screenshots/run_tests.py:20](/Users/fabianaguilar/Projects/AsymmetricBridge/test-screenshots/run_tests.py:20), [test-screenshots/run_tests.py:505](/Users/fabianaguilar/Projects/AsymmetricBridge/test-screenshots/run_tests.py:505) — The requested v3.1 “39 Playwright tests” are not present/runnable here; only a 7-scenario visual script exists and it targets deployed URL, not this workspace branch | Why: regression confidence for onboarding/CSV/predictions/digests/mobile drawer is incomplete | Fix: add local Playwright config/specs + `npm` script to run branch-local e2e suite.
+- **[MEDIUM]** [supabase/migrations/002_create_predictions.sql:6](/Users/fabianaguilar/Projects/AsymmetricBridge/supabase/migrations/002_create_predictions.sql:6), [supabase/migrations/002_create_predictions.sql:11](/Users/fabianaguilar/Projects/AsymmetricBridge/supabase/migrations/002_create_predictions.sql:11) — `predictions.type` and `predictions.outcome` have no DB CHECK constraints | Why: non-hook writers can persist invalid values that UI logic does not expect | Fix: add CHECK constraints (`type IN (...)`, `outcome IN ('hit','miss','partial') OR outcome IS NULL`).
+
+LOW
+- **[LOW]** [supabase/migrations/002_create_predictions.sql:15](/Users/fabianaguilar/Projects/AsymmetricBridge/supabase/migrations/002_create_predictions.sql:15), [supabase/migrations/003_create_portfolio_snapshots.sql:13](/Users/fabianaguilar/Projects/AsymmetricBridge/supabase/migrations/003_create_portfolio_snapshots.sql:13), [supabase/migrations/004_create_digests.sql:13](/Users/fabianaguilar/Projects/AsymmetricBridge/supabase/migrations/004_create_digests.sql:13) — Index creation omits `IF NOT EXISTS` while tables use it | Why: partial/rerun migration recovery is brittle (duplicate-index failures) | Fix: switch to `CREATE INDEX IF NOT EXISTS ...`.
+
+---
+
+Please go ahead and fix all the things that are able to be fixed right now and then we'll go into testing and then we'll go into the 3.3
+
+---
+
+This session is being continued from a previous conversation that ran out of context. The summary below covers the earlier portion of the conversation.
+
+Analysis:
+Let me chronologically analyze the conversation:
+
+1. **Initial Request**: User provides a detailed v3.2 implementation plan for AsymmetricBridge with 4 batches (A-D).
+
+2. **Exploration Phase**: I launched an Explore agent to understand the codebase, then read all the actual source files needed for modifications.
+
+3. **User interruption #1**: "Please make sure To write a Codex prompt to do a code review like we did for the previous version 3.1"
+
+4. **Batch A Implementation**: Created 3 migration SQL files, fixed auth in usePredictions.js and usePortfolioData.js, added scripts to package.json.
+
+5. **Batch C Implementation**: Added skip-to-content link, semantic headings, aria-live regions, focus management.
+
+6. **Batch D Implementation**: Rewrote GuidedTour.jsx with context-awareness (hasThesis check, isOwnerMode filtering, API key detection, dynamic step count).
+
+7. **Build verification**: `npm run build` passed.
+
+8. **Codex Review Prompt**: Wrote CODEX-REVIEW-PROMPT.md following v3.1 format.
+
+9. **User interruption #2**: "And give me the prompt here" - I provided the Codex prompt inline.
+
+10. **Codex Review Results**: User shared Codex findings - 0 CRITICAL, 3 HIGH, 2 MEDIUM, 1 LOW.
+
+11. **Codex Fix Round 1**: I fixed all HIGH (auth error distinction, h2-inside-button, focus trap), MEDIUM (CHECK constraints), and LOW (IF NOT EXISTS) issues. Build passed.
+
+12. **User message**: "Please go ahead and fix all the things that are able to be fixed right now and then we'll go into testing and then we'll go into the 3.3"
+
+13. **Playwright Setup**: Since all code fixes were done, I set up local Playwright test infrastructure:
+    - Installed `@playwright/test`
+    - Created `playwright.config.js`
+    - Wrote 6 test spec files in `e2e/`
+    - Added `test:e2e` and `test:e2e:headed` scripts
+
+14. **Test Run**: First test run showed many failures - the `seedThesis` function was using an invalid thesis object that failed schema validation. The app was redirecting to `/onboarding` instead of showing the dashboard.
+
+15. **Schema Investigation**: I read `thesis-schema.js` which revealed the thesis object requires: `meta` (with name, version), `dominos` (non-empty array with full signal structures), `sources` (non-empty array), `portfolio` (with legs array), and `careerProfile` (with goals array). My minimal seed object was completely insufficient.
+
+**Current state**: The test suite has 46 tests, most failing because the thesis seed doesn't pass validation. Need to create a valid thesis fixture or use the actual `fabian-thesis.js` data.
+
+Let me capture all the specific files and changes made.
+
+Summary:
+1. Primary Request and Intent:
+   - Implement the AsymmetricBridge v3.2 plan ("Make It Actually Work") with 4 batches:
+     - **Batch A**: Create 3 Supabase migration files (predictions, portfolio_snapshots, digests), fix auth assumptions in hooks, add convenience scripts to package.json
+     - **Batch B**: Edge function deployment (infrastructure only, needs Fabian's Telegram credentials)
+     - **Batch C**: Accessibility improvements (skip-to-content, semantic headings, aria-live, focus management, focus-visible)
+     - **Batch D**: Guided Tour context-awareness (hasThesis check, isOwnerMode filtering, API key detection, dynamic steps)
+   - Write a Codex code review prompt for v3.2 (similar to v3.1's CODEX-REVIEW-PROMPT.md)
+   - Address all Codex review findings
+   - Set up local Playwright test infrastructure and fix all fixable issues before testing phase
+   - After testing, move to v3.3
+
+2. Key Technical Concepts:
+   - React 19 + Vite 7 + Supabase + TanStack Query + React Router v7
+   - Inline styles via `S.card()`, `S.tab()`, `S.label()` from `src/styles.js`
+   - Design token system with two themes (Terminal, Observatory)
+   - Edition system: `isOwnerMode` (build-time constant from `VITE_OWNER_MODE` env var) splits Personal vs OSS
+   - Dual storage: Supabase with localStorage fallback
+   - Auth bypass pattern: `user_id: "personal"` for single-user app without auth
+   - Thesis validation via `thesis-schema.js` (strict schema requiring meta, dominos, sources, portfolio, careerProfile)
+   - `ThesisContext` provides `hasThesis`, `isTestMode`, `enterTestMode`, `exitTestMode`
+   - Onboarding guard: `needsOnboarding = !hasThesis || isTestMode` redirects to `/onboarding`
+   - Playwright e2e testing with `npm run preview` as web server
+
+3. Files and Code Sections:
+
+   - **`supabase/migrations/002_create_predictions.sql`** (NEW)
+     - Creates predictions table for conviction ledger with CHECK constraints
+     ```sql
+     CREATE TABLE IF NOT EXISTS predictions (
+       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+       user_id TEXT NOT NULL DEFAULT 'personal',
+       signal_id UUID REFERENCES signal_statuses(id),
+       type TEXT NOT NULL CHECK (type IN ('threshold', 'direction', 'range')),
+       condition JSONB NOT NULL,
+       target_date DATE NOT NULL,
+       created_at TIMESTAMPTZ DEFAULT now(),
+       scored_at TIMESTAMPTZ,
+       outcome TEXT CHECK (outcome IS NULL OR outcome IN ('hit', 'miss', 'partial')),
+       notes TEXT
+     );
+     CREATE INDEX IF NOT EXISTS idx_predictions_user ON predictions(user_id);
+     CREATE INDEX IF NOT EXISTS idx_predictions_signal ON predictions(signal_id);
+     ```
+
+   - **`supabase/migrations/003_create_portfolio_snapshots.sql`** (NEW)
+     - Creates portfolio_snapshots table for Performance Lab
+     ```sql
+     CREATE TABLE IF NOT EXISTS portfolio_snapshots (
+       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+       user_id TEXT NOT NULL DEFAULT 'personal',
+       captured_at TIMESTAMPTZ DEFAULT now(),
+       source_format TEXT,
+       positions JSONB NOT NULL,
+       leg_breakdown JSONB,
+       alignment_score NUMERIC,
+       summary JSONB
+     );
+     CREATE INDEX IF NOT EXISTS idx_portfolio_user ON portfolio_snapshots(user_id);
+     ```
+
+   - **`supabase/migrations/004_create_digests.sql`** (NEW)
+     - Creates digests table for signal digest engine
+     ```sql
+     CREATE TABLE IF NOT EXISTS digests (
+       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+       period_start TIMESTAMPTZ,
+       period_end TIMESTAMPTZ,
+       content_md TEXT,
+       threat_level TEXT,
+       generated_at TIMESTAMPTZ DEFAULT now(),
+       escalation_count INTEGER DEFAULT 0,
+       deescalation_count INTEGER DEFAULT 0
+     );
+     CREATE INDEX IF NOT EXISTS idx_digests_generated ON digests(generated_at DESC);
+     ```
+
+   - **`src/hooks/usePredictions.js`** (MODIFIED)
+     - Fixed `resolveStorageMode()` to distinguish no-session vs auth-error:
+     ```js
+     async function resolveStorageMode() {
+       if (!supabase) return { mode: "local", user: null };
+       try {
+         const { data, error } = await supabase.auth.getUser();
+         if (data?.user) return { mode: "supabase", user: data.user };
+         if (data && !data.user) {
+           return { mode: "supabase", user: { id: "personal" } };
+         }
+         if (error) return { mode: "local", user: null };
+         return { mode: "supabase", user: { id: "personal" } };
+       } catch {
+         return { mode: "local", user: null };
+       }
+     }
+     ```
+
+   - **`src/hooks/usePortfolioData.js`** (MODIFIED)
+     - Fixed `persistSnapshot()` to distinguish no-session vs auth-error:
+     ```js
+     const { data: authData, error: authError } = await supabase.auth.getUser();
+     if (authError && !authData) return;
+     const userId = authData?.user?.id || "personal";
+     ```
+
+   - **`src/components/Navigation.jsx`** (MODIFIED)
+     - Added skip-to-content link as first child of the fragment:
+     ```jsx
+     <a href="#main-content" className="ab-skip-link">
+       Skip to main content
+     </a>
+     ```
+
+   - **`src/App.jsx`** (MODIFIED)
+     - Wrapped Routes in `<main id="main-content">` for skip link target
+
+   - **`src/index.css`** (MODIFIED)
+     - Added `.ab-skip-link` styles (hidden by default, visible on `:focus` at `top: 8px`)
+
+   - **`src/components/CommandCenter.jsx`** (MODIFIED)
+     - Added `aria-live="polite"` signal status summary div showing green/amber/red counts + threat level
+     - Updated version footer from v3.1 to v3.2
+
+   - **`src/components/DominoSection.jsx`** (MODIFIED)
+     - Changed `<h2>` inside `<button>` to `<span role="heading" aria-level="2">` (Codex fix for invalid HTML nesting)
+
+   - **`src/components/performance-lab/PerformanceView.jsx`** (MODIFIED)
+     - Changed "Portfolio Thesis Alignment" from `<div>` to `<h1>` with margin reset
+
+   - **`src/components/conviction/ConvictionScorecard.jsx`** (MODIFIED)
+     - Changed "Conviction Ledger" from `<div>` to `<h1>` with `S.label` styles
+     - Wrapped `formError` in `<div aria-live="assertive">`
+
+   - **`src/components/digests/DigestView.jsx`** (MODIFIED)
+     - Changed "Signal Digest Engine" from `<div>` to `<h1>` with margin reset
+     - Wrapped `feedback` in `<div aria-live="assertive">`
+
+   - **`src/components/GuidedTour.jsx`** (MAJOR REWRITE)
+     - Added imports: `useCallback`, `useThesis`, `isOwnerMode`, `getFredApiKey`, `getTwelveDataApiKey`
+     - Tour steps now in `ALL_TOUR_STEPS` with `ownerOnly` property on portfolio step
+     - Context-aware filtering: `steps = useMemo(() => ALL_TOUR_STEPS.filter(...).map(...), [hasApiKeys])`
+     - `hasThesis` gate prevents tour during onboarding
+     - Dynamic progress: "Step X of Y" where Y is filtered count
+     - API key detection: appends "Currently using sample data" to signal-cards step
+     - Focus management: `previousFocusRef` stores/restores focus, `cardRef` receives focus on open/step change
+     - Focus trap: Tab/Shift+Tab cycling within card buttons
+     - `role="dialog"` + `aria-modal="true"` on overlay
+     - `aria-live="polite"` on card content
+     - `closeTour` callback restores previous focus
+
+   - **`package.json`** (MODIFIED)
+     - Added scripts: `db:push`, `db:reset`, `functions:deploy`, `test:e2e`, `test:e2e:headed`
+     - Added devDependency: `@playwright/test: ^1.58.2`
+
+   - **`CODEX-REVIEW-PROMPT.md`** (REWRITTEN for v3.2)
+     - 9-section review checklist covering schema, auth bypass, accessibility, tour, components, regressions, security, performance, edge functions
+
+   - **`playwright.config.js`** (NEW)
+     - Uses `npm run preview` on port 4173, Chromium only, 1440x900 viewport
+
+   - **`e2e/onboarding.spec.js`** (NEW) - 3 tests for onboarding flow
+   - **`e2e/accessibility.spec.js`** (NEW) - 11 tests for a11y (skip link, headings, aria-live, focus-visible)
+   - **`e2e/guided-tour.spec.js`** (NEW) - 8 tests for tour (show/hide, dialog, steps, escape, skip, focus trap)
+   - **`e2e/navigation.spec.js`** (NEW) - 9 tests for nav, themes, display mode
+   - **`e2e/conviction.spec.js`** (NEW) - 6 tests for conviction scorecard
+   - **`e2e/digests.spec.js`** (NEW) - 6 tests for digest view
+
+   - **`src/config/thesis-schema.js`** (READ ONLY)
+     - Critical for understanding test failures. Validates thesis requires: `meta` (name, version strings), `dominos` (non-empty array, each with id, name, color, icon, description, signals array with full signal objects, thresholds object), `sources` (non-empty array with title, author, date, url, type, color), `portfolio` (with legs array), `careerProfile` (with goals array)
+
+4. Errors and fixes:
+   - **Codex HIGH: h2 inside button** — Invalid HTML content model. Fixed by replacing `<h2>` with `<span role="heading" aria-level="2">` in DominoSection.jsx
+   - **Codex HIGH: Auth errors mixed with no-session** — `usePredictions.js` treated all auth failures as "no user" and routed to "personal". Fixed by distinguishing: `data.user` present → use real user; `data && !data.user` (no session) → use "personal"; `error && !data` (auth check failed) → fall back to local. Same pattern applied to `usePortfolioData.js`.
+   - **Codex HIGH: No focus trap in modal tour** — Tour had `role="dialog"` + `aria-modal` but Tab could escape. Fixed by adding Tab/Shift+Tab focus cycling within the card's focusable elements.
+   - **Codex MEDIUM: No CHECK constraints** — Added `CHECK (type IN ('threshold','direction','range'))` and `CHECK (outcome IS NULL OR outcome IN ('hit','miss','partial'))` to predictions migration.
+   - **Codex LOW: Missing IF NOT EXISTS on indexes** — Added `IF NOT EXISTS` to all `CREATE INDEX` statements in all 3 migrations.
+   - **Playwright test failures (CURRENT)**: 36 of 46 tests failing because the `seedThesis` function creates a minimal thesis object `{ version: 1, career: {...}, portfolio: { legs: [] }, dominoCustomizations: {} }` that fails `validateThesis()` validation. The schema requires `meta`, `dominos` (non-empty with full signal structure), `sources` (non-empty), `portfolio`, and `careerProfile` (with goals array). The app redirects all pages to `/onboarding` because `hasThesis` is false.
+
+5. Problem Solving:
+   - **Auth bypass for single-user app**: Solved by using `user_id: "personal"` as default, with careful distinction between "no session configured" (expected, use personal) and "auth check failed" (unexpected, fall back to local storage)
+   - **Heading inside button**: Solved with ARIA role approach (`role="heading" aria-level="2"` on span) instead of restructuring the component
+   - **Tour context-awareness**: Solved by filtering `ALL_TOUR_STEPS` based on `isOwnerMode` and enriching descriptions based on `hasApiKeys`
+   - **UNSOLVED: Test thesis fixture**: The Playwright tests need a valid thesis object that passes the strict `validateThesis()` schema. Need to either use `fabian-thesis.js` data or build a minimal valid fixture with all required fields.
+
+6. All user messages:
+   - "Implement the following plan: # AsymmetricBridge v3.2 — 'Make It Actually Work' [full plan with Batches A-D]"
+   - "Please make sure To write a Codex prompt to do a code review like we did for the previous version 3.1"
+   - "And give me the prompt here"
+   - "from codex: [full Codex review findings — 0 CRITICAL, 3 HIGH, 2 MEDIUM, 1 LOW]"
+   - "Please go ahead and fix all the things that are able to be fixed right now and then we'll go into testing and then we'll go into the 3.3"
+
+7. Pending Tasks:
+   - Fix Playwright test thesis seed to pass `validateThesis()` — need a valid fixture with meta, dominos (with signals + thresholds), sources, portfolio, and careerProfile
+   - Run tests again to get green suite
+   - Batch B: Edge function deployment (needs Fabian's Telegram credentials + Supabase dashboard config)
+   - Supabase migration deployment (`supabase db push`)
+   - Move to v3.3 after testing is complete
+
+8. Current Work:
+   I was setting up and running the Playwright e2e test suite. The first test run (`npx playwright test`) showed 36/46 failures. I then read `src/config/thesis-schema.js` to understand why — the thesis seed object in the test specs is too minimal and fails validation. The `validateThesis()` function requires: `meta` (object with `name` and `version` strings), `dominos` (non-empty array where each domino has `id`, `name`, `color`, `icon`, `description`, `signals` array with full signal objects including `currentStatus`/`source`/`frequency`/`baseline`/`threshold`/`notes`/`dataPoints`, and `thresholds` object), `sources` (non-empty array), `portfolio` (with `legs` array), and `careerProfile` (with `goals` array). The conversation was interrupted for this summary request right after reading the thesis schema.
+
+9. Optional Next Step:
+   Fix the `seedThesis()` helper function used across all e2e test files to provide a valid thesis object that passes `validateThesis()`. This likely means either: (a) reading `src/config/fabian-thesis.js` and using its structure as a template, or (b) building a minimal but schema-valid fixture with all required fields populated. Then re-run `npx playwright test` to verify tests pass. This directly continues the user's request: "Please go ahead and fix all the things that are able to be fixed right now and then we'll go into testing and then we'll go into the 3.3"
+
+If you need specific details from before compaction (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/fabianaguilar/.REDACTED.jsonl
+Please continue the conversation from where we left off without asking the user any further questions. Continue with the last task that you were asked to work on.
+
+---
+
+Commit and should we finish off v3.2? And then move onto v3.3
