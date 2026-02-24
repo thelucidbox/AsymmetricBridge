@@ -36,3 +36,41 @@ Give it to me give me the prompt here so I can just drop it in the Codex app. Yo
 
 yes commit please
 
+### Prompt 5
+
+Concerning the Codex prompt, should I just open this on the main one like what folder or directory should I point it to what path?
+
+### Prompt 6
+
+Here is what Codex found:**CRITICAL**
+[CRITICAL] [src/components/onboarding/APIKeySetup.jsx:26](/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/onboarding/APIKeySetup.jsx:26) — Onboarding API keys are saved, but never used by live data hooks.
+Why: Keys are written to `localStorage`, while runtime fetchers only read build-time env constants in [src/lib/fred.js:5](/Users/fabianaguilar/Projects/AsymmetricBridge/src/lib/fred.js:5), [src/lib/stocks.js:5](/Users/fabianaguilar/Projects/...
+
+### Prompt 7
+
+Run all four please
+
+### Prompt 8
+
+<teammate-message teammate_id="a11y-fixes" color="blue" summary="Batch B: All 3 accessibility fixes complete">
+Batch B accessibility fixes are complete. Here's what was done:
+
+**1. Removed `outline: "none"` from inline styles (2 files):**
+- `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/SignalUpdateForm.jsx` line 63 — removed from `selectStyle`
+- `/Users/fabianaguilar/Projects/AsymmetricBridge/src/components/digests/DigestView.jsx` line 68 — removed from `selectStyle`
+
+**2. C...
+
+### Prompt 9
+
+<teammate-message teammate_id="system">
+{"type":"teammate_terminated","message":"polish has shut down."}
+</teammate-message>
+
+<teammate-message teammate_id="polish" color="yellow">
+{"type":"idle_notification","from":"polish","timestamp":"2026-02-24T00:03:09.915Z","idleReason":"available"}
+</teammate-message>
+
+<teammate-message teammate_id="polish" color="yellow">
+{"type":"shutdown_approved","requestId":"shutdown-1771891375721@polish","from":"polish","timestamp":"2026-02-24T00:03:13.801Z","paneId...
+

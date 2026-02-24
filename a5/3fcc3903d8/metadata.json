@@ -3,7 +3,7 @@
   "checkpoint_id": "a53fcc3903d8",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 2,
+  "checkpoints_count": 3,
   "files_touched": [
     ".env.example",
     "ARCHITECTURE.md",
@@ -19,7 +19,6 @@
     "productivity/TODO.md",
     "src/App.jsx",
     "src/components/CommandCenter.jsx",
-    "src/components/GlossaryPage.jsx",
     "src/components/GlossaryTooltip.jsx",
     "src/components/Navigation.jsx",
     "src/components/conviction/ConvictionScorecard.jsx",
@@ -31,8 +30,12 @@
     "src/config/ThesisContext.jsx",
     "src/design-tokens/observatory.js",
     "src/design-tokens/terminal.js",
+    "src/hooks/useFredData.js",
+    "src/hooks/useStockData.js",
     "src/index.css",
     "src/lib/export-utils.js",
+    "src/lib/fred.js",
+    "src/lib/stocks.js",
     "src/main.jsx",
     "test-screenshots/01_initial_load.png",
     "test-screenshots/02a_onboarding_step1_welcome.png",
@@ -68,10 +71,10 @@
     }
   ],
   "token_usage": {
-    "input_tokens": 152,
-    "cache_creation_tokens": 401847,
-    "cache_read_tokens": 13977716,
-    "output_tokens": 20115,
-    "api_call_count": 110
+    "input_tokens": 150,
+    "cache_creation_tokens": 214907,
+    "cache_read_tokens": 14488309,
+    "output_tokens": 13111,
+    "api_call_count": 108
   }
 }
