@@ -43,3 +43,7 @@ Let me chronologically analyze the conversation:
 
 Commit and should we finish off v3.2? And then move onto v3.3
 
+### Prompt 6
+
+What do you suggest? Should we run the sub base deploy now or just skip batch B for now and move straight to planning for a v3.3?If we skip for now, I just don't want you to forget about it
+

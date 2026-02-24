@@ -3,7 +3,7 @@
   "checkpoint_id": "a53fcc3903d8",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 6,
+  "checkpoints_count": 3,
   "files_touched": [
     ".env.example",
     "ARCHITECTURE.md",
@@ -55,7 +55,6 @@
     "supabase/migrations/002_create_predictions.sql",
     "supabase/migrations/003_create_portfolio_snapshots.sql",
     "supabase/migrations/004_create_digests.sql",
-    "test-results/.last-run.json",
     "test-screenshots/01_initial_load.png",
     "test-screenshots/02a_onboarding_step1_welcome.png",
     "test-screenshots/02b_career_validation_errors.png",
@@ -97,10 +96,10 @@
     }
   ],
   "token_usage": {
-    "input_tokens": 258,
-    "cache_creation_tokens": 765978,
-    "cache_read_tokens": 23389383,
-    "output_tokens": 37452,
-    "api_call_count": 196
+    "input_tokens": 1661,
+    "cache_creation_tokens": 373340,
+    "cache_read_tokens": 13524436,
+    "output_tokens": 19785,
+    "api_call_count": 110
   }
 }
