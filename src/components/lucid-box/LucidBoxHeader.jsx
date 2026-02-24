@@ -59,7 +59,7 @@ export default function LucidBoxHeader({
             fontFamily: tokens.typography.fontMono,
           }}
         >
-          Dashboard · Signal Tracker · Portfolio · Jobs
+          Dashboard · Signal Tracker · Portfolio
         </p>
       </div>
 
@@ -100,12 +100,6 @@ export default function LucidBoxHeader({
           style={S.sectionTab(section === "thesis", tokens.colors.dominoPolicy)}
         >
           Thesis & Portfolio
-        </button>
-        <button
-          onClick={() => onSwitchSection("jobs")}
-          style={S.sectionTab(section === "jobs", tokens.colors.baseline)}
-        >
-          AI Jobs
         </button>
       </div>
     </>

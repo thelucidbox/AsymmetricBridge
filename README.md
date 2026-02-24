@@ -5,7 +5,7 @@
 <h1 align="center">Asymmetric Bridge</h1>
 
 <p align="center">
-  <strong>Open-source macro intelligence platform. Track your thesis. Score your conviction.</strong>
+  <strong>Track the AI macro theses that are moving markets — against your career and your portfolio.</strong>
 </p>
 
 <p align="center">
@@ -23,9 +23,13 @@
 
 ---
 
-Most people invest based on vibes, not conviction. Asymmetric Bridge gives you a structured framework to define your macro thesis as a chain of dominos, connect each one to live economic signals, upload your portfolio, and see if your bets actually match your beliefs.
+There are thought pieces right now that are genuinely moving markets — [The 2028 Global Intelligence Crisis](https://www.citriniresearch.com/p/the-2028-global-intelligence-crisis) by Citrini & Alap Shah, the [Leopold Aschenbrenner situational awareness](https://situational-awareness.ai/) essays, the [Bull Rebuttal](https://www.theatlantic.com/technology/archive/2024/01/ai-optimism-economy/677061/). Big claims about where AI and the economy are headed.
 
-No black boxes. No subscriptions. Your API keys stay in your browser. You own the data.
+Asymmetric Bridge is a project that helps you track these theses against real economic data — and see how they might affect your professional life and your investments. Define a thesis as a chain of dominos, connect each one to live signals, upload your portfolio, and see what's actually moving.
+
+Not investment advice. Not a platform. Just an open source tool born from reading too many macro research papers and wanting a structured way to follow the answers.
+
+No black boxes. No subscriptions. Clone it, run it yourself. Your API keys stay in your browser.
 
 ## Quickstart
 

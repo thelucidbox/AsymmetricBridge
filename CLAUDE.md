@@ -3,7 +3,7 @@
 ## Identity
 **Type:** Web app (Strategic Intelligence Platform)
 **Stack:** Vite + React + Supabase + FRED API + CoinGecko + Twelve Data
-**Vision:** Strategic intelligence platform — personal edition is Fabian's command center with ALOS/Claude Code integration; open source edition lets anyone build their own macro thesis dashboard with onboarding wizard, educational layer, and brokerage integration.
+**Vision:** Open source macro thesis tracker — define your thesis as a chain of dominos, connect each to live economic signals, and see how your portfolio and career align with the macro landscape.
 
 ## On-Demand Context
 @.claude/context/data-sources.md
@@ -43,8 +43,3 @@
 - OSS packaging (LICENSE, README, CONTRIBUTING, exports)
 - Backend: Supabase persistence, edge functions deployed, Telegram alerts
 
-## ALOS Integration
-- Pipeline: /pipeline status
-- Session: /start-session → work → /wrap-up
-- Quality: /self-review → /design-review → /baseline-ui → /fixing-accessibility → /fixing-metadata → /ship
-- Signal updates: /signal-update skill

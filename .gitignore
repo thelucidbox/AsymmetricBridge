@@ -29,6 +29,13 @@ dist-ssr
 .env.*.local
 .vercel
 
+# Test artifacts
+test-results/
+test-screenshots/
+
+# Internal planning docs (keep local, not in repo)
+productivity/
+
 # Remotion video project (dev-only)
 video/node_modules
 video/out

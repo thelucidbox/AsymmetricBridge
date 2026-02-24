@@ -43,11 +43,11 @@ const POSITIONING = [
   {
     leg: "BUILD the Adaptation",
     thesis:
-      "You ARE the 'New Guilds' thesis — Lucid Box is the adaptation play",
+      "The 'New Guilds' thesis — displaced workers + cheap AI = new businesses",
     color: "#6D6875",
     tickers: [],
     notes:
-      "Bloch's rebuttal: displaced workers + cheap AI = business formation explosion. Your consulting practice is this thesis in action.",
+      "Bloch's rebuttal: displaced workers + cheap AI = business formation explosion. New guild-style entrepreneurship emerges.",
   },
 ];
 

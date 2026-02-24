@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-import AIJobs from "./AIJobs";
 import ErrorBoundary from "./ErrorBoundary";
 import ThesisPortfolio from "./ThesisPortfolio";
 import LucidBoxHeader from "./lucid-box/LucidBoxHeader";
@@ -386,12 +385,6 @@ export default function CommandCenter() {
         {section === "thesis" && (
           <ErrorBoundary>
             <ThesisPortfolio />
-          </ErrorBoundary>
-        )}
-
-        {section === "jobs" && (
-          <ErrorBoundary>
-            <AIJobs />
           </ErrorBoundary>
         )}
 

@@ -8,7 +8,7 @@
 
 ## Quick Start
 ```bash
-git clone git@github.com:yourusername/AsymmetricBridge.git
+git clone git@github.com:thelucidbox/AsymmetricBridge.git
 cd AsymmetricBridge
 npm install
 cp .env.example .env    # Fill in API keys
@@ -26,12 +26,6 @@ VITE_FRED_API_KEY=your-fred-key
 ```
 AsymmetricBridge/
 ├── CLAUDE.md                  # Project instructions
-├── AGENTS.md                  # Codex context
-├── GEMINI.md                  # Gemini context
-├── QUESTIONS.md               # Architecture questions
-├── productivity/
-│   ├── TODO.md                # Task tracking
-│   └── SESSION_LOG.md         # Session history
 ├── docs/
 │   ├── INDEX.md               # Documentation map
 │   ├── tutorials/
@@ -45,20 +39,15 @@ AsymmetricBridge/
 │   ├── components/            # UI components
 │   │   ├── CommandCenter.jsx  # Main dashboard
 │   │   └── SourceMaterials.jsx # Thesis comparison
+│   ├── config/                # Thesis configuration
 │   ├── data/                  # Static data
-│   ├── lib/                   # API clients
+│   ├── lib/                   # API clients + utilities
 │   └── hooks/                 # Data fetching hooks
 └── supabase/
     └── migrations/            # Database schema
 ```
 
-## Development Pipeline
-This project uses the ALOS development pipeline:
-```
-/scaffold-project → /clarify → /spec → /design → /forge → /self-review → /ship
-```
-Run `/pipeline status` to see where you are.
-
 ## Next Steps
-- [ ] Run `/clarify` to sharpen the project vision
-- [ ] Run `/spec` to decompose into features and tasks
+- Customize the thesis in `src/config/default-thesis.js`
+- Add your own API keys for live data feeds
+- Upload a brokerage CSV in the Performance Lab
