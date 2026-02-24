@@ -9,6 +9,7 @@ import {
 } from "../lib/prediction-engine";
 import { calculateBattingAverage } from "../lib/prediction-scorer";
 import { supabase } from "../lib/supabase";
+import { useAuth } from "../lib/AuthContext";
 
 const PREDICTION_COLUMNS =
   "id,user_id,signal_id,type,condition,target_date,created_at,scored_at,outcome,notes";
@@ -46,22 +47,6 @@ function normalizePredictionRecord(row, signalById = new Map()) {
   };
 }
 
-async function resolveStorageMode() {
-  if (!supabase) return { mode: "local", user: null };
-
-  try {
-    const { data, error } = await supabase.auth.getUser();
-    if (data?.user) return { mode: "supabase", user: data.user };
-    if (data && !data.user) {
-      return { mode: "supabase", user: { id: "personal" } };
-    }
-    if (error) return { mode: "local", user: null };
-    return { mode: "supabase", user: { id: "personal" } };
-  } catch {
-    return { mode: "local", user: null };
-  }
-}
-
 async function fetchSupabasePredictions(userId) {
   const { data, error } = await supabase
     .from("predictions")
@@ -95,13 +80,13 @@ async function fetchSupabasePredictions(userId) {
 
 export function usePredictions() {
   const queryClient = useQueryClient();
+  const { userId } = useAuth();
 
   const predictionsQuery = useQuery({
-    queryKey: ["predictions"],
+    queryKey: ["predictions", userId],
     queryFn: async () => {
-      const storage = await resolveStorageMode();
-      if (storage.mode === "supabase" && storage.user?.id) {
-        return fetchSupabasePredictions(storage.user.id);
+      if (supabase) {
+        return fetchSupabasePredictions(userId);
       }
 
       return readStoredPredictions().sort(
@@ -115,9 +100,8 @@ export function usePredictions() {
   const addPredictionMutation = useMutation({
     mutationFn: async ({ template, params }) => {
       const built = createPrediction(template, params);
-      const storage = await resolveStorageMode();
 
-      if (storage.mode === "supabase" && storage.user?.id) {
+      if (supabase) {
         if (!built.signalId) {
           throw new Error(
             "Signal id is required to store predictions in Supabase",
@@ -125,7 +109,7 @@ export function usePredictions() {
         }
 
         const insertPayload = {
-          user_id: storage.user.id,
+          user_id: userId,
           signal_id: built.signalId,
           type: built.type,
           condition: built.condition,
@@ -158,14 +142,13 @@ export function usePredictions() {
 
   const scorePredictionMutation = useMutation({
     mutationFn: async ({ id, outcome }) => {
-      const storage = await resolveStorageMode();
       const normalizedOutcome = normalizeOutcome(outcome);
 
       if (!normalizedOutcome) {
         throw new Error(`Invalid prediction outcome: "${outcome}"`);
       }
 
-      if (storage.mode === "supabase" && storage.user?.id) {
+      if (supabase) {
         const updatePayload = {
           outcome: normalizedOutcome,
           scored_at: new Date().toISOString(),
@@ -175,7 +158,7 @@ export function usePredictions() {
           .from("predictions")
           .update(updatePayload)
           .eq("id", id)
-          .eq("user_id", storage.user.id)
+          .eq("user_id", userId)
           .select(PREDICTION_COLUMNS)
           .single();
 

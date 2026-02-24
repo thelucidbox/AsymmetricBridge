@@ -6,6 +6,7 @@ import {
   Routes,
   useLocation,
 } from "react-router-dom";
+import AuthPage from "./components/auth/AuthPage";
 import CommandCenter from "./components/CommandCenter";
 import DigestView from "./components/digests/DigestView";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -15,6 +16,7 @@ import PerformanceView from "./components/performance-lab/PerformanceView";
 import ConvictionScorecard from "./components/conviction/ConvictionScorecard";
 import GlossaryPage from "./components/GlossaryPage";
 import { useThesis } from "./config/ThesisContext";
+import { useAuth } from "./lib/AuthContext";
 import { useTheme } from "./design-tokens";
 import { S } from "./styles";
 
@@ -90,11 +92,42 @@ export default function App() {
   );
 }
 
+function AuthLoading({ tokens }) {
+  return (
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: tokens.colors.bg,
+      }}
+    >
+      <div
+        style={{
+          fontSize: tokens.typography.sizes.label,
+          fontFamily: tokens.typography.fontMono,
+          color: tokens.colors.textMuted,
+          letterSpacing: tokens.typography.letterSpacing.mono,
+          textTransform: "uppercase",
+        }}
+      >
+        Loading...
+      </div>
+    </div>
+  );
+}
+
 function AppShell() {
   const location = useLocation();
   const { tokens } = useTheme();
+  const { user, loading, requireAuth } = useAuth();
   const { hasThesis, isTestMode } = useThesis();
   const isOnboardingRoute = location.pathname === "/onboarding";
+
+  if (loading) return <AuthLoading tokens={tokens} />;
+
+  if (requireAuth && !user) return <AuthPage />;
 
   const needsOnboarding = !hasThesis || isTestMode;
 

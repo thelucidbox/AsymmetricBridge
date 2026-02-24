@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useThesis, isOwnerMode } from "../../config/ThesisContext";
 import fabianThesis from "../../config/fabian-thesis";
 import { validateThesis } from "../../config/thesis-schema";
+import { useAuth } from "../../lib/AuthContext";
+import { supabase } from "../../lib/supabase";
 import { useTheme } from "../../design-tokens";
 import { S } from "../../styles";
 import APIKeySetup from "./APIKeySetup";
@@ -88,10 +90,34 @@ function normalizeGoals(goals) {
   return [...new Set((goals || []).map((goal) => goal.trim()).filter(Boolean))];
 }
 
+async function seedSignalStatuses(userId, dominos) {
+  if (!supabase || !dominos?.length) return;
+
+  const rows = dominos.flatMap((domino) =>
+    domino.signals.map((signal) => ({
+      user_id: userId,
+      domino_id: domino.id,
+      signal_name: signal.name,
+      status: "green",
+      is_override: false,
+      updated_by: "seed",
+    })),
+  );
+
+  const { error } = await supabase
+    .from("signal_statuses")
+    .upsert(rows, { onConflict: "user_id,domino_id,signal_name" });
+
+  if (error) {
+    console.warn("Unable to seed signal statuses:", error.message);
+  }
+}
+
 export default function OnboardingWizard() {
   const { tokens } = useTheme();
   const navigate = useNavigate();
   const { updateThesis, isTestMode, exitTestMode } = useThesis();
+  const { userId } = useAuth();
 
   const [currentStep, setCurrentStep] = useState(0);
   const [draftThesis, setDraftThesis] = useState(() =>
@@ -255,6 +281,7 @@ export default function OnboardingWizard() {
     setStepErrors((current) => ({ ...current, submit: "" }));
 
     updateThesis(candidate);
+    seedSignalStatuses(userId, candidate.dominos);
     navigate("/", { replace: true });
   };
 

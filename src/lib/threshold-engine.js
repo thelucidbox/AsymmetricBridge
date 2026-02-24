@@ -104,7 +104,11 @@ export function evaluateAllSignals({ fredData, stockData, cryptoData }) {
 }
 
 // Apply evaluation results to Supabase — respects manual overrides
-export async function applyEvaluationResults(results, currentStatuses) {
+export async function applyEvaluationResults(
+  results,
+  currentStatuses,
+  userId = "personal",
+) {
   if (!supabase) return { applied: 0, skipped: 0, errors: [] };
 
   const changes = [];
@@ -171,7 +175,8 @@ export async function applyEvaluationResults(results, currentStatuses) {
         })
         .eq("domino_id", change.domino_id)
         .eq("signal_name", change.signal_name)
-        .eq("is_override", false); // Extra safety: never overwrite manual
+        .eq("is_override", false)
+        .eq("user_id", userId);
 
       if (updateErr) throw updateErr;
 
@@ -183,6 +188,7 @@ export async function applyEvaluationResults(results, currentStatuses) {
         new_status: change.new_status,
         trigger_type: "auto",
         reason: change.reason,
+        user_id: userId,
       });
 
       if (histErr) throw histErr;

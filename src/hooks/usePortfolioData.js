@@ -4,6 +4,7 @@ import { calculateAlignmentScore } from "../lib/alignment-score";
 import { parsePortfolioCsv } from "../lib/csv-parser";
 import { mapPositionsToLegs } from "../lib/leg-mapper";
 import { supabase } from "../lib/supabase";
+import { useAuth } from "../lib/AuthContext";
 
 const EMPTY_ALIGNMENT = {
   score: 0,
@@ -29,14 +30,10 @@ function analyzePortfolioPositions(positions, thesisLegs) {
   };
 }
 
-async function persistSnapshot(parsedPortfolio, analyzedPortfolio) {
+async function persistSnapshot(parsedPortfolio, analyzedPortfolio, userId) {
   if (!supabase) return;
 
   try {
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    if (authError && !authData) return;
-    const userId = authData?.user?.id || "personal";
-
     const snapshotPayload = {
       user_id: userId,
       captured_at: new Date().toISOString(),
@@ -69,6 +66,7 @@ async function persistSnapshot(parsedPortfolio, analyzedPortfolio) {
 
 export function usePortfolioData() {
   const { thesis } = useThesis();
+  const { userId } = useAuth();
   const [positions, setPositions] = useState([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [detectedFormat, setDetectedFormat] = useState(null);
@@ -115,7 +113,7 @@ export function usePortfolioData() {
         }
 
         if (options.persist !== false) {
-          await persistSnapshot(parsed, analysis);
+          await persistSnapshot(parsed, analysis, userId);
         }
 
         return {
@@ -126,7 +124,7 @@ export function usePortfolioData() {
         setIsProcessing(false);
       }
     },
-    [thesisLegs],
+    [thesisLegs, userId],
   );
 
   return {

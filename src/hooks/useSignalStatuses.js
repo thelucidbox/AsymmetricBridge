@@ -1,14 +1,18 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../lib/supabase";
+import { useAuth } from "../lib/AuthContext";
 
 export function useSignalStatuses() {
+  const { userId } = useAuth();
+
   return useQuery({
-    queryKey: ["signal-statuses"],
+    queryKey: ["signal-statuses", userId],
     queryFn: async () => {
       if (!supabase) return null;
       const { data, error } = await supabase
         .from("signal_statuses")
         .select("*")
+        .eq("user_id", userId)
         .order("domino_id");
       if (error) throw error;
       return data;
@@ -20,13 +24,16 @@ export function useSignalStatuses() {
 }
 
 export function useSignalHistory(dominoId, signalName) {
+  const { userId } = useAuth();
+
   return useQuery({
-    queryKey: ["signal-history", dominoId, signalName],
+    queryKey: ["signal-history", userId, dominoId, signalName],
     queryFn: async () => {
       if (!supabase) return [];
       let query = supabase
         .from("signal_history")
         .select("*")
+        .eq("user_id", userId)
         .order("changed_at", { ascending: false })
         .limit(10);
 
@@ -44,6 +51,7 @@ export function useSignalHistory(dominoId, signalName) {
 
 export function useUpdateSignalStatus() {
   const queryClient = useQueryClient();
+  const { userId } = useAuth();
 
   return useMutation({
     mutationFn: async ({
@@ -55,19 +63,18 @@ export function useUpdateSignalStatus() {
     }) => {
       if (!supabase) throw new Error("Supabase not configured");
 
-      // Get current status for history
       const { data: current } = await supabase
         .from("signal_statuses")
         .select("status")
         .eq("domino_id", dominoId)
         .eq("signal_name", signalName)
+        .eq("user_id", userId)
         .single();
 
       const oldStatus = current?.status || "green";
 
       if (oldStatus === newStatus) return { skipped: true };
 
-      // Update status
       const { error: updateError } = await supabase
         .from("signal_statuses")
         .update({
@@ -77,11 +84,11 @@ export function useUpdateSignalStatus() {
           updated_by: triggerType === "manual" ? "manual" : "system",
         })
         .eq("domino_id", dominoId)
-        .eq("signal_name", signalName);
+        .eq("signal_name", signalName)
+        .eq("user_id", userId);
 
       if (updateError) throw updateError;
 
-      // Write history
       const { error: historyError } = await supabase
         .from("signal_history")
         .insert({
@@ -91,6 +98,7 @@ export function useUpdateSignalStatus() {
           new_status: newStatus,
           trigger_type: triggerType,
           reason: reason || null,
+          user_id: userId,
         });
 
       if (historyError) throw historyError;
@@ -106,13 +114,16 @@ export function useUpdateSignalStatus() {
 }
 
 export function useRecentHistory() {
+  const { userId } = useAuth();
+
   return useQuery({
-    queryKey: ["signal-history-recent"],
+    queryKey: ["signal-history-recent", userId],
     queryFn: async () => {
       if (!supabase) return [];
       const { data, error } = await supabase
         .from("signal_history")
         .select("*")
+        .eq("user_id", userId)
         .order("changed_at", { ascending: false })
         .limit(10);
       if (error) throw error;

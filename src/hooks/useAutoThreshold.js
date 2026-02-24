@@ -5,6 +5,7 @@ import {
   applyEvaluationResults,
 } from "../lib/threshold-engine";
 import { supabase } from "../lib/supabase";
+import { useAuth } from "../lib/AuthContext";
 
 // Persist extracted values to signal_data_points so the server-side cron
 // can evaluate thresholds even when the dashboard isn't open
@@ -41,6 +42,7 @@ export function useAutoThreshold({
   signalStatuses,
 }) {
   const queryClient = useQueryClient();
+  const { userId } = useAuth();
   const lastRunRef = useRef(0);
   const [lastResult, setLastResult] = useState(null);
 
@@ -61,7 +63,11 @@ export function useAutoThreshold({
       await persistDataPoints(results);
 
       // Apply status changes to Supabase (respects overrides + idempotency)
-      const outcome = await applyEvaluationResults(results, signalStatuses);
+      const outcome = await applyEvaluationResults(
+        results,
+        signalStatuses,
+        userId,
+      );
 
       setLastResult({
         timestamp: new Date().toISOString(),
@@ -77,7 +83,7 @@ export function useAutoThreshold({
     }
 
     runEvaluation();
-  }, [fredData, stockData, cryptoData, signalStatuses, queryClient]);
+  }, [fredData, stockData, cryptoData, signalStatuses, queryClient, userId]);
 
   return lastResult;
 }

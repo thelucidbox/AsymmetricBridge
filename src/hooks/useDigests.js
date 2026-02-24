@@ -19,6 +19,7 @@ import {
 } from "../lib/digest-templates";
 import { generateAIDigest } from "../lib/ai-digest";
 import { supabase } from "../lib/supabase";
+import { useAuth } from "../lib/AuthContext";
 
 const DIGESTS_QUERY_KEY = ["signal-digests"];
 const DIGEST_STORAGE_KEY = "ab-signal-digests";
@@ -112,7 +113,7 @@ function persistLocalDigest(digest) {
   return next;
 }
 
-async function loadDigests() {
+async function loadDigests(userId) {
   if (!supabase) return readLocalDigests();
 
   try {
@@ -121,6 +122,7 @@ async function loadDigests() {
       .select(
         "id, period_start, period_end, content_md, threat_level, generated_at, escalation_count, deescalation_count",
       )
+      .eq("user_id", userId)
       .order("generated_at", { ascending: false })
       .limit(100);
 
@@ -141,9 +143,11 @@ async function loadDigests() {
 
 export function useDigests() {
   const queryClient = useQueryClient();
+  const { userId } = useAuth();
+
   const digestsQuery = useQuery({
-    queryKey: DIGESTS_QUERY_KEY,
-    queryFn: loadDigests,
+    queryKey: [...DIGESTS_QUERY_KEY, userId],
+    queryFn: () => loadDigests(userId),
     staleTime: 60 * 1000,
   });
 
@@ -155,6 +159,7 @@ export function useDigests() {
       const contentHtml = markdownToHtml(contentMd);
       const generatedAt = new Date().toISOString();
       const payload = {
+        user_id: userId,
         period_start:
           aggregatedData?.period?.startDate || generatedAt.slice(0, 10),
         period_end: aggregatedData?.period?.endDate || generatedAt.slice(0, 10),

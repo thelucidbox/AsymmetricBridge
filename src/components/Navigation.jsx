@@ -7,6 +7,7 @@ import {
   useDisplayMode,
 } from "../hooks/useDisplayMode";
 import { isOwnerMode, useThesis } from "../config/ThesisContext";
+import { useAuth } from "../lib/AuthContext";
 import GuidedTour from "./GuidedTour";
 import { S } from "../styles";
 
@@ -53,6 +54,7 @@ export default function Navigation({
   const { tokens } = useTheme();
   const displayMode = useDisplayMode();
   const { enterTestMode } = useThesis();
+  const { requireAuth, signOut } = useAuth();
   const [isMobile, setIsMobile] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const drawerRef = useRef(null);
@@ -155,10 +157,8 @@ export default function Navigation({
           zIndex: tokens.zIndex.nav,
           background: tokens.colors.navBg,
           borderBottom: `1px solid ${tokens.colors.border}`,
-          backdropFilter: tokens.useGlass ? tokens.glass.blur : "blur(12px)",
-          WebkitBackdropFilter: tokens.useGlass
-            ? tokens.glass.blur
-            : "blur(12px)",
+          backdropFilter: tokens.glass.blur,
+          WebkitBackdropFilter: tokens.glass.blur,
         }}
       >
         <div
@@ -261,6 +261,29 @@ export default function Navigation({
                   </button>
                 </div>
               )}
+
+              {requireAuth && (
+                <div
+                  style={{
+                    marginLeft: 2,
+                    paddingLeft: 8,
+                    borderLeft: `1px solid ${tokens.colors.border}`,
+                  }}
+                >
+                  <button
+                    onClick={signOut}
+                    style={{
+                      ...S.tab(false, tokens.colors.alert),
+                      fontSize: tokens.typography.sizes.label,
+                      fontFamily: tokens.typography.fontMono,
+                      textTransform: "uppercase",
+                      letterSpacing: tokens.typography.letterSpacing.label,
+                    }}
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
@@ -319,10 +342,8 @@ export default function Navigation({
             flexDirection: "column",
             gap: 8,
             transition: "left 0.2s ease",
-            backdropFilter: tokens.useGlass ? tokens.glass.blur : "blur(16px)",
-            WebkitBackdropFilter: tokens.useGlass
-              ? tokens.glass.blur
-              : "blur(16px)",
+            backdropFilter: tokens.glass.elevatedBlur,
+            WebkitBackdropFilter: tokens.glass.elevatedBlur,
           }}
         >
           {navSections.map((section) => renderNavButton(section, true))}
@@ -387,6 +408,22 @@ export default function Navigation({
                 }}
               >
                 Test as new user
+              </button>
+            )}
+
+            {requireAuth && (
+              <button
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  signOut();
+                }}
+                style={{
+                  ...S.tab(false, tokens.colors.alert),
+                  width: "100%",
+                  marginTop: 8,
+                }}
+              >
+                Sign Out
               </button>
             )}
           </div>
