@@ -77,7 +77,10 @@ export default function DominoSection({
                 flexWrap: "wrap",
               }}
             >
-              <span>{`Domino ${domino.id}: ${domino.name}`}</span>
+              <span
+                role="heading"
+                aria-level="2"
+              >{`Domino ${domino.id}: ${domino.name}`}</span>
               <span
                 style={{
                   fontSize: 10,

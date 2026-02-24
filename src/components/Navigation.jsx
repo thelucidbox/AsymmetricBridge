@@ -127,6 +127,9 @@ export default function Navigation({
 
   return (
     <>
+      <a href="#main-content" className="ab-skip-link">
+        Skip to main content
+      </a>
       <nav
         style={{
           position: "sticky",

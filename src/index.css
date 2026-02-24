@@ -94,6 +94,26 @@ button {
   font: inherit;
 }
 
+.ab-skip-link {
+  position: absolute;
+  top: -100%;
+  left: 16px;
+  z-index: 9999;
+  padding: 10px 16px;
+  background: var(--ab-color-bg);
+  color: var(--ab-color-text);
+  border: 2px solid rgba(255,255,255,0.48);
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: var(--ab-font-mono);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.ab-skip-link:focus {
+  top: 8px;
+}
+
 .ab-content-shell {
   width: min(100%, var(--ab-content-max-width));
   margin: 0 auto;

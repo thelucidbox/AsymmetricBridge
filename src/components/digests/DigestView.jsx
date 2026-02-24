@@ -147,7 +147,7 @@ export default function DigestView() {
       <div className="ab-content-shell" style={{ display: "grid", gap: 12 }}>
         <div style={{ ...S.card(tokens.colors.border), marginBottom: 0 }}>
           <div style={{ ...S.label, marginBottom: 8 }}>Signal Digests</div>
-          <div
+          <h1
             style={{
               fontSize:
                 tokens.variant === "observatory"
@@ -155,10 +155,11 @@ export default function DigestView() {
                   : 20,
               fontWeight: tokens.typography.weights.bold,
               marginBottom: 8,
+              margin: "0 0 8px 0",
             }}
           >
             Signal Digest Engine
-          </div>
+          </h1>
           <div
             style={{
               fontSize: tokens.typography.sizes.body,
@@ -219,22 +220,24 @@ export default function DigestView() {
             </button>
           </div>
 
-          {feedback && (
-            <div
-              style={{
-                marginTop: 10,
-                fontSize:
-                  tokens.typography.sizes.bodySmall ||
-                  tokens.typography.sizes.body,
-                color:
-                  feedback.type === "error"
-                    ? tokens.colors.alert
-                    : tokens.colors.baseline,
-              }}
-            >
-              {feedback.text}
-            </div>
-          )}
+          <div aria-live="assertive">
+            {feedback && (
+              <div
+                style={{
+                  marginTop: 10,
+                  fontSize:
+                    tokens.typography.sizes.bodySmall ||
+                    tokens.typography.sizes.body,
+                  color:
+                    feedback.type === "error"
+                      ? tokens.colors.alert
+                      : tokens.colors.baseline,
+                }}
+              >
+                {feedback.text}
+              </div>
+            )}
+          </div>
         </div>
 
         <div style={S.card(tokens.colors.border)}>

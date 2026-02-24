@@ -365,6 +365,19 @@ export default function CommandCenter() {
           isOwnerMode={isOwnerMode}
         />
 
+        <div
+          aria-live="polite"
+          style={{
+            fontSize: 10,
+            color: "rgba(255,255,255,0.45)",
+            fontFamily: "'IBM Plex Mono', monospace",
+            letterSpacing: "0.3px",
+            marginBottom: 4,
+          }}
+        >
+          {greenCt} green · {amberCt} amber · {redCt} red — {threat}
+        </div>
+
         {!isOwnerMode && <SampleDataBanner />}
 
         {section === "lucidbox" && isOwnerMode && (
@@ -452,7 +465,7 @@ export default function CommandCenter() {
             borderTop: "1px solid rgba(255,255,255,0.04)",
           }}
         >
-          Asymmetric Bridge v3.1 · Signal Tracker + Thesis Dashboard · Not
+          Asymmetric Bridge v3.2 · Signal Tracker + Thesis Dashboard · Not
           financial advice
         </div>
       </div>

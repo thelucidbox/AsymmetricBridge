@@ -15,13 +15,16 @@ const PREDICTION_COLUMNS =
 
 function normalizeOutcome(value) {
   const normalized = value == null ? null : String(value).trim().toLowerCase();
-  return normalized === "hit" || normalized === "miss" || normalized === "partial"
+  return normalized === "hit" ||
+    normalized === "miss" ||
+    normalized === "partial"
     ? normalized
     : null;
 }
 
 function normalizePredictionRecord(row, signalById = new Map()) {
-  const condition = row?.condition && typeof row.condition === "object" ? row.condition : {};
+  const condition =
+    row?.condition && typeof row.condition === "object" ? row.condition : {};
   const linkedSignal = row?.signal_id ? signalById.get(row.signal_id) : null;
   const outcome = normalizeOutcome(row?.outcome);
   const scoredAt = row?.scored_at || null;
@@ -48,8 +51,12 @@ async function resolveStorageMode() {
 
   try {
     const { data, error } = await supabase.auth.getUser();
-    if (error || !data?.user) return { mode: "local", user: null };
-    return { mode: "supabase", user: data.user };
+    if (data?.user) return { mode: "supabase", user: data.user };
+    if (data && !data.user) {
+      return { mode: "supabase", user: { id: "personal" } };
+    }
+    if (error) return { mode: "local", user: null };
+    return { mode: "supabase", user: { id: "personal" } };
   } catch {
     return { mode: "local", user: null };
   }
@@ -65,7 +72,9 @@ async function fetchSupabasePredictions(userId) {
   if (error) throw error;
   const rows = Array.isArray(data) ? data : [];
 
-  const signalIds = [...new Set(rows.map((row) => row.signal_id).filter(Boolean))];
+  const signalIds = [
+    ...new Set(rows.map((row) => row.signal_id).filter(Boolean)),
+  ];
   const signalById = new Map();
 
   if (signalIds.length > 0) {
@@ -96,7 +105,8 @@ export function usePredictions() {
       }
 
       return readStoredPredictions().sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
       );
     },
     staleTime: 30 * 1000,
@@ -109,7 +119,9 @@ export function usePredictions() {
 
       if (storage.mode === "supabase" && storage.user?.id) {
         if (!built.signalId) {
-          throw new Error("Signal id is required to store predictions in Supabase");
+          throw new Error(
+            "Signal id is required to store predictions in Supabase",
+          );
         }
 
         const insertPayload = {
@@ -193,7 +205,9 @@ export function usePredictions() {
   const scoredPredictions = useMemo(
     () =>
       predictions
-        .filter((prediction) => prediction.status === "scored" || prediction.outcome)
+        .filter(
+          (prediction) => prediction.status === "scored" || prediction.outcome,
+        )
         .sort((a, b) => {
           const left = new Date(b.scoredAt || b.targetDate || 0).getTime();
           const right = new Date(a.scoredAt || a.targetDate || 0).getTime();
@@ -212,7 +226,8 @@ export function usePredictions() {
     activePredictions,
     scoredPredictions,
     battingAverage,
-    addPrediction: async (template, params) => addPredictionMutation.mutateAsync({ template, params }),
+    addPrediction: async (template, params) =>
+      addPredictionMutation.mutateAsync({ template, params }),
     scorePrediction: async (id, outcome) =>
       scorePredictionMutation.mutateAsync({ id, outcome }),
     isLoading:

@@ -113,57 +113,59 @@ function AppShell() {
     >
       {!isOnboardingRoute && <Navigation />}
 
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <ErrorBoundary>
-              <CommandCenter />
-            </ErrorBoundary>
-          }
-        />
-        <Route
-          path="/onboarding"
-          element={
-            <ErrorBoundary>
-              <OnboardingWizard />
-            </ErrorBoundary>
-          }
-        />
-        <Route
-          path="/performance"
-          element={
-            <ErrorBoundary>
-              <PerformanceView />
-            </ErrorBoundary>
-          }
-        />
-        <Route
-          path="/conviction"
-          element={
-            <ErrorBoundary>
-              <ConvictionScorecard />
-            </ErrorBoundary>
-          }
-        />
-        <Route
-          path="/digests"
-          element={
-            <ErrorBoundary>
-              <DigestView />
-            </ErrorBoundary>
-          }
-        />
-        <Route
-          path="/glossary"
-          element={
-            <ErrorBoundary>
-              <GlossaryPage />
-            </ErrorBoundary>
-          }
-        />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      <main id="main-content">
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <ErrorBoundary>
+                <CommandCenter />
+              </ErrorBoundary>
+            }
+          />
+          <Route
+            path="/onboarding"
+            element={
+              <ErrorBoundary>
+                <OnboardingWizard />
+              </ErrorBoundary>
+            }
+          />
+          <Route
+            path="/performance"
+            element={
+              <ErrorBoundary>
+                <PerformanceView />
+              </ErrorBoundary>
+            }
+          />
+          <Route
+            path="/conviction"
+            element={
+              <ErrorBoundary>
+                <ConvictionScorecard />
+              </ErrorBoundary>
+            }
+          />
+          <Route
+            path="/digests"
+            element={
+              <ErrorBoundary>
+                <DigestView />
+              </ErrorBoundary>
+            }
+          />
+          <Route
+            path="/glossary"
+            element={
+              <ErrorBoundary>
+                <GlossaryPage />
+              </ErrorBoundary>
+            }
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
     </div>
   );
 }

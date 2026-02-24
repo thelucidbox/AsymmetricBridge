@@ -508,7 +508,7 @@ export default function ConvictionScorecard() {
               marginBottom: 10,
             }}
           >
-            <div style={S.label}>Conviction Ledger</div>
+            <h1 style={{ ...S.label, margin: 0 }}>Conviction Ledger</h1>
             {predictions.length > 0 && (
               <div style={{ display: "flex", gap: 6 }}>
                 <button
@@ -811,16 +811,18 @@ export default function ConvictionScorecard() {
                 />
               </label>
 
-              {formError && (
-                <div
-                  style={{
-                    fontSize: tokens.typography.sizes.bodySmall,
-                    color: tokens.colors.alert,
-                  }}
-                >
-                  {formError}
-                </div>
-              )}
+              <div aria-live="assertive">
+                {formError && (
+                  <div
+                    style={{
+                      fontSize: tokens.typography.sizes.bodySmall,
+                      color: tokens.colors.alert,
+                    }}
+                  >
+                    {formError}
+                  </div>
+                )}
+              </div>
 
               <div
                 style={{

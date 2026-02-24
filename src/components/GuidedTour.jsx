@@ -1,18 +1,22 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
+import { isOwnerMode, useThesis } from "../config/ThesisContext";
+import { getFredApiKey } from "../lib/fred";
+import { getTwelveDataApiKey } from "../lib/stocks";
 import { S } from "../styles";
 
 const TOUR_STORAGE_KEY = "ab-guided-tour-complete";
 const EDGE = 12;
 const TARGET_PADDING = 6;
 
-const TOUR_STEPS = [
+const ALL_TOUR_STEPS = [
   {
     id: "domino-cascade",
     title: "Domino Cascade Overview",
     selector: '[data-tour="domino-cascade"]',
     description:
       "Each domino is a disruption vector. Heat and status mix tell you where stress is starting and where it may spread next.",
+    ownerOnly: false,
   },
   {
     id: "signal-cards",
@@ -20,6 +24,7 @@ const TOUR_STEPS = [
     selector: '[data-tour="signal-cards"]',
     description:
       "Every signal is one measurable checkpoint. Status colors give the quick read, and full mode lets you expand for deeper context.",
+    ownerOnly: false,
   },
   {
     id: "status-colors",
@@ -27,6 +32,7 @@ const TOUR_STEPS = [
     selector: '[data-tour="status-colors"]',
     description:
       "Green means baseline, amber means watch, and red means alert. Treat color shifts as momentum changes, not one-off noise.",
+    ownerOnly: false,
   },
   {
     id: "thresholds",
@@ -34,13 +40,15 @@ const TOUR_STEPS = [
     selector: '[data-tour="thresholds"]',
     description:
       "Baselines define normal. Thresholds define escalation. When a signal crosses its threshold, the domino risk level should be reconsidered.",
+    ownerOnly: false,
   },
   {
     id: "portfolio",
-    title: "Portfolio Section",
+    title: "Lucid Box",
     selector: '[data-tour="portfolio-section"]',
     description:
       "This section connects the macro thesis to positioning. Use it to map signal movement to practical decision points.",
+    ownerOnly: true,
   },
 ];
 
@@ -61,42 +69,90 @@ function findTarget(selector) {
 
 export default function GuidedTour() {
   const location = useLocation();
+  const { hasThesis } = useThesis();
   const cardRef = useRef(null);
+  const previousFocusRef = useRef(null);
   const [isOpen, setIsOpen] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const [targetRect, setTargetRect] = useState(null);
   const [cardPosition, setCardPosition] = useState({ top: EDGE, left: EDGE });
-  const step = TOUR_STEPS[stepIndex];
+
+  const hasApiKeys = getFredApiKey() || getTwelveDataApiKey();
+
+  const steps = useMemo(() => {
+    return ALL_TOUR_STEPS.filter((s) => {
+      if (s.ownerOnly && !isOwnerMode) return false;
+      return true;
+    }).map((s) => {
+      if (!hasApiKeys && s.id === "signal-cards") {
+        return {
+          ...s,
+          description:
+            s.description +
+            " Currently using sample data — add API keys for live updates.",
+        };
+      }
+      return s;
+    });
+  }, [hasApiKeys]);
+
+  const step = steps[stepIndex] || steps[0];
+
+  const openTour = useCallback(() => {
+    previousFocusRef.current = document.activeElement;
+    setIsOpen(true);
+    setStepIndex(0);
+  }, []);
+
+  const closeTour = useCallback(() => {
+    markTourComplete();
+    setIsOpen(false);
+    previousFocusRef.current?.focus?.();
+  }, []);
 
   useEffect(() => {
     if (location.pathname !== "/") {
       setIsOpen(false);
       return;
     }
-    if (!hasCompletedTour()) setIsOpen(true);
-  }, [location.pathname]);
+    if (!hasThesis) return;
+    if (!hasCompletedTour()) openTour();
+  }, [location.pathname, hasThesis, openTour]);
+
+  useEffect(() => {
+    if (isOpen && cardRef.current) {
+      cardRef.current.focus();
+    }
+  }, [isOpen, stepIndex]);
 
   const alignSectionForStep = () => {
-    if (typeof document === "undefined") return;
+    if (typeof document === "undefined" || !step) return;
 
-    if (stepIndex <= 3) {
+    if (
+      step.id === "domino-cascade" ||
+      step.id === "signal-cards" ||
+      step.id === "status-colors" ||
+      step.id === "thresholds"
+    ) {
       const signalsButton = findTarget('[data-tour="section-signals"]');
       const signalTarget = findTarget('[data-tour="signal-cards"]');
       if (!signalTarget) signalsButton?.click();
-    } else if (stepIndex === 4) {
+    } else if (step.id === "portfolio") {
       const portfolioTab = findTarget('[data-tour="section-portfolio-tab"]');
       const portfolioTarget = findTarget('[data-tour="portfolio-section"]');
       if (!portfolioTarget) portfolioTab?.click();
     }
 
-    if (stepIndex === 3 && !findTarget('[data-tour="thresholds"]')) {
+    if (step.id === "thresholds" && !findTarget('[data-tour="thresholds"]')) {
       const firstSignalCard = findTarget('[data-tour="signal-card"]');
-      firstSignalCard?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      firstSignalCard?.dispatchEvent(
+        new MouseEvent("click", { bubbles: true }),
+      );
     }
   };
 
   const updateLayout = () => {
-    if (!isOpen) return;
+    if (!isOpen || !step) return;
     const target = findTarget(step.selector);
     const rect = target?.getBoundingClientRect();
     setTargetRect(
@@ -104,7 +160,10 @@ export default function GuidedTour() {
         ? {
             top: Math.max(rect.top - TARGET_PADDING, EDGE),
             left: Math.max(rect.left - TARGET_PADDING, EDGE),
-            width: Math.min(rect.width + TARGET_PADDING * 2, window.innerWidth - EDGE * 2),
+            width: Math.min(
+              rect.width + TARGET_PADDING * 2,
+              window.innerWidth - EDGE * 2,
+            ),
             height: Math.min(
               rect.height + TARGET_PADDING * 2,
               window.innerHeight - EDGE * 2,
@@ -157,25 +216,46 @@ export default function GuidedTour() {
 
   useEffect(() => {
     if (!isOpen) return undefined;
-    const onEscape = (event) => {
-      if (event.key !== "Escape") return;
-      markTourComplete();
-      setIsOpen(false);
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") {
+        closeTour();
+        return;
+      }
+      if (event.key === "Tab" && cardRef.current) {
+        const focusable = cardRef.current.querySelectorAll(
+          'button:not([disabled]), [href], [tabindex]:not([tabindex="-1"])',
+        );
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
     };
-    window.addEventListener("keydown", onEscape);
-    return () => window.removeEventListener("keydown", onEscape);
-  }, [isOpen]);
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [isOpen, closeTour]);
 
-  const isLast = stepIndex === TOUR_STEPS.length - 1;
+  const isLast = stepIndex === steps.length - 1;
   const progressText = useMemo(
-    () => `${stepIndex + 1} / ${TOUR_STEPS.length}`,
-    [stepIndex],
+    () => `Step ${stepIndex + 1} of ${steps.length}`,
+    [stepIndex, steps.length],
   );
 
-  if (!isOpen || location.pathname !== "/") return null;
+  if (!isOpen || location.pathname !== "/" || !step) return null;
 
   return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 160 }}>
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Guided tour"
+      style={{ position: "fixed", inset: 0, zIndex: 160 }}
+    >
       <div
         style={{
           position: "absolute",
@@ -202,6 +282,8 @@ export default function GuidedTour() {
 
       <div
         ref={cardRef}
+        tabIndex={-1}
+        aria-live="polite"
         style={{
           ...S.card("rgba(233,196,106,0.42)"),
           position: "absolute",
@@ -245,7 +327,9 @@ export default function GuidedTour() {
           </span>
         </div>
 
-        <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 8 }}>{step.title}</div>
+        <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 8 }}>
+          {step.title}
+        </div>
         <div
           style={{
             fontSize: 12,
@@ -266,10 +350,7 @@ export default function GuidedTour() {
           }}
         >
           <button
-            onClick={() => {
-              markTourComplete();
-              setIsOpen(false);
-            }}
+            onClick={closeTour}
             style={{
               ...S.tab(false, "#F4A261"),
               borderColor: "rgba(255,255,255,0.12)",
@@ -280,7 +361,9 @@ export default function GuidedTour() {
           </button>
           <div style={{ display: "flex", gap: 8 }}>
             <button
-              onClick={() => setStepIndex((current) => Math.max(current - 1, 0))}
+              onClick={() =>
+                setStepIndex((current) => Math.max(current - 1, 0))
+              }
               disabled={stepIndex === 0}
               style={{
                 ...S.tab(stepIndex > 0, "#6D6875"),
@@ -293,11 +376,12 @@ export default function GuidedTour() {
             <button
               onClick={() => {
                 if (isLast) {
-                  markTourComplete();
-                  setIsOpen(false);
+                  closeTour();
                   return;
                 }
-                setStepIndex((current) => Math.min(current + 1, TOUR_STEPS.length - 1));
+                setStepIndex((current) =>
+                  Math.min(current + 1, steps.length - 1),
+                );
               }}
               style={S.tab(true, "#E9C46A")}
             >

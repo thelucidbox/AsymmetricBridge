@@ -145,16 +145,17 @@ export default function PerformanceView() {
                 <div style={{ ...S.label, marginBottom: 6 }}>
                   Thesis Performance Lab
                 </div>
-                <div
+                <h1
                   style={{
                     fontSize: 20,
                     fontWeight: 700,
                     letterSpacing: "-0.5px",
                     marginBottom: 6,
+                    margin: "0 0 6px 0",
                   }}
                 >
                   Portfolio Thesis Alignment
-                </div>
+                </h1>
                 <div
                   style={{
                     fontSize: 12,

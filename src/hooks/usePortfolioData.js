@@ -14,9 +14,7 @@ const EMPTY_ALIGNMENT = {
 
 function isParsedPayload(value) {
   return Boolean(
-    value
-      && typeof value === "object"
-      && Array.isArray(value.positions),
+    value && typeof value === "object" && Array.isArray(value.positions),
   );
 }
 
@@ -36,10 +34,11 @@ async function persistSnapshot(parsedPortfolio, analyzedPortfolio) {
 
   try {
     const { data: authData, error: authError } = await supabase.auth.getUser();
-    if (authError || !authData?.user) return;
+    if (authError && !authData) return;
+    const userId = authData?.user?.id || "personal";
 
     const snapshotPayload = {
-      user_id: authData.user.id,
+      user_id: userId,
       captured_at: new Date().toISOString(),
       source_format: parsedPortfolio.format || null,
       positions: parsedPortfolio.positions,
@@ -89,16 +88,19 @@ export function usePortfolioData() {
       try {
         const parsed = isParsedPayload(input)
           ? {
-            format: input.format || "Parsed",
-            formatId: input.formatId || "parsed",
-            headers: input.headers || [],
-            positions: input.positions,
-            totalRows: input.totalRows ?? input.positions.length,
-            skippedRows: input.skippedRows ?? 0,
-          }
+              format: input.format || "Parsed",
+              formatId: input.formatId || "parsed",
+              headers: input.headers || [],
+              positions: input.positions,
+              totalRows: input.totalRows ?? input.positions.length,
+              skippedRows: input.skippedRows ?? 0,
+            }
           : await parsePortfolioCsv(input, { onProgress: options.onProgress });
 
-        const analysis = analyzePortfolioPositions(parsed.positions, thesisLegs);
+        const analysis = analyzePortfolioPositions(
+          parsed.positions,
+          thesisLegs,
+        );
 
         setPositions(parsed.positions);
         setDetectedFormat(parsed.format);
