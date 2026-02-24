@@ -28,6 +28,7 @@
     "src/components/onboarding/ThesisSetup.jsx",
     "src/components/performance-lab/PerformanceView.jsx",
     "src/config/ThesisContext.jsx",
+    "src/config/thesis-schema.js",
     "src/design-tokens/observatory.js",
     "src/design-tokens/terminal.js",
     "src/hooks/useFredData.js",
@@ -71,10 +72,10 @@
     }
   ],
   "token_usage": {
-    "input_tokens": 150,
-    "cache_creation_tokens": 214907,
-    "cache_read_tokens": 14488309,
-    "output_tokens": 13111,
-    "api_call_count": 108
+    "input_tokens": 152,
+    "cache_creation_tokens": 361034,
+    "cache_read_tokens": 12601980,
+    "output_tokens": 18063,
+    "api_call_count": 104
   }
 }
