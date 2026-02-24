@@ -561,3 +561,251 @@ Please continue the conversation from where we left off without asking the user 
 ---
 
 Commit and push
+
+---
+
+Let's move on
+
+---
+
+both
+
+---
+
+This session is being continued from a previous conversation that ran out of context. The summary below covers the earlier portion of the conversation.
+
+Analysis:
+Let me carefully analyze the conversation chronologically:
+
+1. **Session Start**: This is a continuation from a previous session. The summary from the prior session provides extensive context about v3.3 and v3.4 work on the Asymmetric Bridge project.
+
+2. **Previous session completed**:
+   - v3.3 Plain English content pass (domino descriptions, threshold reasons, digest templates, glossary terms)
+   - v3.3 build verification and test run (46/46 passing)
+   - v3.3 deploy signal-alert edge function
+   - v3.4 Observatory theme: token gaps filled, but component migration failed (wrong agent type)
+
+3. **This session picks up** with the Observatory theme component migration:
+   - Read design-tokens/index.js to understand the useTheme() hook pattern
+   - Read GlossaryPage.jsx (already uses useTheme correctly) as reference
+   - Read SignalCard.jsx, DominoSection.jsx as migration targets
+   - Read styles.js to understand STATUS_CFG and S helpers (already theme-aware)
+   - Read SignalTimeline.jsx, FeedStatus.jsx
+   - Added `textSecondary` token to both terminal.js and observatory.js
+   - Launched 3 parallel migration agents (general-purpose type)
+
+4. **Migration agents completed** - all 3 agents reported success:
+   - Group 1: SignalCard, DominoSection, SignalTimeline, FeedStatus, GlossaryTooltip, ErrorBoundary
+   - Group 2: LucidBoxHeader, LucidBoxMarket, LucidBoxDominos, LucidBoxPortfolio, GuidedTour, WorkflowInfo, Navigation
+   - Group 3: SignalUpdateForm, CommandCenter, AIJobs, ThesisPortfolio, PerformanceView, CSVUpload, OnboardingWizard, CareerProfile, ThesisSetup, APIKeySetup, ResumeIngestion, SourceMaterials, DigestView, ConvictionScorecard, GlossaryPage
+
+5. **Build passed** but **tests failed** (38/46 failing):
+   - Screenshots showed completely blank pages
+   - Error: `tokens is not defined` ReferenceError
+
+6. **Debugging the runtime crash**:
+   - Created debug-console.spec.js to capture browser console errors
+   - First identified `EmptyStateCard` and `SampleDataBanner` in CommandCenter.jsx using `tokens` without `useTheme()`
+   - Fixed those, but error persisted
+   - Used dev server (port 5173) to get source-mapped stack trace
+   - Found the root cause: `APIKeySetup.jsx:611` → line 420 in source: module-level `const inputStyle = { color: tokens.colors.text }` — crashes at import time
+   - Fixed by reverting to hardcoded `#E8E4DF`
+   - After fix: 46/46 tests passing
+
+7. **Updated TODO.md** with all completed Observatory theme items
+
+8. **User: "Commit and push"**:
+   - Staged 46 files
+   - Committed as `feat: Ship v3.3 + v3.4 Observatory theme migration`
+   - Pushed to origin (commit 97ec6b5)
+
+9. **User: "Let's move on"** → Asked what's next (Visual QA or Auth+RLS)
+
+10. **User: "both"** → Launched two parallel agents:
+    - Glass-morphism audit (Explore agent)
+    - Supabase Auth + RLS plan (Plan agent)
+
+11. **Glass-morphism audit results** (7/10 rating):
+    - Token configuration: correct
+    - S.card() centralization: correct
+    - 29 components correctly use S.card() and get glass
+    - Navigation.jsx has hardcoded backdrop-filter values (medium priority)
+    - Modal overlays missing glass treatment (low priority)
+    - Overall: ~87% properly wired
+
+12. **Auth + RLS plan results** - comprehensive plan:
+    - Phase 1: Migration SQL (006_auth_and_rls.sql) - add user_id columns, unique constraints, RLS policies
+    - Phase 2: AuthContext.jsx provider
+    - Phase 3: AuthPage.jsx (login/signup UI)
+    - Phase 4: Route protection in App.jsx
+    - Phase 5: Supabase client auth config
+    - Phase 6: Hook modifications (6 hooks need user_id)
+    - Phase 7: Edge function changes
+    - Phase 8: Environment configuration
+    - Phase 9: Migration path for existing data
+    - Open questions about shared data, rate limiting, etc.
+
+The summary request comes right after both agents returned their results. The user's last explicit request was "both" (referring to visual QA and Auth+RLS).
+
+User messages in this session:
+1. System-generated continuation message (from previous session)
+2. "Commit and push"
+3. "Let's move on"
+4. "both"
+5. Summary request (current)
+
+Now let me compile all the detailed technical information needed.
+
+Summary:
+1. Primary Request and Intent:
+   The user's overarching goal from the prior session was: "I want to finish all of this tonight" — referring to v3.3 and v3.4 of Asymmetric Bridge. v3.3 was completed in the prior session. This session continued with:
+   - **v3.4 Observatory Theme Migration**: Migrate 25+ components from hardcoded Terminal-theme colors to design tokens via `useTheme()` hook — COMPLETED
+   - **Commit and push** all v3.3 + v3.4 work — COMPLETED (commit `97ec6b5`)
+   - **Both** remaining v3.4 items: Visual QA of Observatory glass-morphism AND Supabase Auth + RLS — research/planning phase completed, implementation pending
+
+2. Key Technical Concepts:
+   - **Design token system**: Two themes (Terminal + Observatory) with `useTheme()` hook returning `{ tokens }`. Tokens accessed via `tokens.colors.*`, `tokens.typography.*`, `tokens.spacing.*`, `tokens.shape.*`, `tokens.motion.*`, `tokens.glass.*`
+   - **Theme-aware styles**: `styles.js` exports `STATUS_CFG` (getter-based, reads `getThemeTokens()`), `S.label`, `S.card()`, `S.tab()`, `S.sectionTab()`, `Badge` — all already theme-aware
+   - **Glass-morphism**: Observatory has `useGlass: true` with blur/shadow tokens; Terminal has `useGlass: false` with `"none"` values. Applied via `maybeGlassCard()` in `S.card()`
+   - **Stack**: React 19 + Vite + Supabase + TanStack Query v5 + React Router v7, no TypeScript
+   - **Edition system**: `isOwnerMode = VITE_OWNER_MODE === "true"` gates Personal vs OSS features
+   - **Display modes**: `full` (expert) vs `simplified` (plain English whyItMatters)
+   - **Supabase Auth + RLS**: Planned dual-mode architecture — Personal mode (no auth, user_id="personal") vs Multi-user mode (Supabase Auth, user_id=auth.uid())
+   - **RLS pattern**: `COALESCE(auth.uid()::text, 'personal')` to support both modes
+   - **Edge functions**: `evaluate-thresholds` + `signal-alert` use SERVICE_ROLE_KEY (bypass RLS)
+
+3. Files and Code Sections:
+
+   - **`src/design-tokens/index.js`** — Theme provider, useTheme hook, getThemeTokens export. Key pattern for all components:
+     ```js
+     export function useTheme() {
+       return useContext(ThemeContext);
+     }
+     // Usage: const { tokens } = useTheme();
+     ```
+
+   - **`src/design-tokens/terminal.js`** — Terminal theme tokens. Added `textSecondary` and previously added `aiAccent`:
+     ```js
+     textSubtle: "rgba(255,255,255,0.25)",
+     textSecondary: "rgba(255,255,255,0.65)",  // NEW
+     ```
+
+   - **`src/design-tokens/observatory.js`** — Observatory theme tokens. Added `textSecondary` and previously filled gaps (dominoGhost, dominoContagion, dominoPolicy, aiAccent, surfaceSoft, surfaceRaised, borderStrong, borderSubtle, textSoft, textSubtle):
+     ```js
+     textSubtle: "rgba(255,255,255,0.25)",
+     textSecondary: "rgba(255,255,255,0.65)",  // NEW
+     ```
+
+   - **`src/styles.js`** — Theme-aware style helpers. Already uses `getThemeTokens()`. Key glass function:
+     ```js
+     function maybeGlassCard(tokens) {
+       if (!tokens.useGlass) return {};
+       return {
+         backdropFilter: tokens.glass.blur,
+         WebkitBackdropFilter: tokens.glass.blur,
+         boxShadow: tokens.glass.shadow,
+         willChange: "transform",
+       };
+     }
+     ```
+
+   - **`src/components/CommandCenter.jsx`** — Main dashboard. Fixed `EmptyStateCard` and `SampleDataBanner` which referenced `tokens` outside their scope:
+     ```js
+     function EmptyStateCard({ title, description, color }) {
+       const { tokens } = useTheme();  // ADDED - was missing
+       return ( /* ... tokens.colors.textMuted ... */ );
+     }
+     function SampleDataBanner() {
+       const { tokens } = useTheme();  // ADDED - was missing
+       // ...
+     }
+     ```
+
+   - **`src/components/onboarding/APIKeySetup.jsx`** — ROOT CAUSE of blank-page crash. Module-level `inputStyle` had `tokens.colors.text` which crashes at import time:
+     ```js
+     // BEFORE (BROKEN - module-level, tokens not in scope):
+     const inputStyle = { color: tokens.colors.text, /* ... */ };
+     
+     // AFTER (FIXED - reverted to hardcoded):
+     const inputStyle = { color: "#E8E4DF", /* ... */ };
+     ```
+
+   - **`src/components/Navigation.jsx`** — Refactored by agent: `DEFAULT_SECTIONS` → `DEFAULT_SECTION_DEFS` with `colorKey` strings resolved via `tokens.colors[d.colorKey]` in useMemo. Has hardcoded backdrop-filter values (identified in glass audit as medium priority fix).
+
+   - **`productivity/TODO.md`** — Updated to mark all v3.4 Observatory theme items as complete. Remaining: visual QA and Auth+RLS.
+
+   - **25+ component files migrated** by 3 parallel agents:
+     - Group 1: SignalCard, DominoSection, SignalTimeline, FeedStatus, GlossaryTooltip, ErrorBoundary
+     - Group 2: LucidBoxHeader, LucidBoxMarket, LucidBoxDominos, LucidBoxPortfolio, GuidedTour, WorkflowInfo, Navigation
+     - Group 3: SignalUpdateForm, CommandCenter, AIJobs, ThesisPortfolio, PerformanceView, CSVUpload, OnboardingWizard, CareerProfile, ThesisSetup, APIKeySetup, ResumeIngestion, SourceMaterials, GlossaryPage (DigestView and ConvictionScorecard were already tokenized)
+
+   - **Token mapping reference used for migration**:
+     - Backgrounds: `rgba(w,0.02)` → `surfaceSoft`, `rgba(w,0.03)` → `surfaceRaised`
+     - Borders: `rgba(w,0.06)` → `border`, `rgba(w,0.1)` → `borderStrong`, `rgba(w,0.04)` → `borderSubtle`
+     - Text: `rgba(w,0.25)` → `textSubtle`, `rgba(w,0.4)` → `textSoft`, `rgba(w,0.48)` → `textMuted`, `rgba(w,0.65)` → `textSecondary`
+     - Hex: `#E8E4DF` → `text`, `#2A9D8F` → `baseline`, `#E63946` → `alert`, `#E9C46A` → `accent`
+     - Fonts: `"'IBM Plex Mono', monospace"` → `tokens.typography.fontMono`
+     - Transitions: hardcoded string → `tokens.motion.default`
+
+4. Errors and Fixes:
+   - **38/46 e2e tests failing after migration (blank pages everywhere)**:
+     - Symptom: `ReferenceError: tokens is not defined` at runtime
+     - Initial suspect: `EmptyStateCard` and `SampleDataBanner` in CommandCenter.jsx used `tokens` without `useTheme()` in their scope
+     - Fix applied: Added `const { tokens } = useTheme()` to both functions
+     - Error persisted after fix — same error on ALL pages including /conviction (where CommandCenter doesn't render)
+     - Used source-mapped stack trace via dev server: error at `APIKeySetup.jsx:611` → line 420 in source
+     - **Root cause**: Module-level `const inputStyle = { color: tokens.colors.text }` — evaluates at import time, before any component renders. Since APIKeySetup is imported by OnboardingWizard which is imported by App.jsx, ALL pages crash.
+     - **Fix**: Reverted `color: tokens.colors.text` back to `color: "#E8E4DF"` (hardcoded, acceptable for module-level constant)
+     - After fix: 46/46 tests passing, build clean
+     - **Lesson**: Module-level constants cannot reference `tokens` from `useTheme()` — hooks only work inside React function components. The other two onboarding files (ThesisSetup, CareerProfile) correctly had hardcoded values in their `inputStyle` constants.
+
+   - **Debug test approach**: Created temporary `e2e/debug-console.spec.js` to capture `pageerror` events with stack traces. Used dev server (port 5173) instead of preview (port 4173) to get source-mapped error locations. Cleaned up after debugging.
+
+5. Problem Solving:
+   - **Observatory theme migration**: Successfully migrated 25+ components using 3 parallel general-purpose agents with detailed token mapping reference
+   - **Runtime crash debugging**: Systematic approach — screenshots → console error capture → source-mapped stack traces → root cause identification
+   - **Glass-morphism audit**: Confirmed 87% proper wiring. Key finding: Navigation.jsx has hardcoded backdrop-filter fallbacks, modal overlays missing glass treatment (both low/medium priority)
+   - **Auth + RLS planning**: Comprehensive 9-phase plan covering migration SQL, AuthContext provider, AuthPage UI, route protection, hook modifications, edge function changes, and migration path for existing data
+
+6. All User Messages:
+   - (System-generated continuation from previous session with full context summary)
+   - "Commit and push"
+   - "Let's move on"
+   - "both" (referring to Visual QA and Supabase Auth + RLS)
+
+7. Pending Tasks:
+   - **Visual QA fixes (from glass audit)**: Navigation.jsx hardcoded backdrop-filter → should use tokens conditionally. Modal overlays could benefit from glass treatment. (Medium/Low priority)
+   - **Supabase Auth + RLS implementation** (9 phases):
+     1. Migration SQL `006_auth_and_rls.sql` — add user_id columns to 6 tables, update unique constraints, enable RLS, create policies
+     2. `src/lib/supabase.js` — add auth config (autoRefreshToken, detectSessionInUrl)
+     3. `src/lib/AuthContext.jsx` — new auth context provider (dual-mode: personal vs multi-user)
+     4. `src/main.jsx` — wrap with AuthProvider
+     5. `src/components/auth/AuthPage.jsx` — login/signup UI
+     6. `src/App.jsx` — auth gate in AppShell
+     7. Hook updates (useSignalStatuses, useDigests, useAutoThreshold, usePredictions, usePortfolioData, threshold-engine) — add user_id to writes
+     8. Edge function updates — evaluate-thresholds signalKey needs user_id dimension
+     9. seed.sql, .env.example, config.toml updates
+   - Open questions from the plan: shared vs per-user live_data_cache, new user signal seeding, magic link redirect URL configuration, edge function per-user evaluation strategy
+
+8. Current Work:
+   Both research/planning agents completed and returned results. The glass-morphism audit identified Navigation.jsx as the only component breaking the centralization pattern (hardcoded backdrop-filter values). The Auth + RLS plan is comprehensive and ready for implementation. The user said "both" meaning they want to proceed with both visual QA fixes and Auth + RLS implementation.
+
+9. Optional Next Step:
+   Begin implementing the Supabase Auth + RLS per the plan, starting with:
+   1. Fix Navigation.jsx hardcoded backdrop-filter (quick glass-morphism fix from audit)
+   2. Create migration `006_auth_and_rls.sql` with user_id columns, constraints, and RLS policies
+   3. Create `src/lib/AuthContext.jsx` auth provider
+   4. Create `src/components/auth/AuthPage.jsx` login/signup UI
+   
+   The user's last request was "both" in response to "Visual QA — Observatory glass-morphism across all screens" and "Supabase Auth + RLS — email/password or magic link, RLS policies, multi-user isolation". Both planning agents returned their results immediately before this summary was requested.
+
+If you need specific details from before compaction (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/fabianaguilar/.REDACTED.jsonl
+Please continue the conversation from where we left off without asking the user any further questions. Continue with the last task that you were asked to work on.
+
+---
+
+Can I take a look at the actual site right now?
+
+---
+
+commit and push. What isn't clear to me is how the user would add in data that they would need to find somewhere else so for example SAAS job openings. How would they enter in that data? Also, can you open up my person dashborad?
