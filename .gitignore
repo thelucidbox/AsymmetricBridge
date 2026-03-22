@@ -34,7 +34,8 @@ test-results/
 test-screenshots/
 
 # Internal tooling (keep local, not in repo)
-.claude/
+.claude/settings.json
+.claude/settings.local.json
 .entire/
 productivity/
 AGENTS.md
